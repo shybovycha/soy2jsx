@@ -1,0 +1,14 @@
+{
+  "name": "soy2jsx",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/pegjs -o SOY.js --trace --allowed-start-rules SOY SOY.pegjs && node index.js sample.soy"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "pegjs": "^0.10.0"
+  }
+}

@@ -1,0 +1,72 @@
+{namespace Moo.Foo}
+
+{template .FunctionCall}
+<h1>{moo()}</h1>
+<h1>{moo(3.14)}</h1>
+<h1>{moo(-3.14)}</h1>
+<h1>{moo(-3.14, 2.22, 15, -290, 'MOO', "Foo")}</h1>
+
+<h1>{moo($foo)}</h1>
+
+<h1>{moo($boo[$foo])}</h1>
+
+<h1>{moo($moo.foo[0], "Fubar", 'Baz', 3.33)}</h1>
+{/template}
+
+{template .Bar}
+<div>Hello <span class="moofoo-elt">world</span> from me</div><h1>Hello, world</h1>
+{/template}
+
+/**
+ * @param moo Moo is a good name for a variable!
+ */
+{template .Dao}
+{call .Bar /}
+{/template}
+
+{template .Dzen}
+{call .Dao moo='MooVal' foo='Bar' bar='bazzz' /}
+
+{call .Dao moo="MooDoubleQuotedVal" /}
+
+{call .Bar baz /}
+
+{call .Bar}
+{/call}
+
+{call .Bar}
+{param moo: 'foo' /}
+{param foo: 'bar' /}
+{/call}
+
+{call .Bar}
+
+{param moo}
+<span>Hello, World!</span>
+<div>Hello, <b> World </b>!</div>
+{/param}
+
+{param foo: 'bar' /}
+
+{/call}
+
+{/template}
+
+{template .Variables}
+<h1>{$moo}</h1>
+<h1>{$foo}</h1>
+
+<h1>{$moo.foo}</h1>
+
+<h1>{$moo[$foo]}</h1>
+
+<h1>{$moo.foo[0]}</h1>
+
+<h1>{$moo.foo[115]}</h1>
+
+<h1>{$moo.foo[$bar]}</h1>
+
+<h1>{$moo.foo[$bar.baz]}</h1>
+
+<h1>{$moo.foo[$bar.baz[$dao].dzen].$boo}</h1>
+{/template}
