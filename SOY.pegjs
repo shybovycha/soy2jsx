@@ -35,11 +35,23 @@ ComplexIdentifier = head:Identifier tail:ShortIdentifier? {
 FullTemplateName = ComplexIdentifier;
 
 TemplateBodyElement =
-  SingleElement / PairElement / HtmlComment / SoyComment / SoyBodyExpr / WS;
+  SingleElement / PairElement / HtmlComment / SoyComment / SoyBodyExpr / BlankLine;
+
+BlankLine =
+  chars:WS+ {
+    return {
+      type: 'BlankLine',
+      children: chars.join(''),
+      attributes: []
+    };
+  };
 
 HtmlComment = "<!--" chars:(!"-->" .)* "-->" { return chars.map(c => c[1]).join(""); };
 
-SoyComment = "/*" chars:(!"*/" .)* "*/" { return chars.map(c => c[1]).join(""); };
+SoyComment = SoyInlineComment / SoyMultilineComment;
+
+SoyInlineComment = "//" chars:[^\n]+ { return chars.join(''); };
+SoyMultilineComment = "/*" chars:(!"*/" .)* "*/" { return chars.map(c => c[1]).join(""); };
 
 NamespaceDecl =
   SoyComment* WS* "{namespace" WS+ name:NamespaceName "}" {
@@ -69,17 +81,14 @@ SoyBodyExpr =
 SoyStringInterpolateableExpr = FloatNumber / IntegerNumber / SoyVariableInterpolation / SoyFunctionCall;
 
 SoyCapableString = str:(DoubleQuotedSoyCapableString / SingleQuotedSoyCapableString) {
-  return {
-    type: "TextNode",
-    attributes: {},
-    children: str.reduce((acc, e) => acc.concat(e.children), [])
-  };
+  return str;
 };
+
 DoubleQuotedSoyCapableString = '"' content:(SoyStringInterpolateableExpr / EscapeableDoubleQuoteText)* '"' { return content; };
 SingleQuotedSoyCapableString = "'" content:(SoyStringInterpolateableExpr / EscapeableSingleQuoteText)* "'" { return content; };
 
-EscapeableDoubleQuoteText = chars:[^{"]+ { return chars.join(''); };
-EscapeableSingleQuoteText = chars:[^{']+ { return chars.join(''); };
+EscapeableDoubleQuoteText = chars:[^"]+ { return chars.join(''); };
+EscapeableSingleQuoteText = chars:[^']+ { return chars.join(''); };
 
 SoySwitchOperator =
   "{switch" WS+ expression:SoyValueExpr WS* "}" WS* clauses:SoySwitchOperatorBody WS* "{/switch}" {
@@ -225,6 +234,36 @@ SoyUnaryOperator = "+" / "-" / "not";
 
 SoyComparisonOperator = "==" / "<" / ">" / "<=" / ">=" / "!=";
 
+SoyAttributeExpr =
+  SoyAttributeIfOperator /
+  SoyFunctionCall /
+  SoyVariableInterpolation;
+
+SoyAttributeIfOperator =
+  mainClause:SoyAttributeIfClause otherClauses:SoyAttributeElseifClause* otherwiseClause:SoyAttributeElseClause? SoyEndifOperator {
+    const values = [ mainClause, otherwiseClause ].concat(otherClauses).filter(branch => !!branch);
+
+    return {
+      type: "IfOperator",
+      values
+    };
+  };
+
+SoyAttributeIfClause =
+  "{" WS* "if" WS+ clause:(SoyBinaryExpression / SoyAtomicValue) WS* "}" WS* output:Attribute* {
+    return { clause, output };
+  };
+
+SoyAttributeElseifClause =
+  "{" WS* "elseif" WS+ clause:(SoyBinaryExpression / SoyAtomicValue) WS* "}" WS* output:Attribute* {
+    return { clause, output };
+  };
+
+SoyAttributeElseClause =
+  "{" WS* "else" WS* "}" WS* output:Attribute* {
+    return { clause: null, output };
+  };
+
 SoyIfOperator =
   mainClause:SoyIfClause otherClauses:SoyElseifClause* otherwiseClause:SoyElseClause? SoyEndifOperator {
     const values = [ mainClause, otherwiseClause ].concat(otherClauses).filter(branch => !!branch);
@@ -329,16 +368,16 @@ MultipleFunctionCallArguments =
   };
 
 SoyFunctionCall =
-  "{" funcCall:FunctionCall "}" {
+  "{" WS* funcCall:FunctionCall WS* "}" {
       return funcCall;
   };
 
 FunctionCall =
-  name:Identifier "(" args:FunctionCallArguments? ")" {
+  name:Identifier "(" WS* args:FunctionCallArguments? WS* ")" {
       return {
           type: "FunctionCall",
-            name,
-            args
+          name,
+          args
         };
   };
 
@@ -348,22 +387,27 @@ InPlaceTemplateCall =
   "{call" WS+ name:TemplateName WS+ params:TemplateCallInlineParams? WS* "/}" {
       return {
         type: "TemplateRef",
-          name: name,
-          attributes: params,
-          content: []
-        };
+        name: name,
+        attributes: params || {},
+        content: []
+      };
   };
 
 TemplateCallInlineParams =
-  (TemplateCallInlineParam WS+ TemplateCallInlineParams) / TemplateCallInlineParam;
+  MultipleTemplateCallInlineParams / SingleTemplateCallInlineParams;
+
+MultipleTemplateCallInlineParams =
+  first:TemplateCallInlineParam WS+ rest:TemplateCallInlineParams { return [ first ].concat(rest); };
+
+SingleTemplateCallInlineParams = first:TemplateCallInlineParam { return [ first ]; };
 
 TemplateCallInlineParam =
   TemplateCallInlineValueParam / TemplateCallInlineBooleanParam;
 
 TemplateCallInlineBooleanParam = name:Identifier {
     return {
-          [name]: true
-        };
+      [name]: true
+    };
   };
 
 TemplateCallInlineValueParam =
@@ -380,14 +424,18 @@ VariableParamValue = "$" Identifier;
 MultilineTemplateCall =
   "{call" WS+ name:TemplateName "}" WS* params:MultilineTemplateCallParams WS* "{/call}" {
       return {
-            type: "TemplateReference",
-            name: name,
-            attributes: params,
-            content: []
-        };
+        type: "TemplateReference",
+        name: name,
+        attributes: params || {},
+        content: []
+      };
     };
 
-MultilineTemplateCallParams = (MultilineTemplateCallParam WS*)*;
+MultilineTemplateCallParams = MultipleMultilineTemplateCallParams / SingleMultilineTemplateCallParams;
+
+MultipleMultilineTemplateCallParams = WS* first:SingleMultilineTemplateCallParams WS* rest:MultilineTemplateCallParams { return [ first ].concat(rest); };
+
+SingleMultilineTemplateCallParams = WS* first:MultilineTemplateCallParam WS* { return [ first ]; };
 
 MultilineTemplateCallParam =
   MultilineTemplateCallValueParam / MultilineTemplateCallBooleanParam;
@@ -395,8 +443,8 @@ MultilineTemplateCallParam =
 MultilineTemplateCallBooleanParam =
   "{param" WS+ name:Identifier WS* "/}" {
       return {
-          [name]: true
-        };
+        [name]: true
+      };
   };
 
 MultilineTemplateCallValueParam =
@@ -405,27 +453,35 @@ MultilineTemplateCallValueParam =
 MultilineTemplateCallMultilineParam =
   "{param" WS+ name:Identifier WS* "}" WS* content:TemplateBodyElement* WS* "{/param}" {
       return {
-          [name]: {
-              name: name,
-                attributes: [],
-                content: content
-            }
-        };
+        [name]: {
+          name: name,
+          attributes: [],
+          content: content
+        }
+      };
     };
 
 MultilineTemplateCallInlineParam =
   "{param" WS+ name:Identifier WS* ":" WS* value:SoyValueExpr WS* "/}" {
       return {
-          [name]: value
-        };
+        [name]: value
+      };
     };
 
 Attributes =
-  attrs:(Attribute / Attribute " " Attributes)* {
-    return attrs;
+  MultipleAttributes / SingleAttribute;
+
+SingleAttribute =
+  attr:Attribute {
+    return [ attr ];
   };
 
-Attribute = ValueAttribute / BooleanAttribute;
+MultipleAttributes =
+  first:Attribute WS+ rest:Attributes {
+    return [ first ].concat(rest);
+  };
+
+Attribute = ValueAttribute / BooleanAttribute / SoyAttributeExpr;
 
 BooleanAttribute =
   attr:AttributeName {
@@ -453,16 +509,25 @@ AttributeNameChar = [a-zA-Z\-0-9_.];
 SingleQuotedString = "'" chars:[^']+ "'" { return chars.join(''); };
 DoubleQuotedString = '"' chars:[^"]+ '"' { return chars.join(''); };
 
-ElementContent =
-  (SoyBodyExpr / SingleElement / PairElement / Text)*;
+ElementContent = MultipleElementContentChildren / SingleElementContentChild;
+
+MultipleElementContentChildren =
+  WS* first:ElementContentChild WS* rest:ElementContent WS* { return [ first ].concat(rest); };
+
+SingleElementContentChild = WS* first:ElementContentChild WS* { return [ first ]; };
+
+ElementContentChild =
+  WS* content:(SoyBodyExpr / SingleElement / PairElement / Text) WS* {
+    return content;
+  };
 
 SingleElement =
-  "<" name:TagName " "? attributes:Attributes? "/>" {
+  "<" name:TagName WS* attributes:Attributes? WS* "/>" {
     return {
       type: "HTMLElement",
       name,
-        attributes: attributes.reduce((acc, e) => Object.assign(acc, e), {}),
-        children: []
+      attributes: attributes || {}, //.reduce((acc, e) => Object.assign(acc, e), {}),
+      children: []
     };
   };
 
@@ -476,17 +541,17 @@ PairElement =
 
     return {
       type: "HTMLElement",
-      name:    startTag.name,
-      attributes: startTag.attributes,
+      name: startTag.name,
+      attributes: startTag.attributes || {},
       children,
     };
   };
 
 StartTag =
-  "<" name:TagName " "? attributes:Attributes? ">" {
+  "<" name:TagName WS* attributes:Attributes? ">" {
     return {
         name,
-        attributes: attributes.reduce((acc, e) => Object.assign(acc, e), {})
+        attributes: attributes || {} //.reduce((acc, e) => Object.assign(acc, e), {})
     };
   };
 
@@ -498,7 +563,7 @@ TagName =
       return head + tail.join("");
   };
 
-Text    =
+Text =
   chars:[^<]+  {
   return {
       type: "TextNode",

@@ -9,6 +9,7 @@ function parseFile(filename) {
     fs.readFile(filename, 'utf8', (err, sample) => {
         if (err) {
             console.error('Could not read input file');
+            process.exit(1);
             return;
         }
 
@@ -23,6 +24,7 @@ function parseFile(filename) {
             }
         } catch (e) {
             console.error('ERROR: Could not parse file.', e);
+            process.exit(1);
         }
     });
 }

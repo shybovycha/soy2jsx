@@ -1,13 +1,22 @@
 {namespace foo}
 
 /**
- * some template
- */
-{template .moo}
-    <div class="form-body">
-        <div class="bar-baz dao-dzen">
-            <span class="moo-icon {$baz} icon-warning"></span>
-            <p>{getText('some.gettext.key', getText('default.gettext.key'))}</p>
-        </div>
-    </div>
+* Body of alert dialog showing that this request type is associated with email settings and cannot perform some operations
+* @param description
+*/
+{template .rqTypeUsedByEmailSettingsError}
+<div class="sd-general-error-dialog">
+    <p>
+        {$description}
+        {if $moo == 3}
+            {call ServiceDesk.Templates.Shared.Utils.helpLink}
+                {param helpLinkKey: 'troubleshoot.requesttype' /}
+                {param analyticsKey: 'page.view.customer.request.type.error' /}
+                {param linkText: getText('sd.admin.request.type.error.learn.more') /}
+            {/call}
+        {else}
+            <h1>hello world!</h1>
+        {/if}
+    </p>
+</div>
 {/template}
