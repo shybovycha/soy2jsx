@@ -37,6 +37,7 @@ FullTemplateName = ComplexIdentifier;
 TemplateBodyElement =
   SingleElement /
   PairElement /
+  NonClosedElement /
   HtmlComment /
   SoyComment /
   SoyBodyExpr /
@@ -220,6 +221,7 @@ BetweenWithStepRangeParams = startIndex:IntegerNumber WS* "," WS* endIndex:Integ
 SoyAtomicValue =
   FloatNumber /
   IntegerNumber /
+  BooleanValue /
   DoubleQuotedString /
   SingleQuotedString /
   VariableReference /
@@ -229,7 +231,21 @@ SoyAtomicValue =
 SoyValueExpr =
   SoyTernaryOperator /
   SoyBinaryExpression /
-  SoyAtomicValue;
+  SoyAtomicValue /
+  SoyArrayExpression /
+  SoyMapExpression;
+
+SoyArrayExpression = "[" WS* elements:SoyArrayElements? WS* "]" { return elements.reduce((acc, e) => acc.concat(e), []); };
+
+SoyArrayElements = SoyArrayMultipleElements / SoyArraySingleElement;
+SoyArraySingleElement = WS* elt:SoyValueExpr WS*  { return [ elt ]; };
+SoyArrayMultipleElements = first:SoyArraySingleElement "," rest:SoyArrayElements { return [ first ].concat(rest); };
+
+SoyMapExpression = "[" WS* entries:SoyMapEntries? WS* "]" { return entries.reduce((acc, e) => Object.assign(acc, { [e.key]: e.value }), {}); };
+
+SoyMapEntries = SoyMapMultipleEntry / SoyMapSingleEntry;
+SoyMapSingleEntry = WS* key:SoyValueExpr WS* ":" WS* value:SoyValueExpr WS* { return { key, value }; };
+SoyMapMultipleEntry = first:SoyMapSingleEntry "," rest:SoyMapEntries { return [ first ].concat(rest); };
 
 SoyBinaryExpression = SoyBracedBinaryExpression / SoyRawBinaryExpression;
 
@@ -398,6 +414,8 @@ FloatNumber =
       return parseFloat(text());
   };
 
+BooleanValue = value:("true" / "false") { return { true: true, false: false }[value]; };
+
 FunctionCallArguments = MultipleFunctionCallArguments / SingleFunctionCallArgument;
 
 SingleFunctionCallArgument =
@@ -549,8 +567,8 @@ AttributeNameChar = [a-zA-Z\-0-9_.];
 //        return value;
 //    };
 
-SingleQuotedString = "'" chars:[^']+ "'" { return chars.join(''); };
-DoubleQuotedString = '"' chars:[^"]+ '"' { return chars.join(''); };
+SingleQuotedString = "'" chars:[^']* "'" { return chars.join(''); };
+DoubleQuotedString = '"' chars:[^"]* '"' { return chars.join(''); };
 
 ElementContent = MultipleElementContentChildren / SingleElementContentChild / BlankChild;
 
