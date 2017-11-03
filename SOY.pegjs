@@ -35,7 +35,15 @@ ComplexIdentifier = head:Identifier tail:ShortIdentifier? {
 FullTemplateName = ComplexIdentifier;
 
 TemplateBodyElement =
-  SingleElement / PairElement / HtmlComment / SoyComment / SoyBodyExpr / BlankLine;
+  SingleElement /
+  PairElement /
+  HtmlComment /
+  SoyComment /
+  SoyBodyExpr /
+  BlankLine /
+  TemplateBodyText;
+
+TemplateBodyText = chars:[^<{]+ { return chars.join(''); };
 
 BlankLine =
   chars:WS+ {
@@ -69,6 +77,7 @@ IdentifierFirstChar = [a-zA-Z];
 IdentifierChar = [a-zA-Z0-9_];
 
 SoyBodyExpr =
+  SoySpecialCharacter /
   SoyVariableInterpolation /
   SoyFunctionCall /
   SoyTemplateCall /
@@ -77,6 +86,25 @@ SoyBodyExpr =
   SoyForeachOperator /
   SoyForOperator /
   SoySwitchOperator;
+
+SoyFilterableAtomicValue =
+  DoubleQuotedString /
+  SingleQuotedString /
+  VariableReference /
+  FunctionCall /
+  SoyUnaryExpression;
+
+SoySpecialCharacter =
+  SoySpecialCharacterSpace /
+  SoySpecialCharacterNewline;
+
+SoySpecialCharacterSpace = "{sp}" { return { type: "SpecialCharacter", name: "space" }; };
+
+SoySpecialCharacterNewline = "{\\n}" { return { type: "SpecialCharacter", name: "newline" }; };
+
+SoyFilters = (filter:SoyFilter)+;
+
+SoyFilter = WS* "|" WS* name:Identifier { return name; };
 
 SoyStringInterpolateableExpr = FloatNumber / IntegerNumber / SoyVariableInterpolation / SoyFunctionCall;
 
@@ -203,7 +231,11 @@ SoyValueExpr =
   SoyBinaryExpression /
   SoyAtomicValue;
 
-SoyBinaryExpression =
+SoyBinaryExpression = SoyBracedBinaryExpression / SoyRawBinaryExpression;
+
+SoyBracedBinaryExpression = "(" expr:SoyRawBinaryExpression ")" { return expr; };
+
+SoyRawBinaryExpression =
   leftArg:SoyAtomicValue WS* operator:SoyBinaryOperator WS* rightArg:(SoyBinaryExpression / SoyAtomicValue) {
     return {
       type: "BinaryOperator",
@@ -303,7 +335,9 @@ SoyTernaryOperator =
     };
   };
 
-SoyLetOperator =
+SoyLetOperator = SoyInlineLetOperator / SoyMultilineLetOperator;
+
+SoyInlineLetOperator =
   "{" WS* "let" WS+ "$" name:Identifier WS* ":" WS* value:SoyValueExpr WS* "/}" {
     return {
       type: "VariableDeclaration",
@@ -312,7 +346,16 @@ SoyLetOperator =
     };
   };
 
-SoyVariableInterpolation = "{" reference:VariableReference "}" { return reference; };
+SoyMultilineLetOperator =
+  "{" WS* "let" WS+ "$" name:Identifier WS* "}" WS* value:TemplateBodyElement* WS* "{/let}" {
+    return {
+      type: "VariableDeclaration",
+      name,
+      value
+    };
+  };
+
+SoyVariableInterpolation = "{" reference:VariableReference filters:SoyFilters? "}" { return Object.assign({}, reference, { filters }); };
 
 VariableReference =
   "$" reference:(ObjectPropertyReference / Identifier) {
@@ -368,8 +411,8 @@ MultipleFunctionCallArguments =
   };
 
 SoyFunctionCall =
-  "{" WS* funcCall:FunctionCall WS* "}" {
-      return funcCall;
+  "{" WS* funcCall:FunctionCall WS* filters:SoyFilters? WS* "}" {
+      return Object.assign({}, funcCall, { filters });
   };
 
 FunctionCall =
@@ -477,7 +520,7 @@ SingleAttribute =
   };
 
 MultipleAttributes =
-  first:Attribute WS+ rest:Attributes {
+  WS* first:Attribute WS+ rest:Attributes WS* {
     return [ first ].concat(rest);
   };
 
@@ -509,15 +552,17 @@ AttributeNameChar = [a-zA-Z\-0-9_.];
 SingleQuotedString = "'" chars:[^']+ "'" { return chars.join(''); };
 DoubleQuotedString = '"' chars:[^"]+ '"' { return chars.join(''); };
 
-ElementContent = MultipleElementContentChildren / SingleElementContentChild;
+ElementContent = MultipleElementContentChildren / SingleElementContentChild / BlankChild;
+
+BlankChild = WS+ { return null; };
 
 MultipleElementContentChildren =
-  WS* first:ElementContentChild WS* rest:ElementContent WS* { return [ first ].concat(rest); };
+  WS* first:ElementContentChild WS* rest:ElementContent? WS* { return [ first ].concat(rest); };
 
 SingleElementContentChild = WS* first:ElementContentChild WS* { return [ first ]; };
 
 ElementContentChild =
-  WS* content:(SoyBodyExpr / SingleElement / PairElement / Text) WS* {
+  WS* content:(SoyBodyExpr / SingleElement / PairElement / NonClosedElement / Text) WS* {
     return content;
   };
 
@@ -532,20 +577,16 @@ SingleElement =
   };
 
 PairElement =
-  startTag:StartTag children:ElementContent endTag:EndTag {
-    if (startTag.name != endTag) {
-      throw new Error(
-        "Expected </" + JSON.stringify(startTag) + "> but </" + JSON.stringify(endTag) + "> found."
-      );
-    }
-
+  startTag:StartTag children:ElementContent? endTag:EndTag & { return startTag.name == endTag } {
     return {
       type: "HTMLElement",
       name: startTag.name,
       attributes: startTag.attributes || {},
-      children,
+      children: children || [],
     };
   };
+
+NonClosedElement = tag:StartTag { return Object.assign({}, tag, { children: [] }); };
 
 StartTag =
   "<" name:TagName WS* attributes:Attributes? ">" {

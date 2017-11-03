@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/pegjs -o SOY.js --trace --allowed-start-rules SOY SOY.pegjs && node index.js sample.soy"
+    "compile-grammar": "./node_modules/.bin/pegjs -o SOY.js --trace --allowed-start-rules SOY SOY.pegjs ",
+    "test": "npm run-script compile-grammar && node index.js sample.soy"
   },
   "author": "",
   "license": "ISC",
