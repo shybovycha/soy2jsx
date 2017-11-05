@@ -26,7 +26,7 @@ function parseFile(filename) {
                     throw `Parsing ${filename} failed. Data does not exist: ` + JSON.stringify(data);
                 }
             } catch (e) {
-                // console.error('ERROR: Could not parse file.', e);
+                console.error(`ERROR: Could not parse file ${filename}.`, e);
                 return reject(err);
             }
         });
@@ -50,15 +50,15 @@ if (stat.isDirectory()) {
 
         files = files.filter(f => !excluded.some(r => r.test(f)));
 
-        Promise.all(files.map(f => parseFile(f)
-            .then(data => results.successful.push(f))
-            .catch(err => results.failed.push(f)))
-        )
-            .then(data => console.log('Successful'))
-            .catch(err => console.log('Failed files:\n', results.failed));
+        Promise.all(files.map(f => new Promise((resolve, reject) => 
+            parseFile(f)
+                .then(data => resolve(results.successful.push(f)))
+                .catch(err => resolve(results.failed.push(f))))
+        ))
+            .then(data => console.log(`Succeeded: ${results.successful.length} / ${files.length}\nFailed:\n${results.failed.join('\n')}`));
     });
 } else if (stat.isFile()) {
-    parseFile(process.argv[2]);
+    parseFile(process.argv[2]).then(() => process.exit(0)).catch(() => process.exit(1));
 } else {
     console.error(`${firstArg} does not exist or is not a file or a directory`);
 }
