@@ -11,5 +11,8 @@
   "license": "ISC",
   "devDependencies": {
     "pegjs": "^0.10.0"
+  },
+  "dependencies": {
+    "glob": "^7.1.2"
   }
 }

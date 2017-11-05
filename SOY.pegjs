@@ -298,19 +298,22 @@ SoyAttributeIfOperator =
   };
 
 SoyAttributeIfClause =
-  "{" WS* "if" WS+ clause:(SoyBinaryExpression / SoyAtomicValue) WS* "}" WS* output:Attribute* {
+  "{" WS* "if" WS+ clause:(SoyBinaryExpression / SoyAtomicValue) WS* "}" WS* output:SoyAttributeIfOutput* WS* {
     return { clause, output };
   };
 
 SoyAttributeElseifClause =
-  "{" WS* "elseif" WS+ clause:(SoyBinaryExpression / SoyAtomicValue) WS* "}" WS* output:Attribute* {
+  "{" WS* "elseif" WS+ clause:(SoyBinaryExpression / SoyAtomicValue) WS* "}" WS* output:SoyAttributeIfOutput* WS* {
     return { clause, output };
   };
 
 SoyAttributeElseClause =
-  "{" WS* "else" WS* "}" WS* output:Attribute* {
+  "{" WS* "else" WS* "}" WS* output:SoyAttributeIfOutput* {
     return { clause: null, output };
   };
+
+SoyAttributeIfOutput =
+  name:(SoyStringInterpolateableExpr / EscapeableDoubleQuoteText / AttributeName) WS* "=" WS* value:SoyCapableString { return { name, value }; };
 
 SoyIfOperator =
   mainClause:SoyIfClause otherClauses:SoyElseifClause* otherwiseClause:SoyElseClause? SoyEndifOperator {
@@ -538,7 +541,7 @@ SingleAttribute =
   };
 
 MultipleAttributes =
-  WS* first:Attribute WS+ rest:Attributes WS* {
+  WS* first:Attribute rest:Attributes WS* {
     return [ first ].concat(rest);
   };
 

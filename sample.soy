@@ -1,33 +1,43 @@
-{namespace ServiceDesk.Templates.HelpBubble}
+{namespace ServiceDesk.Templates.Components.RequestTypeIcons}
 
 /**
- * Creates an info help bubble using aui-inline-dialog2. Used by info-help-bubble.js - use that rather than calling this
- * template directly, as it handles cleanup.
- * @param id The id you would like to use for the info bubble
- * @param bubbleContents The contents you would like to have inside the info bubble
- * @param alignment How the dialog is positioned relative to the trigger
+ * Renders a request type icon using the given iconId
+ * @param iconId
+ * @param? class
+ * @param? title
+ * @param? dataKey
+ * @param? dataValue
+ * @param? useCustomerShim
+ * @param? style Specify an inline style. Normally we don't do this, but it is handy for e-mail.
  */
-{template .bubble}
-    {sp}
-    {call aui.icons.icon}
-        {param useIconFont: true /}
-        {param size: 'small' /}
-        {param icon: 'info' /}
-        {param extraAttributes: [
-            'data-aui-trigger': '',
-            'aria-controls': $id,
-            'tabindex': 0
-        ] /}
-    {/call}
-    <aui-inline-dialog id="{$id}" class="sd-help-bubble sd-help-bubble-dialog2-{$alignment}" alignment="bottom {$alignment}">
-        {$bubbleContents |noAutoescape}
-    </aui-inline-dialog>
+{template .icon}
+    <img aria-hidden="true" {if $style}style="{$style}" {/if}class="{if $class}{$class} {/if}vp-rq-icon" src="{contextPath()}{if $useCustomerShim}/servicedesk/customershim{/if}/secure/viewavatar?avatarType=SD_REQTYPE&amp;avatarId={$iconId}" {if $title}title="{$title}"{/if} {if $dataKey}data-{$dataKey}="{$dataValue}"{/if}>
 {/template}
 
 /**
- * Creates a container to place an info help bubble inside. Use this to create a container to pass to info-help-bubble.js
- * @param? after Is this to be positioned after the container
+ * Renders a request type icon using the given iconId
+ * @param iconId
+ * @param? class
+ * @param? title
+ * @param? dataKey
+ * @param? dataValue
  */
-{template .container}
-    <div class="sd-help-bubble-container{if $after}-after{/if}"></div>
+{template .smallIcon}
+    {call .icon data="all"}
+        {param class: $class ? $class + ' vp-rq-icon-small' : 'vp-rq-icon-small' /}
+    {/call}
+{/template}
+
+/**
+ * Renders a request type icon using the given iconId
+ * @param iconId
+ * @param? class
+ * @param? title
+ * @param? dataKey
+ * @param? dataValue
+ */
+{template .mediumIcon}
+    {call .icon data="all"}
+        {param class: $class ? $class + ' vp-rq-icon-medium' : 'vp-rq-icon-medium' /}
+    {/call}
 {/template}

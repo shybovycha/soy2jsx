@@ -1,32 +1,65 @@
 const parser = require('./SOY.js');
+
 const fs = require('fs');
 const util = require('util');
 const process = require('process');
+const glob = require('glob');
 
 function parseFile(filename) {
-    console.log('Parsing file', filename);
+    // console.log('Parsing file', filename);
 
-    fs.readFile(filename, 'utf8', (err, sample) => {
-        if (err) {
-            console.error('Could not read input file');
-            process.exit(1);
-            return;
-        }
-
-        try {
-            const data = parser.parse(sample);
-
-            if (data) {
-                console.log(`File ${filename} parsed successfully`)
-                console.log('Parser result: ', util.inspect(data, { depth: null, showHidden: false }));
-            } else {
-                throw `Parsing ${filename} failed. Data does not exist: ` + JSON.stringify(data);
+    return new Promise((resolve, reject) => {
+        fs.readFile(filename, 'utf8', (err, sample) => {
+            if (err) {
+                // console.error('Could not read input file');
+                return reject(err);
             }
-        } catch (e) {
-            console.error('ERROR: Could not parse file.', e);
-            process.exit(1);
-        }
+
+            try {
+                const data = parser.parse(sample);
+
+                if (data) {
+                    // console.log(`File ${filename} parsed successfully`);
+                    // console.log('Parser result: ', util.inspect(data, { depth: null, showHidden: false }));
+                    return resolve(data);
+                } else {
+                    throw `Parsing ${filename} failed. Data does not exist: ` + JSON.stringify(data);
+                }
+            } catch (e) {
+                // console.error('ERROR: Could not parse file.', e);
+                return reject(err);
+            }
+        });
     });
 }
 
-parseFile(process.argv[2]);
+const firstArg = process.argv[2];
+const stat = fs.lstatSync(firstArg);
+
+if (stat.isDirectory()) {
+    glob(firstArg + '/**/*.soy', (err, files) => {
+        if (err) {
+             console.error('Error: ', err);
+             process.exit(1);
+             return;
+        }
+
+        const results = { successful: [], failed: [] };
+
+        const excluded = [ /sdmakehome/, /\/target\/classes\// ];
+
+        files = files.filter(f => !excluded.some(r => r.test(f)));
+
+        Promise.all(files.map(f => parseFile(f)
+            .then(data => results.successful.push(f))
+            .catch(err => results.failed.push(f)))
+        )
+            .then(data => console.log('Successful'))
+            .catch(err => console.log('Failed files:\n', results.failed));
+    });
+} else if (stat.isFile()) {
+    parseFile(process.argv[2]);
+} else {
+    console.error(`${firstArg} does not exist or is not a file or a directory`);
+}
+
