@@ -8,7 +8,7 @@ Namespace =
 WS = [\r\n \t];
 
 TemplateDef =
-  comments:SoyComment* WS* "{template " name:TemplateName "}" WS+ body:TemplateBodyElement* "{/template}" WS* {
+  comments:SoyComment* WS* "{template " name:TemplateName WS* attributes:Attributes? "}" WS+ body:TemplateBodyElement* "{/template}" WS* {
     return {
       type: "Template",
         comments,
@@ -285,7 +285,25 @@ SoyComparisonOperator = "==" / "<" / ">" / "<=" / ">=" / "!=";
 SoyAttributeExpr =
   SoyAttributeIfOperator /
   SoyFunctionCall /
-  SoyVariableInterpolation;
+  SoyVariableInterpolation /
+  SoyAttributeGeneratorExpr;
+
+SoyAttributeGeneratorExpr =
+  SoyAttributeGeneratorValueAttribute / SoyAttributeGeneratorBooleanAttribute;
+
+SoyAttributeGeneratorValueAttribute = name:SoyGeneratedAttributeName "=" value:SoyCapableString { return { type: 'Attribute', name, value }; };
+
+SoyAttributeGeneratorBooleanAttribute = name:SoyGeneratedAttributeName { return { type: 'Attribute', name, value: name }; };
+
+SoyGeneratedAttributeName = SoyGeneratedAttributeNamePart+;
+
+SoyGeneratedAttributeNamePart =
+  SoyFunctionCall /
+  SoyVariableInterpolation /
+  SoyGeneratedAttributeNameStringPart;
+
+SoyGeneratedAttributeNameStringPart =
+  chars:AttributeNameChar+ { return chars.join(''); };
 
 SoyAttributeIfOperator =
   mainClause:SoyAttributeIfClause otherClauses:SoyAttributeElseifClause* otherwiseClause:SoyAttributeElseClause? SoyEndifOperator {
@@ -298,19 +316,22 @@ SoyAttributeIfOperator =
   };
 
 SoyAttributeIfClause =
-  "{" WS* "if" WS+ clause:(SoyBinaryExpression / SoyAtomicValue) WS* "}" WS* output:Attribute* {
+  "{" WS* "if" WS+ clause:(SoyBinaryExpression / SoyAtomicValue) WS* "}" WS* output:SoyAttributeIfOperatorOutput {
     return { clause, output };
   };
 
 SoyAttributeElseifClause =
-  "{" WS* "elseif" WS+ clause:(SoyBinaryExpression / SoyAtomicValue) WS* "}" WS* output:Attribute* {
+  "{" WS* "elseif" WS+ clause:(SoyBinaryExpression / SoyAtomicValue) WS* "}" WS* output:SoyAttributeIfOperatorOutput {
     return { clause, output };
   };
 
 SoyAttributeElseClause =
-  "{" WS* "else" WS* "}" WS* output:Attribute* {
+  "{" WS* "else" WS* "}" WS* output:SoyAttributeIfOperatorOutput {
     return { clause: null, output };
   };
+
+SoyAttributeIfOperatorOutput = SoyAttributeIfOperatorOutputSingle+;
+SoyAttributeIfOperatorOutputSingle = attr:Attribute WS* { return [ attr ]; };
 
 SoyIfOperator =
   mainClause:SoyIfClause otherClauses:SoyElseifClause* otherwiseClause:SoyElseClause? SoyEndifOperator {
@@ -467,14 +488,18 @@ TemplateCallInlineParam =
 
 TemplateCallInlineBooleanParam = name:Identifier {
     return {
-      [name]: true
+      type: 'Param',
+      name,
+      value: true
     };
   };
 
 TemplateCallInlineValueParam =
   name:Identifier WS* "=" WS* value:SoyValueExpr {
       return {
-          [name]: value
+          type: 'Param',
+          name,
+          value
         };
   };
 
@@ -504,7 +529,9 @@ MultilineTemplateCallParam =
 MultilineTemplateCallBooleanParam =
   "{param" WS+ name:Identifier WS* "/}" {
       return {
-        [name]: true
+        Type: 'Param',
+        name,
+        value: true
       };
   };
 
@@ -514,7 +541,9 @@ MultilineTemplateCallValueParam =
 MultilineTemplateCallMultilineParam =
   "{param" WS+ name:Identifier WS* "}" WS* content:TemplateBodyElement* WS* "{/param}" {
       return {
-        [name]: {
+        type: 'ContentParam',
+        name,
+        value: {
           name: name,
           attributes: [],
           content: content
@@ -525,7 +554,9 @@ MultilineTemplateCallMultilineParam =
 MultilineTemplateCallInlineParam =
   "{param" WS+ name:Identifier WS* ":" WS* value:SoyValueExpr WS* "/}" {
       return {
-        [name]: value
+        type: 'Param',
+        name,
+        value
       };
     };
 
@@ -542,7 +573,7 @@ MultipleAttributes =
     return [ first ].concat(rest);
   };
 
-Attribute = ValueAttribute / BooleanAttribute / SoyAttributeExpr;
+Attribute = SoyAttributeExpr / ValueAttribute / BooleanAttribute;
 
 BooleanAttribute =
   attr:AttributeName {
@@ -609,8 +640,8 @@ NonClosedElement = tag:StartTag { return Object.assign({}, tag, { children: [] }
 StartTag =
   "<" name:TagName WS* attributes:Attributes? ">" {
     return {
-        name,
-        attributes: attributes || {} //.reduce((acc, e) => Object.assign(acc, e), {})
+      name,
+      attributes: attributes || {} //.reduce((acc, e) => Object.assign(acc, e), {})
     };
   };
 

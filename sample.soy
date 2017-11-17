@@ -1,43 +1,5 @@
 {namespace ServiceDesk.Templates.Components.RequestTypeIcons}
-
-/**
- * Renders a request type icon using the given iconId
- * @param iconId
- * @param? class
- * @param? title
- * @param? dataKey
- * @param? dataValue
- * @param? useCustomerShim
- * @param? style Specify an inline style. Normally we don't do this, but it is handy for e-mail.
- */
 {template .icon}
-    <img aria-hidden="true" {if $style}style="{$style}" {/if}class="{if $class}{$class} {/if}vp-rq-icon" src="{contextPath()}{if $useCustomerShim}/servicedesk/customershim{/if}/secure/viewavatar?avatarType=SD_REQTYPE&amp;avatarId={$iconId}" {if $title}title="{$title}"{/if} {if $dataKey}data-{$dataKey}="{$dataValue}"{/if}>
-{/template}
-
-/**
- * Renders a request type icon using the given iconId
- * @param iconId
- * @param? class
- * @param? title
- * @param? dataKey
- * @param? dataValue
- */
-{template .smallIcon}
-    {call .icon data="all"}
-        {param class: $class ? $class + ' vp-rq-icon-small' : 'vp-rq-icon-small' /}
-    {/call}
-{/template}
-
-/**
- * Renders a request type icon using the given iconId
- * @param iconId
- * @param? class
- * @param? title
- * @param? dataKey
- * @param? dataValue
- */
-{template .mediumIcon}
-    {call .icon data="all"}
-        {param class: $class ? $class + ' vp-rq-icon-medium' : 'vp-rq-icon-medium' /}
-    {/call}
+    <img data-{$dataKey}="{$dataValue}">
+    <img {if $dataKey}data-{$dataKey}="{$dataValue}"{/if}>
 {/template}

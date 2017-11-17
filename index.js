@@ -20,7 +20,10 @@ function parseFile(filename) {
 
                 if (data) {
                     // console.log(`File ${filename} parsed successfully`);
-                    // console.log('Parser result: ', util.inspect(data, { depth: null, showHidden: false }));
+                    if (!!process.env.DEBUG) {
+                        console.log('Parser result: ', util.inspect(data, { depth: null, showHidden: false }));
+                    }
+
                     return resolve(data);
                 } else {
                     throw `Parsing ${filename} failed. Data does not exist: ` + JSON.stringify(data);
