@@ -1,283 +1,87 @@
-/** TODO Rename namespace when rendersoy allows namespaced parameters **/
-{namespace ServiceDesk.Templates.Agent.Queue}
-
-
-/**
- * Temporary queue view template should be replaced with a template in package agent.view.queue
- * @param title page title
- * @param avatar project avatar urls
- * @param projectKey project key
- * @param queueJson queueList as a Json object
- * @param currentJson currentQueue as json
- * @param isAdmin boolean for displaying the ability to edit a queue
- * @param jqlHelpUrl url that explains jql and how to use it
- * @param serverRenderedModuleId
- * @param projectStateHash hash of the number of issues in the project and the last updated timestamp
- * @param slaFields the ids of our SLA custom fields
- */
-{template .queueView}
-    {call ServiceDesk.Templates.Agent.showAgentFrame data="all"}
-        {param bodyClass}ka page-type-navigator navigator-collapsed navigator-issue-only{/param}
-        {param body}
-            {call .queueViewBody data="all" /}
-        {/param}
-        {param selected}
-            sd-queue
-        {/param}
-    {/call}
-{/template}
-
-/**
- * Displays the loading spinner.
- */
-{template .queueBlanketLoading}
-    <div class="sd-blanket-spinner-container">
-        <div class='sd-spinner-large'></div>
-    </div>
-{/template}
-
-/**
- * Displays the loading spinner.
- */
-{template .queueLoading}
-    <div class='sd-spinner-large'></div>
-{/template}
-
-/**
-* @param name
-* @param isNew
-*/
-{template .editQueue}
-    <form class="aui top-label">
-        {if $isNew}
-            <h2>{getText('sd.agent.queue.new')}</h2>
-        {/if}
-
-        <div class="field-group">
-             <label for="queue-name">{getText('sd.agent.queue.field.name')}</label>
-            <input class="text" type="text" id="queue-name" name="name" value="{$name}" />
-        </div>
-        <div class="field-group queue-jql">
-            <label for="jqlautocomplete">{getText('sd.admin.list.queues.jql.long')}</label>
-            <div id="query-component"></div>
-        </div>
-        <div class="field-group queue-columns">
-            <label for="jqlautocomplete">{getText('sd.common.words.columns')}</label>
-            <div id="column-component" class="composite-input"></div>
-        </div>
-        <div class="buttons-container">
+{namespace ServiceDesk.Templates.Agent.Customer}
+{template .requestTypeWorkflowStatusesEditForm}
+<form class="aui top-label vp-form" method="post">
+    <div class="form-body">
+        <table class="form-table" cellspacing="0" cellpadding="0">
+            <thead>
+            <tr>
+                <th>
+                    <div data-intro="{getText('sd.featuretour.portal.workflow.status.jira')}" data-position="bottom">
+                        {getText('sd.admin.request.workflow.status.issue.label')}
+                        <a href="{contextPath()}/plugins/servlet/project-config/{$projectKey}/issuetypes/{$issueTypeId}/workflow">{getText('sd.admin.request.view.workflow.in.jira')}</a>
+                    </div>
+                </th>
+                <th>
+                    <div data-intro="{getText('sd.featuretour.portal.workflow.status.customer')}" data-position="bottom">
+                        {getText('sd.admin.request.workflow.status.request.label')}
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+                {foreach $s in $statuses}
+                <tr>
+                    <td class="label">
+                        <label for="workflowStatus:{$s.id}">
+                            {$s.original}
+                        </label>
+                    </td>
+                    <td>
+                        <input type="text" class="text medium-field" name="workflowStatus:{$s.id}" id="workflowStatus:{$s.id}" value="{$s.custom}" placeholder="{$s.original}" />
+                        {if $s.error}
+                            <div class="error">{$s.error}</div>
+                        {/if}
+                    </td>
+                </tr>
+                {/foreach}
+            </tbody>
+        </table>
+        <div class="buttons-container form-footer">
             <div class="buttons">
-                <input class="aui-button aui-button-primary" type="submit" value="{if $isNew}{getText('sd.common.words.create')}{else}{getText('sd.common.words.save')}{/if}"><a class="cancel" href="#">{getText('sd.common.words.cancel')}</a> <span class="sd-progress"></span>
+                <input accesskey="{getText('AUI.form.submit.button.accesskey')}" class="button" name="create" title="{getText('AUI.form.submit.button.tooltip', getText('AUI.form.submit.button.accesskey'), $modifierKey)}" type="submit" value="{getText('common.words.save')}">
+                <button type="button" accesskey="{getText('AUI.form.cancel.link.accesskey')}" class="cancel aui-button aui-button-link" title="{getText('AUI.form.cancel.link.tooltip', getText('AUI.form.cancel.link.accesskey'), $modifierKey)}">{getText('sd.admin.standard.form.discard')}</button>
+            </div>
+        </div>
+    </div>
+</form>
+{/template}
+
+
+/**
+ * Render dialog for providing default value
+ * @param submitUrl action url for the form
+ * @param editHtml edit html for the form field
+ * @param isHideAction says whether popup is triggered after a 'Hide field' action or after a 'Set value'.
+ * @param modifierKey
+ */
+{template .defaultValueDialog}
+    <form action="{$submitUrl}" class="aui" method="post">
+        <div class="form-body">
+            <h2 class="dialog-title">
+            {if $isHideAction}
+                {getText('sd.admin.request.fields.value.dialog.hide.field.header')}
+            {else}
+                {getText('sd.admin.request.fields.value.dialog.set.value.header')}
+            {/if}
+            </h2>
+            <p class="sd-set-hidden-value-info">{getText('sd.admin.request.fields.value.dialog.info')}</p>
+            {$editHtml |noAutoescape}
+        </div>
+        <div class="buttons-container form-footer">
+            <div class="buttons">
+                <input accesskey="{getText('AUI.form.submit.button.accesskey')}" class="button" name="submit" title="{getText('AUI.form.submit.button.tooltip', getText('AUI.form.submit.button.accesskey'), $modifierKey)}" type="submit" value="{getText('sd.admin.request.fields.value.dialog.submit')}">
+                <a accesskey="{getText('AUI.form.cancel.link.accesskey')}" class="cancel" href="#" title="{getText('AUI.form.cancel.link.tooltip', getText('AUI.form.cancel.link.accesskey'), $modifierKey)}">{getText('AUI.form.cancel.link.text')}</a>
             </div>
         </div>
     </form>
 {/template}
 
 /**
- * Renders the containers that queue-module will use to render individual views to
+ * error message
+ * @param message
  */
-{template .queueViewBody}
-    <div class="queue-issues-container"></div>
-    <div class="queue-edit-container"></div>
-    <div class="sd-queue-issue"></div>
-{/template}
-
-/**
-* Shows the dirty edits and prompts user to save them
-* @param queue
-*/
-{template .deleteQueue}
-  <h2 class="dialog-title">{getText('sd.agent.queue.delete.title')}</h2>
-  <form class="aui" action="#" method="post">
-      <div class="form-body">
-        {let $escapedQueueName}{$queue.name|escapeHtml}{/let}
-        <p>{getText('sd.agent.queue.delete.desc', $escapedQueueName)|noAutoescape}</p>
-      </div>
-      <div class="form-footer buttons-container">
-          <div class="buttons">
-              <input type="button" class="aui-button aui-button-primary sd-confirm" value="{getText('sd.common.words.delete')}" />
-              <a href='#' class="cancel">{getText('sd.form.cancel.text')}</a>
-          </div>
-      </div>
-  </form>
-{/template}
-
-
-/**
-* Shows the dirty edits and prompts user to save them
-* @param changes
-*/
-{template .saveChanges}
-  <h2 class="dialog-title">{getText('sd.agent.queue.changes.save')}</h2>
-  <form class="aui" action="#" method="post">
-      <div class="form-body">
-        <p>{getText('sd.agent.queue.changes.save.desc')}</p>
-        <ul>
-            {foreach $change in $changes}
-            <li>{$change|noAutoescape}</li>
-            {/foreach}
-        </ul>
-      </div>
-      <div class="form-footer buttons-container">
-          <div class="buttons">
-              <input type="button" class="aui-button aui-button-primary sd-confirm-save" value="{getText('sd.common.words.save')}" />
-              <input type="button" class="aui-button sd-confirm-discard" value="{getText('sd.common.words.discard')}" />
-              <a href='#' class="cancel">{getText('sd.form.cancel.text')}</a>
-          </div>
-      </div>
-  </form>
-{/template}
-
-/**
-* @param tableHtml
-*/
-{template .table}
-<div class='sd-issue-table'>{$tableHtml|noAutoescape}</div>
-{/template}
-
-/**
- * @param currentQueue the currently selected queue as json
- * @param isAdmin is the user a project admin
- * @param showHelpBubble whether to show the help bubble
- */
-{template .queueContent}
-    <div class="sd-queue-edit-form"></div>
-    {call ServiceDesk.Templates.InternalApi.Panel.panel}
-        {param titleContent}
-            <h2 class="sd-queue-title" data-intro="{getText('sd.featuretour.queue.title')}" data-position="right-top" is="unpinned-subnav">
-                 <span class="sd-queue-title-val">{$currentQueue.name}</span>
-             </h2>
-        {/param}
-        {param actionsContent}
-            {if $isAdmin}
-                <div class="aui-buttons sd-metric-options">
-                    {call aui.buttons.button}
-                        {param extraClasses: 'sd-edit-queue-settings' /}
-                        {param text: getText('sd.agent.queue.button.edit') /}
-                        {param iconType: 'aui' /}
-                        {param iconClass: 'aui-icon-small aui-iconfont-edit' /}
-                    {/call}
-                </div>
-            {/if}
-        {/param}
-        {param bodyContent}
-            <div class="sd-queue-table-container">
-                <div class="sd-queue-table-body"></div>
-            </div>
-        {/param}
-        {param includeHelpBubbleContainer: $showHelpBubble /}
+{template .requestTypeErrorMessage}
+    {call aui.message.error}
+        {param content: $message /}
     {/call}
-    </div>
-{/template}
-
-/**
- * Display a please refresh warning for queue tables
- */
-{template .refreshMessage}
-<div class="sd-refresh-notice aui-message warning">
-        <span class="sd-notice-text">{getText('sd.agent.queue.update.message')}</span>&nbsp;&nbsp;
-        <a href="#" class="sd-notice-update">{getText('sd.agent.queue.update.update')}</a>&nbsp;&nbsp;
-        <a href="#" class="sd-notice-hide">{getText('sd.agent.queue.update.ignore')}</a>
-    </div>
-{/template}
-
-/**
-*/
-{template .createQueue}
-    <div class="sd-queue-edit-form"></div>
-    <div class="sd-queues-content">
-        <div class="sd-queue-table-container">
-            <div class="sd-queue-table-body"></div>
-        </div>
-    </div>
-{/template}
-
-/**
-* Furniture for view issue
-*/
-{template .viewIssue}
-<div id="issue-container">
-</div>
-{/template}
-
-/**
- * Display empty queue message on first display
- * @param name then queue name
- */
-{template .emptyQueueWelcome}
-    <div class="sd-queue-empty-container">
-        <span class="sd-queue-description sd-queue-empty">{getText('sd.agent.queue.empty.issue.welcome.message', $name)}</span>
-    </div>
-{/template}
-
-/**
- * Display empty queue congratulation message
- */
-{template .emptyQueueCongrats}
-    {let $messageIndex: randomInt(3) /}
-    {let $imageIndex: randomInt(3) /}
-    <div class="sd-queue-empty-container">
-        <div class="sd-queue-empty-trophy-{$imageIndex}" ></div>
-        <span class="sd-queue-description sd-queue-empty">
-        {if $messageIndex == 0}
-            {getText('sd.agent.queue.empty.issue.congratulations.message.0')}
-        {elseif $messageIndex == 1}
-            {getText('sd.agent.queue.empty.issue.congratulations.message.1')}
-        {else}
-            {getText('sd.agent.queue.empty.issue.congratulations.message.2')}
-        {/if}
-        </span>
-    </div>
-{/template}
-
-/**
- * Display a spinner for data loading
- */
-{template .emptyProject}
-    <span class="sd-queue-description">{getText('sd.agent.queue.empty.project')}</span>
-{/template}
-
-/**
- * Display a spinner for data loading
- */
-{template .error}
-    <span class="sd-queue-description">{getText('sd.agent.queue.empty.error')} {getText('sd.agent.queue.empty.error.request')}</span>
-{/template}
-
-
-/**
-* Dialog for when we failed to retrieve issue
-*/
-{template .issueError}
-<h2 class="dialog-title">{getText('sd.agent.queue.issue.error.title')}</h2>
-  <form class="aui" action="#" method="post">
-      <div class="form-body">
-        <div class="aui-message error">
-            <span class="aui-icon icon-error"></span>
-            <p>{getText('sd.agent.queue.issue.error.desc')}</p>
-        </div>
-      </div>
-      <div class="form-footer buttons-container">
-          <div class="buttons">
-              <button type="button" class="aui-button cancel">{getText('sd.common.words.acknowledge')}</button>
-          </div>
-      </div>
-  </form>
-{/template}
-
-/**
- * Renders the contents of the Queues info bubble displayed in the top right
- */
-{template .helpBubbleContents}
-    <h2 class="aui-nav-heading">{getText('sd.project.sidebar.queues')}</h2>
-    <p>{getText('sd.renaissance.page.bubble.queue')}</p>
-    <p>
-        {call ServiceDesk.Templates.Shared.Utils.helpLinkStart}
-            {param helpLinkKey: 'managing.queues' /}
-            {param analyticsKey: 'page.view.onboarding.bubble.queues' /}
-            {param newTab: true /}
-        {/call}
-        {getText('sd.renaissance.page.bubble.queue.doc.link')}
-        {call ServiceDesk.Templates.Shared.Utils.helpLinkEnd /}
-    </p>
 {/template}

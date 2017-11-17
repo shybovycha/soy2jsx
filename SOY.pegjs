@@ -45,13 +45,13 @@ FullTemplateName
 
 TemplateBodyElement
   = BlankLine
-  / DoctypeElement
   / HtmlComment
+  / SoyComment
+  / DoctypeElement
   / GeneratedElement
   / SingleElement
   / PairElement
   / NonClosedElement
-  / SoyComment
   / SoyBodyExpr
   / TemplateBodyText;
 
@@ -75,7 +75,7 @@ SoyComment
   / SoyMultilineComment;
 
 SoyInlineComment
-  = "//" chars:[^\n]+ { return chars.join(''); };
+  = "//" chars:[^\n]* { return chars.join(''); };
 
 SoyMultilineComment
   = "/*" chars:(!"*/" .)* "*/" { return chars.map(c => c[1]).join(""); };
@@ -96,11 +96,15 @@ Identifier
 IdentifierFirstChar = [a-zA-Z];
 IdentifierChar = [a-zA-Z0-9_];
 
+SoyMathEvaluationExpression
+  = "{" WS* expression:SoyMathExpression WS* "}" { return { type: "MathExpression", expression }; }
+
 SoyBodyExpr
-  = SoySpecialCharacter
+  = SoyMathEvaluationExpression
+  / SoySpecialCharacter
+  / SoyEvaluatedTernaryOperator
   / SoyVariableInterpolation
   / SoyFunctionCall
-  / SoyEvaluatedTernaryOperator
   / SoyTemplateCall
   / SoyLetOperator
   / SoyIfOperator
@@ -239,7 +243,6 @@ SoyForeachWithEmptySectionOperator
     };
   };
 
-
 SoyForOperator
   = "{" WS* "for" WS+ iterator:VariableReference WS+ "in" WS+ range:SoyRangeExpr WS* "}" WS* output:TemplateBodyElement* WS* "{/for}" {
     return {
@@ -256,16 +259,16 @@ SoyRangeExpr
   };
 
 SoyRangeParams
-  = InListParams
-  / BetweenWithStepRangeParams
+  = BetweenWithStepRangeParams
   / BetweenTwoValuesRangeParams
-  / FromZeroToHeroRangeParams;
+  / FromZeroToHeroRangeParams
+  / InListParams;
 
 InListParams
   = list:SoyValueExpr { return { list }; };
 
 FromZeroToHeroRangeParams
-  = endIndex:IntegerNumber {
+  = endIndex:SoyMathExpression {
     return {
       startIndex: 0,
       endIndex,
@@ -274,7 +277,7 @@ FromZeroToHeroRangeParams
   };
 
 BetweenTwoValuesRangeParams
-  = startIndex:IntegerNumber WS* "," WS* endIndex:IntegerNumber {
+  = startIndex:SoyMathExpression WS* "," WS* endIndex:SoyMathExpression {
     return {
       startIndex,
       endIndex,
@@ -283,7 +286,7 @@ BetweenTwoValuesRangeParams
   };
 
 BetweenWithStepRangeParams
-  = startIndex:IntegerNumber WS* "," WS* endIndex:IntegerNumber WS* "," WS* step:IntegerNumber {
+  = startIndex:SoyMathExpression WS* "," WS* endIndex:SoyMathExpression WS* "," WS* step:SoyMathExpression {
     return {
       startIndex,
       endIndex,
@@ -300,11 +303,13 @@ SoyAtomicValue
   / VariableReference
   / FunctionCall
   / SoyArrayExpression
-  / SoyMapExpression;
+  / SoyMapExpression
+  / SoyNullValue;
 
 SoyValueExpr
   = SoyTernaryOperator
   / SoyBooleanExpression
+  / SoyMathExpression
   / SoyAtomicValue;
 
 SoyArrayExpression
@@ -321,7 +326,7 @@ SoyArrayMultipleElements
   = first:SoyArraySingleElement "," rest:SoyArrayElements { return [ first ].concat(rest); };
 
 SoyMapExpression
-  = "[" WS* entries:SoyMapEntries? WS* "]" { return [].concat(entries).reduce((acc, e) => Object.assign(acc, { [e.key]: e.value }), {}); };
+  = "[" WS* entries:SoyMapEntries? WS* "]" { return entries; } //.reduce((acc, e) => Object.assign(acc, { [e.key]: e.value }), {}); };
 
 SoyMapEntries
   = SoyMapMultipleEntry
@@ -332,6 +337,8 @@ SoyMapSingleEntry
 
 SoyMapMultipleEntry
   = first:SoyMapSingleEntry "," rest:SoyMapEntries { return [ first ].concat(rest); };
+
+SoyNullValue = "null";
 
 SoyBooleanExpression
   = SoyBinaryExpression
@@ -365,11 +372,26 @@ SoyUnaryExpression
   / SoyPrimaryBooleanExpression;
 
 SoyBinaryOperator
-  = SoyComparisonOperator / SoyArithmeticOperator / SoyLogicOperator;
+  = SoyComparisonOperator
+  / SoyArithmeticOperator
+  / SoyLogicOperator;
 
 SoyPrimaryBooleanExpression
   = "(" WS* expr:SoyBooleanExpression WS* ")" { return expr; }
   / SoyAtomicValue;
+
+SoyMathExpression
+  = lhs:SoyMathPrimaryExpression WS* operator:SoyArithmeticOperator WS* rhs:SoyMathExpression { return { operator, args: [lhs, rhs] }; }
+  / SoyMathPrimaryExpression;
+
+SoyMathPrimaryExpression
+  = '(' WS* sentence:SoyMathExpression WS* ')' { return sentence; }
+  / SoyMathOperand;
+
+SoyMathOperand
+  = sign:"-"? number:[0-9]+ { return (sign == "-" ? -1 : 1) * parseInt(number); }
+  / VariableReference
+  / FunctionCall
 
 SoyArithmeticOperator
   = "+"
@@ -389,11 +411,11 @@ SoyUnaryOperator
 
 SoyComparisonOperator
   = "=="
-  / "<"
-  / ">"
   / "<="
   / ">="
-  / "!=";
+  / "!="
+  / "<"
+  / ">";
 
 SoyAttributeExpr
   = SoyAttributeIfOperator
@@ -596,12 +618,12 @@ FunctionCall
   };
 
 SoyTemplateCall
-  = MixedTemplateCall
-  / InPlaceTemplateCall
-  / MultilineTemplateCall;
+  = InPlaceTemplateCall
+  / MultilineTemplateCall
+  / MixedTemplateCall;
 
 MixedTemplateCall
-  = "{call" WS+ name:TemplateName WS+ inlineParams:TemplateCallInlineParams? WS* "}" WS* bodyParams:MultilineTemplateCallParams WS* "{/call}" {
+  = "{call" WS+ name:TemplateName WS+ inlineParams:TemplateCallInlineParams? WS* "}" WS* bodyParams:MultilineTemplateCallParams? WS* "{/call}" {
     return {
       type: "TemplateRef",
       name: name,
@@ -660,7 +682,7 @@ VariableParamValue
   = "$" Identifier;
 
 MultilineTemplateCall
-  = "{call" WS+ name:TemplateName WS* "}" WS* params:MultilineTemplateCallParams WS* "{/call}" {
+  = "{call" WS+ name:TemplateName WS* "}" WS* params:MultilineTemplateCallParams? WS* "{/call}" {
     return {
       type: "TemplateReference",
       name: name,
