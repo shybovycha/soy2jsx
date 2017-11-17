@@ -118,6 +118,8 @@ SoyFilterableAtomicValue
 
 SoySpecialCharacter
   = SoySpecialCharacterSpace
+  / SoySpecialCharacterIndentation
+  / SoySpecialCharacterCaretReturn
   / SoySpecialCharacterNewline;
 
 SoySpecialCharacterSpace
@@ -125,6 +127,12 @@ SoySpecialCharacterSpace
 
 SoySpecialCharacterNewline
   = "{\\n}" { return { type: "SpecialCharacter", name: "newline" }; };
+
+SoySpecialCharacterIndentation
+  = "{\\t}" { return { type: "SpecialCharacter", name: "indentation" }; };
+
+SoySpecialCharacterCaretReturn
+  = "{\\r}" { return { type: "SpecialCharacter", name: "caret_return" }; };
 
 SoyFilters
   = (filter:SoyFilter)+;
@@ -248,9 +256,13 @@ SoyRangeExpr
   };
 
 SoyRangeParams
-  = BetweenWithStepRangeParams
+  = InListParams
+  / BetweenWithStepRangeParams
   / BetweenTwoValuesRangeParams
   / FromZeroToHeroRangeParams;
+
+InListParams
+  = list:SoyValueExpr { return { list }; };
 
 FromZeroToHeroRangeParams
   = endIndex:IntegerNumber {
@@ -419,12 +431,12 @@ SoyAttributeIfOperator
   };
 
 SoyAttributeIfClause
-  = "{" WS* "if" WS+ clause:(SoyBinaryExpression / SoyAtomicValue) WS* "}" WS* output:SoyAttributeIfOperatorOutput {
+  = "{" WS* "if" WS+ clause:SoyBooleanExpression WS* "}" WS* output:SoyAttributeIfOperatorOutput {
     return { clause, output };
   };
 
 SoyAttributeElseifClause
-  = "{" WS* "elseif" WS+ clause:(SoyBinaryExpression / SoyAtomicValue) WS* "}" WS* output:SoyAttributeIfOperatorOutput {
+  = "{" WS* "elseif" WS+ clause:SoyBooleanExpression WS* "}" WS* output:SoyAttributeIfOperatorOutput {
     return { clause, output };
   };
 

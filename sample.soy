@@ -1,511 +1,283 @@
-{namespace ServiceDesk.Templates.Customer}
-
-/**
-* Create Request form
-* @param reqCreate
-* @param env
-* @param portalWebFragments
-*/
-{template .requestCreate}
-<form action="" method="post" class="aui vp-form top-label vp-request-form">
-    {let $requestType: $reqCreate.form /}
-    <input type="hidden" value="{$env.xsrfToken}" name="atl_token">
-    <input type="hidden" value="{$reqCreate.projectId}" name="projectId">
-    {foreach $field in $reqCreate.fields}
-        {call .renderField data="all"}
-            {param field: $field /}
-        {/call}
-    {/foreach}
-
-    {if $portalWebFragments.pagePanels.fieldPanels.length > 0}
-        <div class="field-panels">
-            {foreach $panel in $portalWebFragments.pagePanels.fieldPanels}
-                {$panel.html|noAutoescape}
-            {/foreach}
-        </div>
-    {/if}
-    <div class="buttons-container">
-        <div class="buttons">
-            <input class="aui-button aui-button-primary" type="submit" value="{getText('sd.common.words.create')}">
-            <button class="aui-button aui-button-link trigger-smart-cancel">{getText('sd.common.words.cancel')}</button>
-            <div class="cv-sd-status js-status"></div>
-        </div>
-    </div>
-    <div id="kb-results"></div>
-</form>
-{/template}
+/** TODO Rename namespace when rendersoy allows namespaced parameters **/
+{namespace ServiceDesk.Templates.Agent.Queue}
 
 
 /**
- * Render one of known fields
- * @param field the field
- * @param reqCreate
+ * Temporary queue view template should be replaced with a template in package agent.view.queue
+ * @param title page title
+ * @param avatar project avatar urls
+ * @param projectKey project key
+ * @param queueJson queueList as a Json object
+ * @param currentJson currentQueue as json
+ * @param isAdmin boolean for displaying the ability to edit a queue
+ * @param jqlHelpUrl url that explains jql and how to use it
+ * @param serverRenderedModuleId
+ * @param projectStateHash hash of the number of issues in the project and the last updated timestamp
+ * @param slaFields the ids of our SLA custom fields
  */
-{template .renderField}
-    {if $field.displayed}
-        {switch $field.fieldType}
-            {case 'checkbox'}
-                {call .checkboxControl data="$field"/}
-            {case 'radio'}
-                {call .radioControl data="$field"/}
-            {case 'attachment'}
-               {if $field.required or $reqCreate.canCreateAttachments}
-                    {call .attachmentControl data="all"/}
-               {/if}
-            {case 'organisationpicker'}
-                <div id="js-organization-picker">
-                    {call .organisationPicker data="all" /}
-                </div>
-            {default}
-                    <div class="field-group{if $field.fieldType == 'reporter'} field-separator{/if}">
-                    {call .standardLabel data="$field"/}
-                    <div class="field-container">
-                        {switch $field.fieldType}
-                            {case 'text'}
-                                {call .textControl data="$field"/}
-                            {case 'textarea'}
-                                {call .textareaControl data="$field"/}
-                            {case 'select'}
-                                {call .selectControl data="$field"/}
-                            {case 'multiselect'}
-                                {call .multiselectControl data="$field"/}
-                            {case 'cascadingselect'}
-                                {call .cascadingSelectControl data="$field"/}
-                            {case 'userpicker', 'reporter'}
-                                {call .renderUserPicker data="$field"}
-                                    {param canBrowseUsers: $reqCreate.canBrowseUsers /}
-                                    {param canSignupCustomers: $reqCreate.canSignupCustomers /}
-                                    {param canSubmitWithEmailAddress: $reqCreate.canSubmitWithEmailAddress /}
-                                    {param projectId: $reqCreate.projectId /}
-                                    {param field: $field /}
-                                {/call}
-                            {case 'date'}
-                                {call .dateControl data="$field"}
-                                    {param calendarParams: $reqCreate.calendarParams /}
-                                {/call}
-                            {case 'duedate'}
-                                {call .dateControl data="$field"}
-                                    {param calendarParams: $reqCreate.calendarParams /}
-                                {/call}
-                            {case 'datetime'}
-                                {call .dateTimeControl data="$field"}
-                                    {param calendarParams: $reqCreate.calendarParams /}
-                                {/call}
-                            {case 'multiuserpicker'}
-                                {call .multiuserControl data="$field"}
-                                    {param canBrowseUsers: $reqCreate.canBrowseUsers /}
-                                    {param projectId: $reqCreate.projectId /}
-                                    {param field: $field /}
-                                {/call}
-                            {case 'labelpicker'}
-                                {call .labelControl data="$field"}
-                                {/call}
-                            {default}
-                                Unknown field: {$field.fieldId}
-                        {/switch}
-                    </div>
-                    {call .standardInfo data="$field"/}
-                </div>
-        {/switch}
-    {/if}
-{/template}
-
-/**
-* Render standard optional marker.
-* @param required is the field required
-*/
-{template .standardRequired}
-    {if not $required}
-        {sp}<span class="vp-optional">({getText('sd.form.field.optional')})</span>
-    {/if}
-{/template}
-
-/**
- * Render standard label.
- * @param fieldId field name
- * @param label field placeholder
- * @param required is the field required
- */
-{template .standardLabel}
-    {if $label}
-        <label class="field-label" for="{$fieldId}">
-            {$label}
-            {call .standardRequired data="all" /}
-        </label>
-    {/if}
-{/template}
-
-/**
- * Render standard field description.
- * @param descriptionHtml field description
- */
-{template .standardInfo}
-    {if $descriptionHtml}
-        <div class="description">{$descriptionHtml|noAutoescape}</div>
-    {/if}
-{/template}
-
-/**
- * Render single text input field. Params below should match the ViewportField to ease parameter passing via data.
- * @param fieldId field name
- * @param defaultObject field value
- */
-{template .textControl}
-    <input class="text" type="text" name="{$fieldId}" id="{$fieldId}"
-    {if $defaultObject}
-        value="{$defaultObject}"
-    {/if}/>
-{/template}
-
-/**
- * Render single text input field. Params below should match the ViewportField to ease parameter passing via data.
- * @param fieldId field name
- * @param defaultObject field value
- * @param defaultList default list of values
- */
-{template .userPickerTextControl}
-    <input class="text" type="text" name="{$fieldId}" id="{$fieldId}"
-    {if $defaultList}
-        value="{foreach $v in $defaultList}{if not isFirst($v)}, {/if}{$v.id}{/foreach}"
-    {elseif $defaultObject}
-        value="{$defaultObject.id}"
-    {/if}/>
-{/template}
-
-/**
- * Render single textarea field. Params below should match the ViewportField to ease parameter passing via data.
- * @param fieldId field name
- * @param defaultObject field value
- */
-{template .textareaControl}
-    <textarea class="textarea" rows="6" cols="10" name="{$fieldId}" id="{$fieldId}">
-    {if $defaultObject}
-       {$defaultObject}
-    {/if}
-    </textarea>
-{/template}
-
-/**
- * Render select field list. Params below should match the ViewportField to ease parameter passing via data.
- * @param fieldId field name
- * @param noneOptionRequired should we render the none option for this field
- * @param values field values list
- */
-{template .selectControl}
-    <select class="trigger-select2 js-select2-picker" name="{$fieldId}" id="{$fieldId}">
-        {if $noneOptionRequired}
-            <option class="default-option" value="-1">{getText('sd.request.details.field.none')}</option>
-        {/if}
-
-        {foreach $v in $values}
-            <option value="{$v.value}"{if $v.selected} selected{/if}>{$v.label}</option>
-        {/foreach}
-    </select>
-{/template}
-
-/**
- * Render multiple select field list. Params below should match the ViewportField to ease parameter passing via data.
- * @param fieldId field name
- * @param values field values list
- */
-{template .multiselectControl}
-    <select class="trigger-select2 js-select2-picker" size="5" name="{$fieldId}" id="{$fieldId}" multiple>
-        {foreach $v in $values}
-            <option value="{$v.value}"{if $v.selected} selected{/if}>{$v.label}</option>
-        {/foreach}
-    </select>
-{/template}
-
-/**
- * Render multiple select field list. Params below should match the ViewportField to ease parameter passing via data.
- * @param fieldId field name
- * @param values field values list
- */
-{template .cascadingSelectControl}
-    <div class="aui-field-cascadingselect trigger-cascading-select">
-        <select class="cascadingselect-parent" name="{$fieldId}" id="{$fieldId}" data-children="">
-            <option class="default-option" value="">{getText('sd.request.details.field.none')}</option>
-            {foreach $v in $values}
-                <option class="option-group-{$v.value}" value="{$v.value}"{if $v.selected} selected{/if}>{$v.label}</option>
-            {/foreach}
-        </select>
-        <select class="cascadingselect-child" name="{$fieldId}:1" id="{$fieldId}:1">
-            <option class="default-option" value="">{getText('sd.request.details.field.none')}</option>
-            {foreach $v in $values}
-                <option class="option-group-{$v.value}" value="">{getText('sd.request.details.field.none')}</option>
-                {foreach $c in $v.children}
-                    <option class="option-group-{$v.value}" value="{$c.value}"{if $c.selected} selected{/if}>{$c.label}</option>
-                {/foreach}
-            {/foreach}
-        </select>
-    </div>
-{/template}
-
-/**
- * Render checkbox field list. Params below should match the ViewportField to ease parameter passing via data.
- * @param label field label
- * @param required is the field required
- * @param fieldId field name
- * @param values field values list
- */
-{template .checkboxControl}
-    <fieldset class="field-group group">
-        <label class="field-label">
-            {$label}
-            {call .standardRequired data="all" /}
-        </label>
-        <div class="field-container">
-            {foreach $v in $values}
-                <div class="checkbox">
-                    <input class="checkbox" type="checkbox" name="{$fieldId}" id="{$fieldId}{print index($v)}" value="{$v.value}" {if $v.selected}checked {/if}>
-                    <label for="{$fieldId}{print index($v)}">{$v.label}</label>
-                </div>
-            {/foreach}
-        </div>
-        {call .standardInfo data="all"/}
-    </fieldset>
-{/template}
-
-/**
- * Render radio button field list. Params below should match the ViewportField to ease parameter passing via data.
- * @param label field label
- * @param required is the field required
- * @param fieldId field name
- * @param values field values list
- * @param noneOptionRequired should we render the none option for this field
- */
-{template .radioControl}
-    <fieldset class="field-group group">
-        {if $label}
-            <label class="field-label">
-                {$label}
-                {call .standardRequired data="all" /}
-            </label>
-        {/if}
-        <div class="field-container">
-            {if $noneOptionRequired}
-                <div class="radio">
-                    // None is checked by default. But if anything declared later is default selected, will override this
-                    <input class="radio" type="radio" name="{$fieldId}" id="{$fieldId}" value="-1" checked>
-                    <label for="{$fieldId}">{getText('sd.request.details.field.none')}</label>
-                </div>
-            {/if}
-
-            {foreach $v in $values}
-                <div class="radio">
-                    <input class="radio" type="radio" name="{$fieldId}" id="{$fieldId}{print index($v)}" value="{$v.value}" {if $v.selected}checked {/if}>
-                    <label for="{$fieldId}{print index($v)}">{$v.label}</label>
-                </div>
-            {/foreach}
-        </div>
-        {call .standardInfo data="all"/}
-    </fieldset>
-{/template}
-
-/**
- * Render user picker backed by javascript
- * @param fieldId field name
- * @param defaultObject preselected user data
- * @param defaultObjectAsJson preselected user data
- * @param canBrowseUsers canBrowseUsers
- * @param canSignupCustomers canSignupCustomers
- * @param canSubmitWithEmailAddress canSubmitEmailAddress
- * @param field copy of the field originally passed in
- * @param projectId
- */
-{template .renderUserPicker}
-    {if $canBrowseUsers}
-        {let $reportField: $field.fieldType == 'reporter' /}
-        <sd-user-picker data-field-id="{$fieldId}"
-            {if $defaultObject}
-                data-value="{$defaultObject.id}"
-                data-default="{$defaultObjectAsJson}"
-            {/if}
-            {if $projectId}
-                data-project-id="{$projectId}"
-            {/if}
-            {if $field}
-                data-field-config-id="{$field.fieldConfigId}"
-            {/if}
-            data-allow-clear="{not $reportField}"
-            data-allow-signup="{$reportField and $canSignupCustomers}"
-            data-can-submit-email="{$canSubmitWithEmailAddress}">
-    {else}
-        {call .userPickerTextControl data="$field"}
-            {param fieldId: $fieldId /}
-            {param defaultObject: $defaultObject /}
-        {/call}
-    {/if}
-{/template}
-
-/**
- * Render date picker backed by javascript
- * @param fieldId field name
- * @param defaultObject preselected user data
- * @param calendarParams
- */
-{template .dateControl}
-    <input class="text date-picker trigger-date-picker sd-date-picker-transparent" tabindex="-1" name="{$fieldId}" id="{$fieldId}"
-        data-showstime="false"
-        data-useiso8601weeknumbers="{$calendarParams.useISO8601WeekNumbers}"
-        data-firstday="{$calendarParams.firstDay}"
-        {if $defaultObject}
-            data-date="{$defaultObject}"
-            data-default="{$defaultObject}"
-        {else}
-            data-date="{$calendarParams.date}"
-        {/if}
-        data-ifformat="{$calendarParams.dateIfFormat}"
-        data-timeformat="{$calendarParams.timeFormat}"
-    />
-    <button class="aui-button aui-button-subtle trigger-show-date-picker show-date-picker sd-date-picker-group" id="trigger-{$fieldId}" title="{getText('sd.form.date')}">
-        <span aria-hidden="true" class="sd-calendar-icon aui-icon aui-icon-large aui-iconfont-calendar"></span>
-    </button>
-{/template}
-
-/**
- * Render date-time picker backed by javascript
- * @param fieldId field name
- * @param defaultObject preselected user data
- * @param calendarParams
- */
-{template .dateTimeControl}
-    <input class="text date-picker trigger-date-picker date-time-picker sd-date-picker-transparent" tabindex="-1" name="{$fieldId}" id="{$fieldId}"
-        data-showstime="true"
-        data-useiso8601weeknumbers="{$calendarParams.useISO8601WeekNumbers}"
-        data-firstday="{$calendarParams.firstDay}"
-        {if $defaultObject}
-            data-date="{$defaultObject}"
-            data-default="{$defaultObject}"
-        {else}
-            data-date="{$calendarParams.date}"
-        {/if}
-        data-ifformat="{$calendarParams.dateTimeIfFormat}"
-        data-timeformat="{$calendarParams.timeFormat}"
-    />
-    <button class="aui-button aui-button-subtle trigger-show-date-picker show-date-picker sd-date-picker-group sd-datetime-picker-group" id="trigger-{$fieldId}" title="{getText('sd.form.date')}">
-        <span aria-hidden="true" class="sd-calendar-icon aui-icon aui-icon-large aui-iconfont-calendar"></span>
-    </button>
-{/template}
-
-/**
- * Render attachment field
- * @ param fieldId field name
- * @param field
- * @param reqCreate
- * @param env
- */
-{template .attachmentControl}
-    <div class="field-group">
-        {call .standardLabel data="$field"/}
-        <div class="field-container">
-            <div class="sd-attachment-container">
-                {call ServiceDesk.Util.Files.DragDrop.browseFiles /}
-                <div class="sd-thumbnail-container"></div>
-                <div id='attach-max-size' class="hidden">{$env.maxAttachmentSize}</div>
-                <div class="hidden">
-                    <input type="hidden" value="{$reqCreate.projectId}" name="pid">
-                </div>
-                <div class="hidden">
-                    <input type="hidden" value="{$env.xsrfToken}" name="atl_token">
-                </div>
-            </div>
-         </div>
-        {call .standardInfo data="$field"/}
-    </div>
-{/template}
-
-
-
-/**
- * Render user picker backed by javascript
- *
- * This control does not supply a name="{$fieldId}" so that $(e.currentTarget).serialize will ignore the input. Custom
- * serialization is used for this field and it is identified by the class cv-select2-override-serializer. This is
- * required as select2 stores it's values in the hidden field as value='item1,item2,item3' and jquery serialize will
- * send [name]=item1,item2,item3 instead of [name]=item1 [name]=item2 [name]=item3
- * see servicedesk/customer/util/cv-select2-serializer
- *
- * @param fieldId field name
- * @param defaultList preselected user list data
- * @param defaultListAsJson preselected user list data
- * @param canBrowseUsers canBrowseUsers
- * @param field copy of the field originally passed in
- * @param projectId
- */
-{template .multiuserControl}
-    {if $canBrowseUsers}
-        <sd-user-picker data-field-id="{$fieldId}"
-            {if $defaultList}
-                data-value="{foreach $v in $defaultList}{if not isFirst($v)},{/if}{$v.id}{/foreach}"
-                data-default="{$defaultListAsJson}"
-            {/if}
-            {if $projectId}
-                data-project-id="{$projectId}"
-            {/if}
-            {if $field}
-                data-field-config-id="{$field.fieldConfigId}"
-            {/if}
-            data-allow-clear="true"
-            data-multiple="true"
-        />
-    {else}
-        {call .userPickerTextControl data="$field"}
-            {param fieldId: $fieldId /}
-            {param defaultList: $defaultList /}
-        {/call}
-    {/if}
-{/template}
-
-/**
- * Renders select dropdown to select organisation that user want's to share request with.
- *
- * @param organisationOptions
- * @param defaultOrganisationId
- * @param field
- */
-{template .organisationPicker}
-    {if $organisationOptions and isFeatureFlagEnabled('sd.customer.orgs.group.participants')}
-        <sd-select
-            class="js-share-with-organisation-picker"
-            data-type="link"
-            data-id="{$field.fieldId}"
-            data-value="{$defaultOrganisationId}"
-            data-options="{toJson($organisationOptions)}"
-        ></sd-select>
-    {/if}
-{/template}
-
-/**
- * Render user picker backed by javascript
- *
- * This control does not supply a name="{$fieldId}" so that $(e.currentTarget).serialize will ignore the input. Custom
- * serialization is used for this field and it is identified by the class cv-select2-override-serializer. This is
- * required as select2 stores it's values in the hidden field as value='item1,item2,item3' and jquery serialize will
- * send [name]=item1,item2,item3 instead of [name]=item1 [name]=item2 [name]=item3
- * see servicedesk/customer/util/cv-select2-serializer
- *
- * @param fieldId field name
- * @param defaultListAsJson preselected list labels as json string
-
- */
-{template .labelControl}
-    <input type="hidden" class="trigger-select2-labels cv-select2-override-space-serializer label-picker js-select2-picker" id="{$fieldId}" data-select2-name="{$fieldId}"
-        {if $defaultListAsJson}
-            value="{$defaultListAsJson}"
-            data-default="{$defaultListAsJson}"
-        {/if}
-/>
-{/template}
-
-/**
- * "NEW" lozenge for User Picker control
- */
-{template .newLozenge}
-    {call aui.lozenges.lozenge}
-        {param text: getText('sd.user.picker.new.lozenge') /}
-        {param type: 'complete' /}
-        {param isSubtle: true /}
-        {param extraClasses: 'user-picker-new-lozenge' /}
+{template .queueView}
+    {call ServiceDesk.Templates.Agent.showAgentFrame data="all"}
+        {param bodyClass}ka page-type-navigator navigator-collapsed navigator-issue-only{/param}
+        {param body}
+            {call .queueViewBody data="all" /}
+        {/param}
+        {param selected}
+            sd-queue
+        {/param}
     {/call}
+{/template}
+
+/**
+ * Displays the loading spinner.
+ */
+{template .queueBlanketLoading}
+    <div class="sd-blanket-spinner-container">
+        <div class='sd-spinner-large'></div>
+    </div>
+{/template}
+
+/**
+ * Displays the loading spinner.
+ */
+{template .queueLoading}
+    <div class='sd-spinner-large'></div>
+{/template}
+
+/**
+* @param name
+* @param isNew
+*/
+{template .editQueue}
+    <form class="aui top-label">
+        {if $isNew}
+            <h2>{getText('sd.agent.queue.new')}</h2>
+        {/if}
+
+        <div class="field-group">
+             <label for="queue-name">{getText('sd.agent.queue.field.name')}</label>
+            <input class="text" type="text" id="queue-name" name="name" value="{$name}" />
+        </div>
+        <div class="field-group queue-jql">
+            <label for="jqlautocomplete">{getText('sd.admin.list.queues.jql.long')}</label>
+            <div id="query-component"></div>
+        </div>
+        <div class="field-group queue-columns">
+            <label for="jqlautocomplete">{getText('sd.common.words.columns')}</label>
+            <div id="column-component" class="composite-input"></div>
+        </div>
+        <div class="buttons-container">
+            <div class="buttons">
+                <input class="aui-button aui-button-primary" type="submit" value="{if $isNew}{getText('sd.common.words.create')}{else}{getText('sd.common.words.save')}{/if}"><a class="cancel" href="#">{getText('sd.common.words.cancel')}</a> <span class="sd-progress"></span>
+            </div>
+        </div>
+    </form>
+{/template}
+
+/**
+ * Renders the containers that queue-module will use to render individual views to
+ */
+{template .queueViewBody}
+    <div class="queue-issues-container"></div>
+    <div class="queue-edit-container"></div>
+    <div class="sd-queue-issue"></div>
+{/template}
+
+/**
+* Shows the dirty edits and prompts user to save them
+* @param queue
+*/
+{template .deleteQueue}
+  <h2 class="dialog-title">{getText('sd.agent.queue.delete.title')}</h2>
+  <form class="aui" action="#" method="post">
+      <div class="form-body">
+        {let $escapedQueueName}{$queue.name|escapeHtml}{/let}
+        <p>{getText('sd.agent.queue.delete.desc', $escapedQueueName)|noAutoescape}</p>
+      </div>
+      <div class="form-footer buttons-container">
+          <div class="buttons">
+              <input type="button" class="aui-button aui-button-primary sd-confirm" value="{getText('sd.common.words.delete')}" />
+              <a href='#' class="cancel">{getText('sd.form.cancel.text')}</a>
+          </div>
+      </div>
+  </form>
+{/template}
+
+
+/**
+* Shows the dirty edits and prompts user to save them
+* @param changes
+*/
+{template .saveChanges}
+  <h2 class="dialog-title">{getText('sd.agent.queue.changes.save')}</h2>
+  <form class="aui" action="#" method="post">
+      <div class="form-body">
+        <p>{getText('sd.agent.queue.changes.save.desc')}</p>
+        <ul>
+            {foreach $change in $changes}
+            <li>{$change|noAutoescape}</li>
+            {/foreach}
+        </ul>
+      </div>
+      <div class="form-footer buttons-container">
+          <div class="buttons">
+              <input type="button" class="aui-button aui-button-primary sd-confirm-save" value="{getText('sd.common.words.save')}" />
+              <input type="button" class="aui-button sd-confirm-discard" value="{getText('sd.common.words.discard')}" />
+              <a href='#' class="cancel">{getText('sd.form.cancel.text')}</a>
+          </div>
+      </div>
+  </form>
+{/template}
+
+/**
+* @param tableHtml
+*/
+{template .table}
+<div class='sd-issue-table'>{$tableHtml|noAutoescape}</div>
+{/template}
+
+/**
+ * @param currentQueue the currently selected queue as json
+ * @param isAdmin is the user a project admin
+ * @param showHelpBubble whether to show the help bubble
+ */
+{template .queueContent}
+    <div class="sd-queue-edit-form"></div>
+    {call ServiceDesk.Templates.InternalApi.Panel.panel}
+        {param titleContent}
+            <h2 class="sd-queue-title" data-intro="{getText('sd.featuretour.queue.title')}" data-position="right-top" is="unpinned-subnav">
+                 <span class="sd-queue-title-val">{$currentQueue.name}</span>
+             </h2>
+        {/param}
+        {param actionsContent}
+            {if $isAdmin}
+                <div class="aui-buttons sd-metric-options">
+                    {call aui.buttons.button}
+                        {param extraClasses: 'sd-edit-queue-settings' /}
+                        {param text: getText('sd.agent.queue.button.edit') /}
+                        {param iconType: 'aui' /}
+                        {param iconClass: 'aui-icon-small aui-iconfont-edit' /}
+                    {/call}
+                </div>
+            {/if}
+        {/param}
+        {param bodyContent}
+            <div class="sd-queue-table-container">
+                <div class="sd-queue-table-body"></div>
+            </div>
+        {/param}
+        {param includeHelpBubbleContainer: $showHelpBubble /}
+    {/call}
+    </div>
+{/template}
+
+/**
+ * Display a please refresh warning for queue tables
+ */
+{template .refreshMessage}
+<div class="sd-refresh-notice aui-message warning">
+        <span class="sd-notice-text">{getText('sd.agent.queue.update.message')}</span>&nbsp;&nbsp;
+        <a href="#" class="sd-notice-update">{getText('sd.agent.queue.update.update')}</a>&nbsp;&nbsp;
+        <a href="#" class="sd-notice-hide">{getText('sd.agent.queue.update.ignore')}</a>
+    </div>
+{/template}
+
+/**
+*/
+{template .createQueue}
+    <div class="sd-queue-edit-form"></div>
+    <div class="sd-queues-content">
+        <div class="sd-queue-table-container">
+            <div class="sd-queue-table-body"></div>
+        </div>
+    </div>
+{/template}
+
+/**
+* Furniture for view issue
+*/
+{template .viewIssue}
+<div id="issue-container">
+</div>
+{/template}
+
+/**
+ * Display empty queue message on first display
+ * @param name then queue name
+ */
+{template .emptyQueueWelcome}
+    <div class="sd-queue-empty-container">
+        <span class="sd-queue-description sd-queue-empty">{getText('sd.agent.queue.empty.issue.welcome.message', $name)}</span>
+    </div>
+{/template}
+
+/**
+ * Display empty queue congratulation message
+ */
+{template .emptyQueueCongrats}
+    {let $messageIndex: randomInt(3) /}
+    {let $imageIndex: randomInt(3) /}
+    <div class="sd-queue-empty-container">
+        <div class="sd-queue-empty-trophy-{$imageIndex}" ></div>
+        <span class="sd-queue-description sd-queue-empty">
+        {if $messageIndex == 0}
+            {getText('sd.agent.queue.empty.issue.congratulations.message.0')}
+        {elseif $messageIndex == 1}
+            {getText('sd.agent.queue.empty.issue.congratulations.message.1')}
+        {else}
+            {getText('sd.agent.queue.empty.issue.congratulations.message.2')}
+        {/if}
+        </span>
+    </div>
+{/template}
+
+/**
+ * Display a spinner for data loading
+ */
+{template .emptyProject}
+    <span class="sd-queue-description">{getText('sd.agent.queue.empty.project')}</span>
+{/template}
+
+/**
+ * Display a spinner for data loading
+ */
+{template .error}
+    <span class="sd-queue-description">{getText('sd.agent.queue.empty.error')} {getText('sd.agent.queue.empty.error.request')}</span>
+{/template}
+
+
+/**
+* Dialog for when we failed to retrieve issue
+*/
+{template .issueError}
+<h2 class="dialog-title">{getText('sd.agent.queue.issue.error.title')}</h2>
+  <form class="aui" action="#" method="post">
+      <div class="form-body">
+        <div class="aui-message error">
+            <span class="aui-icon icon-error"></span>
+            <p>{getText('sd.agent.queue.issue.error.desc')}</p>
+        </div>
+      </div>
+      <div class="form-footer buttons-container">
+          <div class="buttons">
+              <button type="button" class="aui-button cancel">{getText('sd.common.words.acknowledge')}</button>
+          </div>
+      </div>
+  </form>
+{/template}
+
+/**
+ * Renders the contents of the Queues info bubble displayed in the top right
+ */
+{template .helpBubbleContents}
+    <h2 class="aui-nav-heading">{getText('sd.project.sidebar.queues')}</h2>
+    <p>{getText('sd.renaissance.page.bubble.queue')}</p>
+    <p>
+        {call ServiceDesk.Templates.Shared.Utils.helpLinkStart}
+            {param helpLinkKey: 'managing.queues' /}
+            {param analyticsKey: 'page.view.onboarding.bubble.queues' /}
+            {param newTab: true /}
+        {/call}
+        {getText('sd.renaissance.page.bubble.queue.doc.link')}
+        {call ServiceDesk.Templates.Shared.Utils.helpLinkEnd /}
+    </p>
 {/template}
