@@ -1,172 +1,25 @@
-{namespace ServiceDesk.Templates.Shared.Utils}
-
-
+{namespace ServiceDesk.Templates.Customer}
 
 /**
- * Renders the start of a link for documentation on CAC (confluence.atlassian.com)
- * @param helpLinkKey
- * @param analyticsKey
- * @param? extraClasses A string of space-separated class names
- * @param? newTab
+ * Kb View
+ * @param kbPage the article
  */
-{template .helpLinkStart}
-<a class="sd-help-link-docs{if $extraClasses} {$extraClasses}{/if}"
-    href="{sdHelpUrl($helpLinkKey)}"
-    data-analytics-key="page.view.help.docs.{$analyticsKey}"
-    {if $newTab != false}target="_blank"{/if}
->
-{/template}
-
-/**
- * Renders the start of a link for documentation on the SD KB space on CAC
- * @param helpLinkKey
- * @param analyticsKey
- * @param? newTab
- */
-{template .helpKBLinkStart}
-    <a class="sd-help-kb-link-docs"
-        href="{helpKBUrl($helpLinkKey)}"
-        data-analytics-key="page.view.help.docs.{$analyticsKey}"
-        {if $newTab != false}target="_blank"{/if}
-    >
-{/template}
-
-
-/**
- * Renders the end of a link for documentation on CAC (confluence.atlassian.com)
- */
-{template .helpLinkEnd}
-</a>
-{/template}
-
-
-/**
- * Renders a link for documentation on CAC (confluence.atlassian.com)
- * @param helpLinkKey
- * @param linkText
- * @param analyticsKey
- * @param? newTab
- */
-{template .helpLink}
-    {call .helpLinkStart data="all" /}
-    {$linkText}
-    {call .helpLinkEnd /}
-{/template}
-
-/**
- * Renders a link for documentation on the SD KB space on CAC
- * @param helpLinkKey
- * @param linkText
- * @param analyticsKey
- * @param? newTab
- */
-{template .helpKBLink}
-    {call .helpKBLinkStart data="all" /}
-    {$linkText}
-    {call .helpLinkEnd /}
-{/template}
-
-/**
-* Renders a user, with avatar next to it
-* @param? displayName
-* @param? tag
-* @param? avatarUrl
-* @param? avatarSize
-* @param? isNotActive
-*/
-{template .user}
-<span class="sd-user {if $tag}sd-user-tagged{/if}" title="{$displayName}">
-    {if $avatarSize}
-    <span class="aui-avatar aui-avatar-{$avatarSize} {if $tag}sd-user-cell sd-avatar-cell{/if}">
-        <span class="aui-avatar-inner">
-            <img src="{$avatarUrl}"></img>
-        </span>
-    </span>
+{template .kbPortalView}
+    {let $renderLink: $kbPage.backUrl and $kbPage.backText /}
+    {if $renderLink}
+        <a class="js-cv-kb-portal-view-back" href="{$kbPage.backUrl}">{$kbPage.backText}</a>
     {/if}
-    {if $tag}
-        <span class="sd-user-cell">
-    {/if}
-    <span class="sd-user-value">
-    {if $isNotActive}
-        <del>{$displayName}</del> ({getText('admin.common.words.inactive')})
-    {else}
-        {$displayName}
-    {/if}
-    </span>
-    {if $tag}
-        <span class="sd-user-tag" title="{$tag}">{$tag}</span>
-        </span>
-    {/if}
-</span>
-{/template}
-
-/**
-* Renders a user, with avatar next to it
-* @param? displayName
-* @param? organisationProfileUrl
-* @param? avatarUrl
-* @param? avatarSize
-*/
-{template .organisation}
-<a href="{$organisationProfileUrl}">
-    <span class="sd-user" title="{$displayName}">
-        {if $avatarSize}
-            <span class="aui-avatar aui-avatar-{$avatarSize}">
-                <span class="aui-avatar-inner">
-                    {if $avatarUrl}
-                        <img alt="{getText('sd.customer.organisation.avatar.url.alt')}"src="{$avatarUrl}"></img>
-                    {else}
-                        <span class="organization-listing-avatar" />
-                    {/if}
-                </span>
-            </span>
-        {/if}
-        <span class="sd-user-value">
-            {$displayName}
-        </span>
-    </span>
-</a>
-{/template}
-
-/**
-* Renders a link for the jira profile page, with or without avatar. Also has correct classes so that user hover gets applied.
-* @param name
-*/
-{template .profileLink}
-<a class="user-hover sd-user-hover" rel="{$name}" href="{contextPath()}/secure/ViewProfile.jspa?name={$name|escapeUri}">
-    {call .user data="all" /}
-</a>
-{/template}
-
-
-/**
-* Renders user with hover
-* @param name
-*/
-{template .userHover}
-<span class="user-hover sd-user-hover" rel="{$name}">
-    {call .user data="all" /}
-</span>
-{/template}
-
-/**
- * Renders a generic error message with a link to report error.
- * @param contactLink
- */
-{template .generalError}
-{let $refreshLink}
-    <a href="#" class="js-sd-reload-page">
-{/let}
-{getText('cv.ajax.error', $refreshLink, '</a>')|noAutoescape}
-<br />
-<br />
-{if $contactLink}
-    {let $contactLinkHtml}
-        <a href="{$contactLink}" class="js-sd-reload-page">
-    {/let}
-    {getText('cv.ajax.error.contact.us', $contactLinkHtml, '</a>')|noAutoescape}
-{else}
-    {getText('cv.ajax.error.contact.admin')}
-{/if}
-
+    <h2 class="cv-kb-portal-view-title">{$kbPage.title}</h2>
+    <div class="cv-kb-view-iframe-container {if $renderLink}with-back-link{/if}">
+        <iframe class="kb-view-iframe js-kb-view-iframe hidden" src="{$kbPage.url}" frameBorder="0"></iframe>
+        <span class="sd-spinner-xlarge"></span>
+    </div>
+    <div class="cv-kb-portal-view-footer">
+        <sd-kb-feedback-collector{sp}
+            {if $renderLink}
+                href="{$kbPage.backUrl}"
+                text="{$kbPage.backText}"
+            {/if}
+        />
+    </div>
 {/template}

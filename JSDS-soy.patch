@@ -1,0 +1,907 @@
+diff --git a/plugin/src/main/resources/servicedesk/comment/servicedesk-comment.soy b/plugin/src/main/resources/servicedesk/comment/servicedesk-comment.soy
+index 9bafb479499..37a633b2a41 100644
+--- a/plugin/src/main/resources/servicedesk/comment/servicedesk-comment.soy
++++ b/plugin/src/main/resources/servicedesk/comment/servicedesk-comment.soy
+@@ -346,7 +346,7 @@
+             {if $isRolePresent}
+                 <optgroup label="{getText('sd.common.words.project.roles')}">
+                     {foreach $roleLevel in $roleSecurityLevels}
+-                        <option value="role:{$roleLevel.id}"{if $selectedCommentSecurityLevel == ('role:' + $roleLevel.id)} selected="selected"{/if}>{$roleLevel.name}</option>
++                        <option value="role:{$roleLevel.id}" {if $selectedCommentSecurityLevel == ('role:' + $roleLevel.id)} selected="selected"{/if}>{$roleLevel.name}</option>
+                     {/foreach}
+                 </optgroup>
+             {/if}
+diff --git a/plugin/src/main/resources/servicedesk/components/inlineedit/inline-edit.soy b/plugin/src/main/resources/servicedesk/components/inlineedit/inline-edit.soy
+index 78f2f5d1cbd..bb5c819f45c 100644
+--- a/plugin/src/main/resources/servicedesk/components/inlineedit/inline-edit.soy
++++ b/plugin/src/main/resources/servicedesk/components/inlineedit/inline-edit.soy
+@@ -6,7 +6,7 @@
+ * @param modifierKey
+ */
+ {template .field}
+-<form class="ajs-dirty-warning-exempt aui" action= "#">
++<form class="ajs-dirty-warning-exempt aui" action="#">
+     <div class="inline-edit-fields field-group">
+         {$editHtml|noAutoescape}
+     </div>
+diff --git a/plugin/src/main/resources/servicedesk/customer/feature/requestcomment/cv-request-comment.soy b/plugin/src/main/resources/servicedesk/customer/feature/requestcomment/cv-request-comment.soy
+index 7e85b0c5d21..cfbf61954aa 100644
+--- a/plugin/src/main/resources/servicedesk/customer/feature/requestcomment/cv-request-comment.soy
++++ b/plugin/src/main/resources/servicedesk/customer/feature/requestcomment/cv-request-comment.soy
+@@ -29,7 +29,7 @@
+         </div>
+         <div class="sd-thumbnail-container"></div>
+         <div class="buttons">
+-            <input class="aui-button aui-button-primary" type="submit" value="{getText('sd.request.details.add.comment.button')}"></button>
++            <input class="aui-button aui-button-primary" type="submit" value="{getText('sd.request.details.add.comment.button')}"></input>
+             <button class="aui-button aui-button-link js-trigger-cancel">{getText('sd.form.cancel.text')}</button>
+             {if $reqDetails.canCreateAttachments}
+                 <div class="comment-attachment">
+diff --git a/plugin/src/main/resources/servicedesk/customer/feature/requestcreate/cv-request-create.soy b/plugin/src/main/resources/servicedesk/customer/feature/requestcreate/cv-request-create.soy
+index 50ca0e08e83..d89864c0507 100644
+--- a/plugin/src/main/resources/servicedesk/customer/feature/requestcreate/cv-request-create.soy
++++ b/plugin/src/main/resources/servicedesk/customer/feature/requestcreate/cv-request-create.soy
+@@ -315,6 +315,7 @@
+  */
+ {template .renderUserPicker}
+     {if $canBrowseUsers}
++        {let $reportField: $field.fieldType == 'reporter' /}
+         <sd-user-picker data-field-id="{$fieldId}"
+             {if $defaultObject}
+                 data-value="{$defaultObject.id}"
+@@ -326,7 +327,6 @@
+             {if $field}
+                 data-field-config-id="{$field.fieldConfigId}"
+             {/if}
+-            {let $reportField: $field.fieldType == 'reporter' /}
+             data-allow-clear="{not $reportField}"
+             data-allow-signup="{$reportField and $canSignupCustomers}"
+             data-can-submit-email="{$canSubmitWithEmailAddress}">
+@@ -353,7 +353,7 @@
+             data-date="{$defaultObject}"
+             data-default="{$defaultObject}"
+         {else}
+-            data-date = "{$calendarParams.date}"
++            data-date="{$calendarParams.date}"
+         {/if}
+         data-ifformat="{$calendarParams.dateIfFormat}"
+         data-timeformat="{$calendarParams.timeFormat}"
+@@ -378,7 +378,7 @@
+             data-date="{$defaultObject}"
+             data-default="{$defaultObject}"
+         {else}
+-            data-date = "{$calendarParams.date}"
++            data-date="{$calendarParams.date}"
+         {/if}
+         data-ifformat="{$calendarParams.dateTimeIfFormat}"
+         data-timeformat="{$calendarParams.timeFormat}"
+diff --git a/plugin/src/main/resources/servicedesk/internal/feature/sla-panel/sd-sla-view.soy b/plugin/src/main/resources/servicedesk/internal/feature/sla-panel/sd-sla-view.soy
+index 5edc11b33bb..2078fbca396 100644
+--- a/plugin/src/main/resources/servicedesk/internal/feature/sla-panel/sd-sla-view.soy
++++ b/plugin/src/main/resources/servicedesk/internal/feature/sla-panel/sd-sla-view.soy
+@@ -8,15 +8,17 @@
+     {if $goalView and $isAgent}
+         <div class="sla-tag-example-wrapper">
+             {if isFeatureFlagEnabled('sd.sla.improved.rendering')}
+-                <div class="sla-tag {call .getStatusClass data="all" /} {call .getEmergencyClass data="all" /} js-tooltip"
+-                data-html="true" title="{call .issueSlaTooltipText data="all" /}">
++                <div class="sla-tag {call .getStatusClass data='all' /} {call .getEmergencyClass data='all' /} js-tooltip"
++                data-html="true" title="{call .issueSlaTooltipText data='all' /}">
+                     <div style="mso-number-format: \@;">{$goalView.remainingTimeHumanReadable}</div>
++                    {call .getStatusIcon data="all" /}
++                </div>
+             {else}
+-                <div class="sla-tag {call .getStatusClass data="all" /} {call .getEmergencyClass data="all" /}">
++                <div class="sla-tag {call .getStatusClass data='all' /} {call .getEmergencyClass data='all' /}">
+                     <div style="mso-number-format: \@;">{$goalView.remainingTime}</div>
+-            {/if}
+-                {call .getStatusIcon data="all" /}
++                    {call .getStatusIcon data="all" /}
+                 </div>
++            {/if}
+         </div>
+     {elseif not $isAgent}
+         <span class="sla-agent-restricted">{getText('sd.sla.nav.no.permission')}</span>
+@@ -63,8 +65,8 @@
+ {template .issuePanelSlaView}
+ <div class="sla-view-issue">
+     <div class="sla-tag-container">
+-        <div class="sla-tag {call .getStatusClass data="all" /} {call .getEmergencyClass data="all" /} js-tooltip"
+-            data-html="true" title="{call .issueSlaTooltipText data="all" /}">
++        <div class="sla-tag {call .getStatusClass data='all' /} {call .getEmergencyClass data='all' /} js-tooltip"
++            data-html="true" title="{call .issueSlaTooltipText data='all' /}">
+             {if isFeatureFlagEnabled('sd.sla.improved.rendering')}
+                 <span class="sla-tag-duration">{$goalView.remainingTimeHumanReadable}</span>
+             {else}
+@@ -81,8 +83,8 @@
+             {else}
+                 {getText('sd.sla.issue.webpanel.longgoal.display', $goalView.goalTimeLong)}
+             {/if}
+-        <!-- calendars -->
+-        <span class="sla-calendar-icon js-tooltip aui-icon aui-icon-small aui-iconfont-calendar" title="{$goalView.calendarName}"></span>
++            <!-- calendars -->
++            <span class="sla-calendar-icon js-tooltip aui-icon aui-icon-small aui-iconfont-calendar" title="{$goalView.calendarName}"></span>
+         </div>
+     </div>
+     {if $hasPreviousCycles}
+diff --git a/plugin/src/main/resources/servicedesk/notifications/conversational/custom-email-notifications.soy b/plugin/src/main/resources/servicedesk/notifications/conversational/custom-email-notifications.soy
+index 8a9dd4d3e46..61ae77c7567 100644
+--- a/plugin/src/main/resources/servicedesk/notifications/conversational/custom-email-notifications.soy
++++ b/plugin/src/main/resources/servicedesk/notifications/conversational/custom-email-notifications.soy
+@@ -182,14 +182,18 @@
+         <hr class="jsd-notifications-separator" />
+         <img class="logo" src="cid:{$sharedPortalLogoId}" height="30" alt=""/>
+         <p class="footer-with-logo sd-custom-notifications-additional-info">
++            {getText('sd.email.conversational.notification.footer', $helpCenterName)}
++            {sp}<i>{getText('sd.email.conversational.notification.footer.powered')}</i>
++            {sp}<a class="gray-link" href="{$wacLink}">{getText('sd.email.conversational.notification.servicedesk')}</a>
++        </p>
+     {else}
+         <hr class="jsd-notifications-separator" />
+         <p class="sd-custom-notifications-additional-info">
++            {getText('sd.email.conversational.notification.footer', $helpCenterName)}
++            {sp}<i>{getText('sd.email.conversational.notification.footer.powered')}</i>
++            {sp}<a class="gray-link" href="{$wacLink}">{getText('sd.email.conversational.notification.servicedesk')}</a>
++        </p>
+     {/if}
+-    {getText('sd.email.conversational.notification.footer', $helpCenterName)}
+-    {sp}<i>{getText('sd.email.conversational.notification.footer.powered')}</i>
+-    {sp}<a class="gray-link" href="{$wacLink}">{getText('sd.email.conversational.notification.servicedesk')}</a>
+-    </p>
+ {/template}
+ 
+ /**
+diff --git a/project-ui/src/main/resources/servicedesk/internal/project/apps/settings/settings-app.soy b/project-ui/src/main/resources/servicedesk/internal/project/apps/settings/settings-app.soy
+index f813f157436..d75f779a703 100644
+--- a/project-ui/src/main/resources/servicedesk/internal/project/apps/settings/settings-app.soy
++++ b/project-ui/src/main/resources/servicedesk/internal/project/apps/settings/settings-app.soy
+@@ -19,7 +19,6 @@
+ <body class="sd-flex-layout sd-project-settings">
+     <div class="sd-alerts-container"></div>
+     <div class="js-page-contents sd-page-contents"></div>
+-</div>
+ </body>
+ {/template}
+ 
+diff --git a/project-ui/src/main/resources/servicedesk/internal/project/feature/sla-consistency-updater/sla-consistency-updater.soy b/project-ui/src/main/resources/servicedesk/internal/project/feature/sla-consistency-updater/sla-consistency-updater.soy
+index d70d2308fc2..66817ae0214 100644
+--- a/project-ui/src/main/resources/servicedesk/internal/project/feature/sla-consistency-updater/sla-consistency-updater.soy
++++ b/project-ui/src/main/resources/servicedesk/internal/project/feature/sla-consistency-updater/sla-consistency-updater.soy
+@@ -20,7 +20,7 @@
+ /**
+ */
+ {template .updatePrompt}
+-<button type="button" class="aui-button aui-button-link sd-update-button js-update-button js-tooltip" data-gravity="nw" title="{call .consistencyTooltip data="all" /}"><span class="aui-icon aui-icon-error"></span>Update</button>
++<button type="button" class="aui-button aui-button-link sd-update-button js-update-button js-tooltip" data-gravity="nw" title="{call .consistencyTooltip data='all' /}"><span class="aui-icon aui-icon-error"></span>Update</button>
+ {/template}
+ 
+ /**
+@@ -28,7 +28,7 @@
+ */
+ {template .progress}
+ <div class="aui-group">
+-    <div class="aui-item sd-updater-progress js-tooltip" title="{call .consistencyTooltip data="all" /}">
++    <div class="aui-item sd-updater-progress js-tooltip" title="{call .consistencyTooltip data='all' /}">
+         <div class="aui-progress-indicator">
+             <span class="aui-progress-indicator-value"></span>
+         </div>
+diff --git a/project-ui/src/main/resources/servicedesk/internal/project/feature/sla-goals/sla-goals.soy b/project-ui/src/main/resources/servicedesk/internal/project/feature/sla-goals/sla-goals.soy
+index e16a24449ff..9ff187b2f8b 100644
+--- a/project-ui/src/main/resources/servicedesk/internal/project/feature/sla-goals/sla-goals.soy
++++ b/project-ui/src/main/resources/servicedesk/internal/project/feature/sla-goals/sla-goals.soy
+@@ -99,12 +99,10 @@
+  */
+ {template .goalPercentage}
+     {if $percentage < 90}
+-    <span class="sla-percentage-fail">
++    <span class="sla-percentage-fail">{$body}</span>
+     {else}
+-    <span class="sla-percentage-success">
++    <span class="sla-percentage-success">{$body}</span>
+     {/if}
+-        {$body}
+-    </span>
+ {/template}
+ 
+ 
+diff --git a/project-ui/src/main/resources/servicedesk/internal/project/feature/welcome-guide-dismiss/welcome-guide-dismiss.soy b/project-ui/src/main/resources/servicedesk/internal/project/feature/welcome-guide-dismiss/welcome-guide-dismiss.soy
+index 24a04a542dd..fcda6e88062 100644
+--- a/project-ui/src/main/resources/servicedesk/internal/project/feature/welcome-guide-dismiss/welcome-guide-dismiss.soy
++++ b/project-ui/src/main/resources/servicedesk/internal/project/feature/welcome-guide-dismiss/welcome-guide-dismiss.soy
+@@ -4,5 +4,5 @@
+  * Dismiss flag body
+  */
+ {template .flag}
+-    <button class="aui-button aui-button-link js-bring-back-welcome" tabindex="1">{getText('sd.common.words.undo')}</a>
++    <button class="aui-button aui-button-link js-bring-back-welcome" tabindex="1">{getText('sd.common.words.undo')}</button>
+ {/template}
+\ No newline at end of file
+diff --git a/project-ui/src/main/resources/servicedesk/internal/project/pages/custom-queue/custom-queue.soy b/project-ui/src/main/resources/servicedesk/internal/project/pages/custom-queue/custom-queue.soy
+index 1b7ed363fe6..e601591a9d6 100644
+--- a/project-ui/src/main/resources/servicedesk/internal/project/pages/custom-queue/custom-queue.soy
++++ b/project-ui/src/main/resources/servicedesk/internal/project/pages/custom-queue/custom-queue.soy
+@@ -141,7 +141,7 @@
+  * @param showHelpBubble whether to show the help bubble
+  */
+ {template .queueContent}
+-    <div class="sd-queue-edit-form"></div>
++    <div class="sd-queue-edit-form">
+     {call ServiceDesk.Templates.InternalApi.Panel.panel}
+         {param titleContent}
+             <h2 class="sd-queue-title" data-intro="{getText('sd.featuretour.queue.title')}" data-position="right-top" is="unpinned-subnav">
+@@ -217,7 +217,7 @@
+     {let $messageIndex: randomInt(3) /}
+     {let $imageIndex: randomInt(3) /}
+     <div class="sd-queue-empty-container">
+-        <div class="sd-queue-empty-trophy-{$imageIndex}" ></div>
++        <div class="sd-queue-empty-trophy-{$imageIndex}"></div>
+         <span class="sd-queue-description sd-queue-empty">
+         {if $messageIndex == 0}
+             {getText('sd.agent.queue.empty.issue.congratulations.message.0')}
+diff --git a/project-ui/src/main/resources/servicedesk/internal/project/pages/incoming-email/addemailaccountdialog/add-email-account-dialog.soy b/project-ui/src/main/resources/servicedesk/internal/project/pages/incoming-email/addemailaccountdialog/add-email-account-dialog.soy
+index c672056f84c..d2e15e88bdb 100644
+--- a/project-ui/src/main/resources/servicedesk/internal/project/pages/incoming-email/addemailaccountdialog/add-email-account-dialog.soy
++++ b/project-ui/src/main/resources/servicedesk/internal/project/pages/incoming-email/addemailaccountdialog/add-email-account-dialog.soy
+@@ -14,7 +14,7 @@
+         {/if}
+     </h2>
+ </div>
+-<form class="aui sd-add-email-account-form js-add-email-account-form ajs-dirty-warning-exempt" >
++<form class="aui sd-add-email-account-form js-add-email-account-form ajs-dirty-warning-exempt">
+     <div class="form-body">
+         <div class="sd-error-message js-error-message"/>
+         <div class="sd-set-email-account-details js-set-email-account-details"/>
+diff --git a/project-ui/src/main/resources/servicedesk/internal/project/pages/kb-settings/confluence-knowledge-base.soy b/project-ui/src/main/resources/servicedesk/internal/project/pages/kb-settings/confluence-knowledge-base.soy
+index 84bf616e73b..a0f146f57de 100644
+--- a/project-ui/src/main/resources/servicedesk/internal/project/pages/kb-settings/confluence-knowledge-base.soy
++++ b/project-ui/src/main/resources/servicedesk/internal/project/pages/kb-settings/confluence-knowledge-base.soy
+@@ -429,6 +429,5 @@
+  * @param name restful table look for a field by AJS.$('[name="name"]')
+  */
+ {template .linkedTitleEdit}
+-    <span name={$name}>{$text}</span>
++    <span name="{$name}">{$text}</span>
+ {/template}
+-
+diff --git a/project-ui/src/main/resources/servicedesk/internal/project/pages/organisation/organisation-page.soy b/project-ui/src/main/resources/servicedesk/internal/project/pages/organisation/organisation-page.soy
+index 82e9420035c..c1ce3f83bab 100644
+--- a/project-ui/src/main/resources/servicedesk/internal/project/pages/organisation/organisation-page.soy
++++ b/project-ui/src/main/resources/servicedesk/internal/project/pages/organisation/organisation-page.soy
+@@ -111,11 +111,7 @@
+     	    [
+                 'extraClasses': 'js-delete-organisation',
+                 'label': getText('sd.agent.customerorganisations.page.toolbar.delete.org')
+-            ],
++            ]
+     	] /}
+     {/call}
+ {/template}
+-
+-
+-
+-
+diff --git a/project-ui/src/main/resources/servicedesk/internal/project/pages/request-type-edit/edit-request-type.soy b/project-ui/src/main/resources/servicedesk/internal/project/pages/request-type-edit/edit-request-type.soy
+index 097de33a02e..8042b1ce047 100644
+--- a/project-ui/src/main/resources/servicedesk/internal/project/pages/request-type-edit/edit-request-type.soy
++++ b/project-ui/src/main/resources/servicedesk/internal/project/pages/request-type-edit/edit-request-type.soy
+@@ -136,7 +136,7 @@
+         <div class="buttons-container form-footer">
+             <div class="buttons">
+                 <input accesskey="{getText('AUI.form.submit.button.accesskey')}" class="button" name="create" title="{getText('AUI.form.submit.button.tooltip', getText('AUI.form.submit.button.accesskey'), $modifierKey)}" type="submit" value="{getText('common.words.save')}">
+-                <button type="button" accesskey="{getText('AUI.form.cancel.link.accesskey')}" class="cancel aui-button aui-button-link" title="{getText('AUI.form.cancel.link.tooltip', getText('AUI.form.cancel.link.accesskey'), $modifierKey)}">{getText('sd.admin.standard.form.discard')}</a>
++                <button type="button" accesskey="{getText('AUI.form.cancel.link.accesskey')}" class="cancel aui-button aui-button-link" title="{getText('AUI.form.cancel.link.tooltip', getText('AUI.form.cancel.link.accesskey'), $modifierKey)}">{getText('sd.admin.standard.form.discard')}</button>
+             </div>
+         </div>
+     </div>
+diff --git a/project-ui/src/main/resources/servicedesk/internal/project/pages/sla/sla.soy b/project-ui/src/main/resources/servicedesk/internal/project/pages/sla/sla.soy
+index 8b29b3aac16..69f91b4e94b 100644
+--- a/project-ui/src/main/resources/servicedesk/internal/project/pages/sla/sla.soy
++++ b/project-ui/src/main/resources/servicedesk/internal/project/pages/sla/sla.soy
+@@ -205,11 +205,12 @@
+             {if $condition.missing}
+             <div class="sla-config-new-events sla-config-error-condition">
+                {getText('sd.sla.configuration.metric.condition.missing')}
++            </div>
+             {else}
+             <div class="sla-config-new-events">
+                 {$condition.name}
+-            {/if}
+             </div>
++            {/if}
+         {/foreach}
+     {else}
+         <div class="sla-config-new-events sla-config-new-events-pause">
+@@ -529,7 +530,7 @@
+       <div class="form-body">
+         <p>{getText('sd.sla.configuration.metric.save.sla.changes.dialog.message')}</p>
+         {if $changes and length($changes) > 0}
+-        <span class="sd-collapse-control-icon collapsed">&nbsp;</span>{sp}<a class="sd-collapse-control">{getText('sd.sla.configuration.metric.save.sla.changes.dialog.review')}</a></p>
++            <span class="sd-collapse-control-icon collapsed">&nbsp;</span>{sp}<a class="sd-collapse-control">{getText('sd.sla.configuration.metric.save.sla.changes.dialog.review')}</a>
+ 
+         <div class="sd-collapse-container">
+         <ul>
+diff --git a/sd-components/approvals/approvals-plugin/src/main/resources/servicedesk/internal/approvals/feature/approval-configuration/approval-configuration.soy b/sd-components/approvals/approvals-plugin/src/main/resources/servicedesk/internal/approvals/feature/approval-configuration/approval-configuration.soy
+index 9aee1aa8e55..23a3167b533 100644
+--- a/sd-components/approvals/approvals-plugin/src/main/resources/servicedesk/internal/approvals/feature/approval-configuration/approval-configuration.soy
++++ b/sd-components/approvals/approvals-plugin/src/main/resources/servicedesk/internal/approvals/feature/approval-configuration/approval-configuration.soy
+@@ -49,7 +49,7 @@
+                             {param extraClasses: 'sd-field-info' /}
+                             {param extraAttributes: [
+                                 'aria-controls': 'sd-customfield-tip',
+-                                'data-aui-trigger' : '',
++                                'data-aui-trigger' : ''
+                             ] /}
+                         {/call}
+                         <aui-inline-dialog id="sd-customfield-tip" class="sd-customfield-tip" responds-to="hover" alignment="bottom center" aria-hidden="true">
+diff --git a/sd-components/automation-modules/automation-modules-plugin/src/main/resources/servicedesk/internal/agent/settings/automation/modules/actions/servicedesk-comment/servicedesk-comment-then-action.soy b/sd-components/automation-modules/automation-modules-plugin/src/main/resources/servicedesk/internal/agent/settings/automation/modules/actions/servicedesk-comment/servicedesk-comment-then-action.soy
+index 0f05b647c52..6475df4f866 100644
+--- a/sd-components/automation-modules/automation-modules-plugin/src/main/resources/servicedesk/internal/agent/settings/automation/modules/actions/servicedesk-comment/servicedesk-comment-then-action.soy
++++ b/sd-components/automation-modules/automation-modules-plugin/src/main/resources/servicedesk/internal/agent/settings/automation/modules/actions/servicedesk-comment/servicedesk-comment-then-action.soy
+@@ -38,11 +38,10 @@
+     <div class="automation-servicedesk-comment-action-header"><b>{getText('sd.action.servicedesk.comment.prompt')}</b></div>
+     {if $isPreview}
+         <div class="automation-servicedesk-comment-preview">{$commentHtml|noAutoescape}</div>
+-        <textarea name="comment" class="textarea hidden">
++        <textarea name="comment" class="textarea hidden">{$comment}</textarea>
+     {else}
+-        <textarea name="comment" class="textarea automation-servicedesk-comment-textarea mentionable" data-projectKey="{$projectKey}">
++        <textarea name="comment" class="textarea automation-servicedesk-comment-textarea mentionable" data-projectKey="{$projectKey}">{$comment}</textarea>
+     {/if}
+-    {$comment}</textarea>
+     <div class="field-tools">
+         <span class="automation-servicedesk-comment-preview-container">
+             <a class="js-sd-preview" href="#" id="sd-comment-preview_link" title="{getText('renderer.preview')}">
+diff --git a/sd-components/canned-responses/canned-responses-plugin/src/main/resources/servicedesk/internal/cannedresponses/canned-responses.soy b/sd-components/canned-responses/canned-responses-plugin/src/main/resources/servicedesk/internal/cannedresponses/canned-responses.soy
+index fccf5cd88a1..78e7d083348 100644
+--- a/sd-components/canned-responses/canned-responses-plugin/src/main/resources/servicedesk/internal/cannedresponses/canned-responses.soy
++++ b/sd-components/canned-responses/canned-responses-plugin/src/main/resources/servicedesk/internal/cannedresponses/canned-responses.soy
+@@ -179,7 +179,7 @@
+  * @param currentPage the active page index (1-based)
+  */
+ {template .paginator}
+-    <sd-paginator num-pages={$pages} current-page={$currentPage}></sd-paginator>
++    <sd-paginator num-pages="{$pages}" current-page="{$currentPage}"></sd-paginator>
+ {/template}
+ 
+ /**
+@@ -225,7 +225,7 @@
+  * @param cannedResponse the canned response to be rendered in this row
+  */
+ {template .cannedResponseRow}
+-    <tr data-response-id={$cannedResponse.id}>
++    <tr data-response-id="{$cannedResponse.id}">
+         <td headers="cr-title">{$cannedResponse.title}</td>
+         <td headers="cr-content">{$cannedResponse.text}</td>
+         <td headers="cr-usage">{$cannedResponse.totalUsageCount}</td>
+diff --git a/sd-components/core-ui/src/main/resources/servicedesk/internal-api/core/feature/select-dropdown/select-dropdown.soy b/sd-components/core-ui/src/main/resources/servicedesk/internal-api/core/feature/select-dropdown/select-dropdown.soy
+index 9ac9ca778ae..ee9b9ba5600 100644
+--- a/sd-components/core-ui/src/main/resources/servicedesk/internal-api/core/feature/select-dropdown/select-dropdown.soy
++++ b/sd-components/core-ui/src/main/resources/servicedesk/internal-api/core/feature/select-dropdown/select-dropdown.soy
+@@ -33,7 +33,7 @@
+         aui-button {if $type}aui-button-{$type}{/if} js-trigger {$id}-trigger select-dropdown-trigger
+     {/param}
+     {param extraAttributes: [
+-        'data-dropdown2-hide-location': 'js-' + $id + '-dropdown-container',
++        'data-dropdown2-hide-location': 'js-' + $id + '-dropdown-container'
+     ] /}
+     {param text: '' /}
+     {param id: 'js-' + $id + '-dropdown-trigger'/}
+diff --git a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/avatar.soy b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/avatar.soy
+index fe9ad03715b..a816b5948d3 100644
+--- a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/avatar.soy
++++ b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/avatar.soy
+@@ -19,7 +19,7 @@
+     {sp}class="aui-avatar aui-avatar-{$size}
+     {$isProject ? ' aui-avatar-project' : ''}
+     {$badgeContent ? ' aui-avatar-badged' : ''}
+-    {call aui.renderExtraClasses data="all" /}"
++    {call aui.renderExtraClasses data='all' /}"
+     {call aui.renderExtraAttributes data="all" /}>
+     <span class="aui-avatar-inner">
+         <img src="{$avatarImageUrl}"
+diff --git a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/badges.soy b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/badges.soy
+index ee9588e6a0d..f30566e6f10 100755
+--- a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/badges.soy
++++ b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/badges.soy
+@@ -11,7 +11,7 @@
+ {template .badge}
+ <{$tagName ? $tagName : 'span'}
+     {if $id} id="{$id}"{/if} 
+-    {sp}class="aui-badge{call aui.renderExtraClasses data="all" /}" 
++    {sp}class="aui-badge{call aui.renderExtraClasses data='all' /}"
+     {call aui.renderExtraAttributes data="all" /}
+ >{$text}</{$tagName ? $tagName : 'span'}>
+ {/template}
+\ No newline at end of file
+diff --git a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/buttons.soy b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/buttons.soy
+index 85831c72a4a..fd453321838 100755
+--- a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/buttons.soy
++++ b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/buttons.soy
+@@ -28,7 +28,7 @@
+         <input
+             {sp}type="{$inputType ? $inputType : 'button'}" {call .buttonAttributes data="all" /} value="{$text}" />
+     {else}
+-        <{$tagName ? $tagName : 'button'}{call .buttonAttributes data="all"}{param tagName: ($tagName ? $tagName : 'button') /}{/call}>
++        <{$tagName ? $tagName : 'button'}{call .buttonAttributes data="all"}{param tagName: $tagName ? $tagName : 'button' /}{/call}>
+             {call .buttonIcon data="all" /}{if $hasLabel}<span class="aui-button-label">{/if}{$text}{if $hasLabel}</span>{/if}
+         </{$tagName ? $tagName : 'button'}>
+     {/if}
+@@ -44,7 +44,7 @@
+ {template .buttons}
+     <div 
+         {if $id} id="{$id}"{/if} 
+-        {sp}class="aui-buttons{call aui.renderExtraClasses data="all" /}" 
++        {sp}class="aui-buttons{call aui.renderExtraClasses data='all' /}"
+         {call aui.renderExtraAttributes data="all" /}>{$content|noAutoescape}</div>
+ {/template}
+ 
+diff --git a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/dialog2.soy b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/dialog2.soy
+index 073b52a13be..22685665c15 100644
+--- a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/dialog2.soy
++++ b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/dialog2.soy
+@@ -63,7 +63,7 @@
+     <{$tagName ? $tagName : 'section'}{if $id} id="{$id}"{/if}{if $titleId} aria-labelledby="{$titleId}"{/if} role="dialog"{sp}
+         class="
+             aui-layer aui-dialog2 aui-dialog2-{$size ? $size : 'medium'}
+-            {call aui.renderExtraClasses data="all" /}
++            {call aui.renderExtraClasses data='all' /}
+         "
+         {if $modal}data-aui-modal="true"{/if}
+         {if $removeOnHide}data-aui-remove-on-hide="true"{/if}
+@@ -118,7 +118,7 @@
+  * @param? extraAttributes
+  */
+ {template .dialog2Header}
+-    <header{if $id} id="{$id}"{/if} class="aui-dialog2-header{call aui.renderExtraClasses data="all" /}"{call aui.renderExtraAttributes data="all" /}>
++    <header{if $id} id="{$id}"{/if} class="aui-dialog2-header{call aui.renderExtraClasses data='all' /}"{call aui.renderExtraAttributes data="all" /}>
+         <h2 {if $titleId} id="{$titleId}"{/if} class="aui-dialog2-header-main">
+             {if $titleText}
+                 {$titleText}
+@@ -155,7 +155,7 @@
+  * @param? extraAttributes
+  */
+ {template .dialog2Footer}
+-    <footer{if $id} id="{$id}"{/if} class="aui-dialog2-footer{call aui.renderExtraClasses data="all" /}"{call aui.renderExtraAttributes data="all" /}>
++    <footer{if $id} id="{$id}"{/if} class="aui-dialog2-footer{call aui.renderExtraClasses data='all' /}"{call aui.renderExtraAttributes data="all" /}>
+         {if $actionContent}
+             <div class="aui-dialog2-footer-actions">
+                 {$actionContent|noAutoescape}
+@@ -182,7 +182,7 @@
+  * @param? extraAttributes
+  */
+ {template .dialog2Panel}
+-    <div{if $id} id="{$id}"{/if} class="aui-dialog2-content{call aui.renderExtraClasses data="all" /}"{call aui.renderExtraAttributes data="all" /}>
++    <div{if $id} id="{$id}"{/if} class="aui-dialog2-content{call aui.renderExtraClasses data='all' /}"{call aui.renderExtraAttributes data="all" /}>
+         {if $content}
+             {$content|noAutoescape}
+         {/if}
+diff --git a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/dropdown2.soy b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/dropdown2.soy
+index 09f804886f5..d2777f15524 100644
+--- a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/dropdown2.soy
++++ b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/dropdown2.soy
+@@ -32,7 +32,7 @@
+  * @param? iconClasses optional classes to use for the icon. Default is "aui-icon-dropdown".
+  **/
+ {template .trigger}
+-<{$tagName ? $tagName : 'a'}{if $id} id="{$id}"{/if} class="aui-dropdown2-trigger{call aui.renderExtraClasses data="all" /}" aria-owns="{$menu.id}" aria-haspopup="true"
++<{$tagName ? $tagName : 'a'}{if $id} id="{$id}"{/if} class="aui-dropdown2-trigger{call aui.renderExtraClasses data='all' /}" aria-owns="{$menu.id}" aria-haspopup="true"
+     {if $title} title="{$title}"{/if}
+     {if $container} data-container="{$container}"{/if}
+     {if (not $tagName or $tagName == 'a') and
+@@ -60,7 +60,7 @@
+  * @param? extraAttributes
+  **/
+ {template .contents}
+-<div id="{$id}" class="aui-dropdown2{call aui.renderExtraClasses data="all" /}"{call aui.renderExtraAttributes data="all" /}>
++<div id="{$id}" class="aui-dropdown2{call aui.renderExtraClasses data='all' /}"{call aui.renderExtraAttributes data="all" /}>
+     {if $content}
+         {$content|noAutoescape}
+     {/if}
+@@ -76,7 +76,7 @@
+  * @param? label Label for the section
+  **/
+ {template .section}
+-<div{if $id} id="{$id}"{/if} class="aui-dropdown2-section{call aui.renderExtraClasses data="all" /}"{call aui.renderExtraAttributes data="all" /}>
++<div{if $id} id="{$id}"{/if} class="aui-dropdown2-section{call aui.renderExtraClasses data='all' /}"{call aui.renderExtraAttributes data="all" /}>
+     {if $label}<strong>{$label}</strong>{/if}
+     {$content|noAutoescape}
+ </div>
+diff --git a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/form.soy b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/form.soy
+index acf185f3033..c0e599e194a 100644
+--- a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/form.soy
++++ b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/form.soy
+@@ -13,7 +13,7 @@
+  * @param? extraAttributes
+  */
+ {template .form}
+-    <form{if $id} id="{$id}"{/if} class="aui{if $isUnsectioned} unsectioned{/if}{if $isLongLabels} long-label{/if}{if $isTopLabels} top-label{/if}{call aui.renderExtraClasses data="all" /}"
++    <form{if $id} id="{$id}"{/if} class="aui{if $isUnsectioned} unsectioned{/if}{if $isLongLabels} long-label{/if}{if $isTopLabels} top-label{/if}{call aui.renderExtraClasses data='all' /}"
+           action="{$action}" method="{$method ? $method : 'post'}"{if $enctype} enctype="{$enctype}"{/if}{call aui.renderExtraAttributes data="all" /}>
+         {$content |noAutoescape}
+     </form>
+@@ -27,7 +27,7 @@
+  * @param? extraAttributes
+  */
+ {template .formDescription}
+-    <div{if $id} id="{$id}"{/if} class="field-group{call aui.renderExtraClasses data="all" /}"
++    <div{if $id} id="{$id}"{/if} class="field-group{call aui.renderExtraClasses data='all' /}"
+         {call aui.renderExtraAttributes data="all" /}>
+         {$content |noAutoescape}
+     </div>
+@@ -44,11 +44,11 @@
+  * @param? extraAttributes
+  */
+ {template .fieldset}
+-    {let $hasClass : $isInline or $isDateSelect or $isGroup or $extraClasses /}
++    {let $hasClass : ($isInline or $isDateSelect or $isGroup or $extraClasses) /}
+     <fieldset{if $id} id="{$id}"{/if}
+         {if $hasClass} class="
+             {$isInline ? 'inline' : $isDateSelect ? 'date-select' : $isGroup ? 'group' : ''}
+-            {call aui.renderExtraClasses data="all" /}
++            {call aui.renderExtraClasses data='all' /}
+         "{/if}
+         {call aui.renderExtraAttributes data="all" /}>
+         <legend><span>{$legendContent |noAutoescape}</span></legend>
+@@ -63,7 +63,7 @@
+  * @param? extraAttributes
+  */
+ {template .fieldGroup}
+-    <div{if $id} id="{$id}"{/if} class="field-group{call aui.renderExtraClasses data="all" /}"
++    <div{if $id} id="{$id}"{/if} class="field-group{call aui.renderExtraClasses data='all' /}"
+      {call aui.renderExtraAttributes data="all" /}>
+         {$content|noAutoescape}
+     </div>
+@@ -77,7 +77,7 @@
+  * @param? extraAttributes
+  */
+ {template .buttons}
+-    <div class="buttons-container{if $alignment} {$alignment}{/if}{call aui.renderExtraClasses data="all" /}"
++    <div class="buttons-container{if $alignment} {$alignment}{/if}{call aui.renderExtraClasses data='all' /}"
+      {call aui.renderExtraAttributes data="all" /}>
+         <div class="buttons">
+             {$content |noAutoescape}
+@@ -95,7 +95,7 @@
+  * @param? extraAttributes
+  */
+ {template .label}
+-    <label{if $id} id="{$id}"{/if}{if $forField} for="{$forField}"{/if}{if $extraClasses} class="{call aui.renderExtraClasses data="all"/}"{/if}
++    <label{if $id} id="{$id}"{/if}{if $forField} for="{$forField}"{/if}{if $extraClasses} class="{call aui.renderExtraClasses data='all'/}"{/if}
+         {call aui.renderExtraAttributes data="all" /}>
+         {$content |noAutoescape}
+         {if $isRequired}
+@@ -122,7 +122,7 @@
+  */
+ {template .input}
+     <input{if $id} id="{$id}"{/if} class="{$type == 'password' ? 'text' : $type == 'submit' ? 'button' : $type}
+-        {call aui.renderExtraClasses data="all" /}
++        {call aui.renderExtraClasses data='all' /}
+         {if $icon and ($type == 'text' or $type == 'password')} aui-field-has-icon {/if}"
+         type="{$type}" name="{if $name}{$name}{else}{$id}{/if}"
+         {if $value} value="{$value}"{/if}
+@@ -314,7 +314,7 @@
+  * @param? icon
+  */
+ {template .textarea}
+-    <textarea{if $id} id="{$id}"{/if} name="{if $name}{$name}{else}{$id}{/if}" class="textarea{call aui.renderExtraClasses data="all" /} {if $icon}aui-field-has-icon{/if}"
++    <textarea{if $id} id="{$id}"{/if} name="{if $name}{$name}{else}{$id}{/if}" class="textarea{call aui.renderExtraClasses data='all' /} {if $icon}aui-field-has-icon{/if}"
+            {if $rows} rows="{$rows}"{/if}{if $cols} cols="{$cols}"{/if}{if $autocomplete} autocomplete="{$autocomplete}"{/if}{if $isDisabled} disabled{/if}{if $isAutofocus} autofocus{/if}
+            {call aui.renderExtraAttributes data="all" /}
+            {call .renderValidationArguments data="all"/}
+@@ -373,7 +373,7 @@
+  * @param? tooltipArguments
+  */
+ {template .select}
+-    <select{if $id} id="{$id}"{/if} name="{if $name}{$name}{else}{$id}{/if}" class="{$isMultiple ? 'multi-select' : 'select'}{call aui.renderExtraClasses data="all" /}"
++    <select{if $id} id="{$id}"{/if} name="{if $name}{$name}{else}{$id}{/if}" class="{$isMultiple ? 'multi-select' : 'select'}{call aui.renderExtraClasses data='all' /}"
+         {if $size} size="{$size}"{/if}{if $isDisabled} disabled{/if}{if $isAutofocus} autofocus{/if}{if $isMultiple} multiple{/if}
+         {call aui.renderExtraAttributes data="all" /}
+         {call .renderValidationArguments data="all"/}
+@@ -417,7 +417,7 @@
+  * @param content
+  */
+ {template .value}
+-    <span{if $id} id="{$id}"{/if} class="field-value{call aui.renderExtraClasses data="all" /}"
++    <span{if $id} id="{$id}"{/if} class="field-value{call aui.renderExtraClasses data='all' /}"
+         {call aui.renderExtraAttributes data="all" /}>
+         {$content |noAutoescape}
+     </span>
+@@ -462,7 +462,7 @@
+     {let $isCheckboxOrRadio: $type == 'checkbox' or $type == 'radio' /}
+     {let $fieldWidthClass: $fieldWidth ? $fieldWidth + '-field' : '' /}
+ 
+-    <div class="{if $isCheckboxOrRadio}{$type}{else}field-group{/if}{call aui.renderExtraClasses data="all" /}"
++    <div class="{if $isCheckboxOrRadio}{$type}{else}field-group{/if}{call aui.renderExtraClasses data='all' /}"
+         {call aui.renderExtraAttributes data="all" /}>
+ 
+         //checkbox and radio labels go after the input
+@@ -556,7 +556,7 @@
+  * @param? extraClasses
+  */
+ {template .fieldError}
+-    <div class="error{call aui.renderExtraClasses data="all" /}">{$message}</div>
++    <div class="error{call aui.renderExtraClasses data='all' /}">{$message}</div>
+ {/template}
+ 
+ /**
+@@ -567,7 +567,7 @@
+  * @param? extraClasses
+  */
+ {template .fieldDescription}
+-    <div class="description{call aui.renderExtraClasses data="all" /}">
++    <div class="description{call aui.renderExtraClasses data='all' /}">
+     {if $text}
+         {$text}
+     {elseif $message}
+@@ -804,7 +804,7 @@
+  */
+ {template .checkboxField}
+     {call .fieldset}
+-        {param legendContent : $legendContent + ($isRequired ? '<span class="aui-icon icon-required"></span>' : '') /}
++        {param legendContent : $isRequired ? $legendContent + '<span class="aui-icon icon-required"></span>' : $legendContent /}
+         {param isGroup : true /}
+         {param id : $id /}
+         {param extraClasses: $extraClasses /}
+@@ -846,7 +846,7 @@
+  */
+ {template .radioField}
+     {call .fieldset}
+-        {param legendContent : $legendContent + ($isRequired ? '<span class="aui-icon icon-required"></span>' : '') /}
++        {param legendContent : $isRequired ? $legendContent + '<span class="aui-icon icon-required"></span>' : $legendContent /}
+         {param isGroup : true /}
+         {param id : $id /}
+         {param extraClasses: $extraClasses /}
+diff --git a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/group.soy b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/group.soy
+index 4812e97b7a4..4d3b24b7f12 100644
+--- a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/group.soy
++++ b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/group.soy
+@@ -9,9 +9,9 @@
+  * @param? isSplit Boolean. Default false. If true, uses preset "split" layout; two items should be added.
+  */
+ {template .group}
+-    <{$tagName ? $tagName : 'div' }{if $id} id="{$id}"{/if} class="aui-group{if $isSplit} aui-group-split{/if}{call aui.renderExtraClasses data="all" /}"{call aui.renderExtraAttributes data="all" /}>
++    <{$tagName ? $tagName : 'div'}{if $id} id="{$id}"{/if} class="aui-group{if $isSplit} aui-group-split{/if}{call aui.renderExtraClasses data='all' /}"{call aui.renderExtraAttributes data="all" /}>
+         {$content|noAutoescape}
+-    </{$tagName ? $tagName : 'div' }>
++    </{$tagName ? $tagName : 'div'}>
+ {/template}
+ 
+ /**
+@@ -22,7 +22,7 @@
+  * @param? tagName
+  */
+ {template .item}
+-    <{$tagName ? $tagName : 'div' }{if $id} id="{$id}"{/if} class="aui-item{call aui.renderExtraClasses data="all" /}"{call aui.renderExtraAttributes data="all" /}>
++    <{$tagName ? $tagName : 'div'}{if $id} id="{$id}"{/if} class="aui-item{call aui.renderExtraClasses data='all' /}"{call aui.renderExtraAttributes data="all" /}>
+         {$content|noAutoescape}
+-    </{$tagName ? $tagName : 'div' }>
++    </{$tagName ? $tagName : 'div'}>
+ {/template}
+\ No newline at end of file
+diff --git a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/icons.soy b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/icons.soy
+index 5a4ca90cbb7..bf25406daa7 100644
+--- a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/icons.soy
++++ b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/icons.soy
+@@ -12,12 +12,13 @@
+  * @param? extraAttributes Standard option.
+  */
+ {template .icon}
++// `<span class="aui-icon aui-icon-help">` for image icons. `<span class="aui-icon aui-icon-small aui-iconfont-help">` for icon font icons
+ <{$tagName ? $tagName : 'span'}
+     {if $id} id="{$id}"{/if}
+     {sp}class="aui-icon{if $useIconFont} aui-icon-{$size ? $size : 'small'}{/if}
+     {sp}aui{$useIconFont ? '-iconfont' : '-icon'}{$iconFontSet ? '-' + $iconFontSet : ''}
+-        -{$icon} // `<span class="aui-icon aui-icon-help">` for image icons. `<span class="aui-icon aui-icon-small aui-iconfont-help">` for icon font icons
+-    {call aui.renderExtraClasses data="all" /}"
++        -{$icon}
++    {call aui.renderExtraClasses data='all' /}"
+     {call aui.renderExtraAttributes data="all" /}>
+     {if $accessibilityText}{$accessibilityText}{/if}
+ </{$tagName ? $tagName : 'span'}>
+diff --git a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/labels.soy b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/labels.soy
+index 8d7a0d93689..fa5d254e30a 100755
+--- a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/labels.soy
++++ b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/labels.soy
+@@ -16,7 +16,7 @@
+     <span
+         {if $id}{sp}id="{$id}"{/if} 
+         {sp}class="aui-label aui-label-closeable aui-label-split
+-        {call aui.renderExtraClasses data="all" /}
++        {call aui.renderExtraClasses data='all' /}
+         "
+         {call aui.renderExtraAttributes data="all" /}
+     >
+@@ -28,7 +28,7 @@
+         {if $id}{sp}id="{$id}"{/if} 
+         {sp}class="aui-label
+         {if $isCloseable}{sp}aui-label-closeable{/if}
+-        {call aui.renderExtraClasses data="all" /}
++        {call aui.renderExtraClasses data='all' /}
+         " 
+         {call aui.renderExtraAttributes data="all" /}
+         {if $url}{sp}href="{$url}"{/if}
+@@ -50,7 +50,7 @@
+     {sp}tabindex="0"
+     {sp}class="aui-icon aui-icon-close"
+     {if $hasTitle != false}
+-        {sp}title="{call .closeIconText data="all" /}"
++        {sp}title="{call .closeIconText data='all' /}"
+     {/if}
+ >
+     {call .closeIconText data="all" /}
+diff --git a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/lozenges.soy b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/lozenges.soy
+index e4e236c5187..63b20eb1b78 100644
+--- a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/lozenges.soy
++++ b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/lozenges.soy
+@@ -17,7 +17,7 @@
+         {if $id} id="{$id}"{/if}
+         {if $title} title="{$title}"{/if}
+         {sp}class="aui-lozenge{$type ? ' aui-lozenge-' + $type : ''}{$isSubtle ? ' aui-lozenge-subtle' : ''}
+-        {call aui.renderExtraClasses data="all" /}"
++        {call aui.renderExtraClasses data='all' /}"
+         {call aui.renderExtraAttributes data="all" /}>
+         {if $maxLength}
+             {$text|truncate:$maxLength}
+diff --git a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/message.soy b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/message.soy
+index 01394f57d43..11a44d28240 100644
+--- a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/message.soy
++++ b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/message.soy
+@@ -121,7 +121,7 @@
+     {let $theType: $type ? $type : 'generic' /}
+     <{$theTagName}
+     {if $id} id="{$id}"{/if}
+-     {sp}class="aui-message aui-message-{$theType} {$theType}{if $isCloseable} closeable{/if}{if $isShadowed} shadowed{/if}{call aui.renderExtraClasses data="all" /}"
++     class="aui-message aui-message-{$theType} {$theType}{if $isCloseable} closeable{/if}{if $isShadowed} shadowed{/if}{call aui.renderExtraClasses data='all' /}"
+      {call aui.renderExtraAttributes data="all" /}>
+         {if $titleContent}
+             <p class="title">
+diff --git a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/page.soy b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/page.soy
+index d781cde7dbe..1148424907f 100644
+--- a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/page.soy
++++ b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/page.soy
+@@ -24,17 +24,17 @@
+ </head>
+ <body{if $pageType}
+         {if $pageType == 'generic'}
+-            {if $extraClasses}{sp}class="{call aui.renderExtraClasses data="all"/}"{/if}
++            {if $extraClasses}{sp}class="{call aui.renderExtraClasses data='all'/}"{/if}
+         {elseif $pageType == 'focused'}
+             {sp}class="aui-page-focused aui-page-focused-{($focusedPageSize ? $focusedPageSize : 'xlarge')}
+-            {call aui.renderExtraClasses data="all"/}"
++            {call aui.renderExtraClasses data='all'/}"
+         {elseif $pageType == 'sidebar'}
+-            {sp}class="aui-page-sidebar{$sidebarState ? ' aui-sidebar-' + $sidebarState : ''}{call aui.renderExtraClasses data="all"/}"
++            {sp}class="aui-page-sidebar{$sidebarState ? ' aui-sidebar-' + $sidebarState : ''}{call aui.renderExtraClasses data='all'/}"
+         {else}
+-            {sp}class="aui-page-{$pageType}{call aui.renderExtraClasses data="all"/}"
++            {sp}class="aui-page-{$pageType}{call aui.renderExtraClasses data='all'/}"
+         {/if}
+     {else}
+-        {sp}class="{call aui.renderExtraClasses data="all"/}"
++        {sp}class="{call aui.renderExtraClasses data='all'/}"
+     {/if}
+     {call aui.renderExtraAttributes data="all" /}>
+     {$content|noAutoescape}
+@@ -78,7 +78,7 @@
+  * @param? id
+  */
+ {template .header}
+-<nav{if $id} id="{$id}"{/if} class="aui-header aui-dropdown2-trigger-group{call aui.renderExtraClasses data="all" /}"{call aui.renderExtraAttributes data="all" /} role="navigation">
++<nav{if $id} id="{$id}"{/if} class="aui-header aui-dropdown2-trigger-group{call aui.renderExtraClasses data='all' /}"{call aui.renderExtraAttributes data="all" /} role="navigation">
+     <div class="aui-header-inner">
+         {if $headerBeforeContent}
+             <div class="aui-header-before">
+@@ -123,7 +123,7 @@
+  * @param? extraAttributes
+  */
+ {template .pagePanel}
+-<{$tagName ? $tagName : 'div'} class="aui-page-panel{call aui.renderExtraClasses data="all" /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
++<{$tagName ? $tagName : 'div'} class="aui-page-panel{call aui.renderExtraClasses data='all' /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
+     <div class="aui-page-panel-inner">
+         {$content|noAutoescape}
+     </div><!-- .aui-page-panel-inner -->
+@@ -139,7 +139,7 @@
+  * @param? extraAttributes
+  */
+ {template .pagePanelNav}
+-<{$tagName ? $tagName : 'div'} class="aui-page-panel-nav{call aui.renderExtraClasses data="all" /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
++<{$tagName ? $tagName : 'div'} class="aui-page-panel-nav{call aui.renderExtraClasses data='all' /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
+     {$content|noAutoescape}
+ </{$tagName ? $tagName : 'div'}><!-- .aui-page-panel-nav -->
+ {/template}
+@@ -153,7 +153,7 @@
+  * @param? extraAttributes
+  */
+ {template .pagePanelContent}
+-<{$tagName ? $tagName : 'section'} class="aui-page-panel-content{call aui.renderExtraClasses data="all" /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
++<{$tagName ? $tagName : 'section'} class="aui-page-panel-content{call aui.renderExtraClasses data='all' /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
+     {$content|noAutoescape}
+ </{$tagName ? $tagName : 'section'}><!-- .aui-page-panel-content -->
+ {/template}
+@@ -167,7 +167,7 @@
+  * @param? extraAttributes
+  */
+ {template .pagePanelSidebar}
+-<{$tagName ? $tagName : 'aside'} class="aui-page-panel-sidebar{call aui.renderExtraClasses data="all" /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
++<{$tagName ? $tagName : 'aside'} class="aui-page-panel-sidebar{call aui.renderExtraClasses data='all' /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
+     {$content|noAutoescape}
+ </{$tagName ? $tagName : 'aside'}><!-- .aui-page-panel-sidebar -->
+ {/template}
+@@ -181,7 +181,7 @@
+  * @param? extraAttributes
+  */
+ {template .pagePanelItem}
+-<{$tagName ? $tagName : 'section'} class="aui-page-panel-item{call aui.renderExtraClasses data="all" /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
++<{$tagName ? $tagName : 'section'} class="aui-page-panel-item{call aui.renderExtraClasses data='all' /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
+     {$content|noAutoescape}
+ </{$tagName ? $tagName : 'section'}><!-- .aui-page-panel-item -->
+ {/template}
+@@ -194,7 +194,7 @@
+  * @param? extraAttributes
+  */
+ {template .pageHeader}
+-<header class="aui-page-header{call aui.renderExtraClasses data="all" /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
++<header class="aui-page-header{call aui.renderExtraClasses data='all' /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
+     <div class="aui-page-header-inner">
+         {$content|noAutoescape}
+     </div><!-- .aui-page-header-inner -->
+@@ -209,7 +209,7 @@
+  * @param? extraAttributes
+  */
+ {template .pageHeaderImage}
+-<div class="aui-page-header-image{call aui.renderExtraClasses data="all" /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
++<div class="aui-page-header-image{call aui.renderExtraClasses data='all' /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
+     {$content|noAutoescape}
+ </div><!-- .aui-page-header-image -->
+ {/template}
+@@ -222,7 +222,7 @@
+  * @param? extraAttributes
+  */
+ {template .pageHeaderMain}
+-<div class="aui-page-header-main{call aui.renderExtraClasses data="all" /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
++<div class="aui-page-header-main{call aui.renderExtraClasses data='all' /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
+     {$content|noAutoescape}
+ </div><!-- .aui-page-header-main -->
+ {/template}
+@@ -235,8 +235,7 @@
+  * @param? extraAttributes
+  */
+ {template .pageHeaderActions}
+-<div class="aui-page-header-actions{call aui.renderExtraClasses data="all" /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
++<div class="aui-page-header-actions{call aui.renderExtraClasses data='all' /}"{if $id} id="{$id}"{/if}{call aui.renderExtraAttributes data="all" /}>
+     {$content|noAutoescape}
+ </div><!-- .aui-page-header-actions -->
+ {/template}
+-
+diff --git a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/trigger.soy b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/trigger.soy
+index fd7fd716218..9014d6843fe 100644
+--- a/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/trigger.soy
++++ b/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/trigger.soy
+@@ -20,7 +20,7 @@
+  * @param? iconClasses optional classes to use for the icon. Default is "aui-icon-dropdown".
+  **/
+ {template .trigger private="true"}
+-<{$tagName ? $tagName : 'a'}{if $id} id="{$id}"{/if} class="{call aui.renderExtraClasses data="all" /}" aria-owns="{$menu.id}" aria-controls="{$menu.id}" aria-haspopup="true"
++<{$tagName ? $tagName : 'a'}{if $id} id="{$id}"{/if} class="{call aui.renderExtraClasses data='all' /}" aria-owns="{$menu.id}" aria-controls="{$menu.id}" aria-haspopup="true"
+     {if $title} title="{$title}"{/if}
+     {if $container} data-container="{$container}"{/if}
+     {if (not $tagName or $tagName == 'a') and
+diff --git a/sd-components/reports/src/main/resources/servicedesk/internal/reports/pages/custom/custom-report.soy b/sd-components/reports/src/main/resources/servicedesk/internal/reports/pages/custom/custom-report.soy
+index a0912667721..90ff9db550a 100644
+--- a/sd-components/reports/src/main/resources/servicedesk/internal/reports/pages/custom/custom-report.soy
++++ b/sd-components/reports/src/main/resources/servicedesk/internal/reports/pages/custom/custom-report.soy
+@@ -319,13 +319,13 @@
+     <form class="aui">
+         <div class="sd-custom-date-range-date-field-group">
+             <label for="sd-custom-date-range-from">{getText('sd.project.reports.customdate.from')}</label>
+-            <input id="sd-custom-date-range-from" class="aui-date-picker text" type="date" readonly value={$fromDate} min={$minDate} max={$maxDate} />
++            <input id="sd-custom-date-range-from" class="aui-date-picker text" type="date" readonly value="{$fromDate}" min="{$minDate}" max="{$maxDate}" />
+             <span class="aui-icon aui-icon-small aui-iconfont-calendar"></span>
+         </div>
+ 
+         <div class="sd-custom-date-range-date-field-group">
+             <label id="sd-custom-date-range-to-label" for="sd-custom-date-range-to">{getText('sd.project.reports.customdate.to')}</label>
+-            <input id="sd-custom-date-range-to" class="aui-date-picker text" type="date" readonly value={$toDate} min={$minDate} max={$maxDate} />
++            <input id="sd-custom-date-range-to" class="aui-date-picker text" type="date" readonly value="{$toDate}" min="{$minDate}" max="{$maxDate}" />
+             <span class="aui-icon aui-icon-small aui-iconfont-calendar"></span>
+         </div>
+ 
