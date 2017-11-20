@@ -9,16 +9,13 @@ Namespace
 WS
   = [\r\n \t];
 
-TemplateDefComments
-  = WS* comments:SoyComment WS* { return comments; };
-
 TemplateDef
-  = comments:TemplateDefComments* "{template " name:TemplateName WS* attributes:Attributes? "}" WS+ body:TemplateBodyElement* "{/template}" WS* {
+  = comments:SoyTemplateDefComment* WS* "{template " name:TemplateName WS* attributes:Attributes? "}" WS+ body:TemplateBodyElement* "{/template}" WS* {
     return {
       type: "Template",
-        comments,
-        name,
-        body
+      comments,
+      name,
+      body
     };
   };
 
@@ -32,12 +29,12 @@ LocalTemplateName
 
 ShortIdentifier
   = ids:("." Identifier)+ {
-    return ids.map(t => t.join('')).join('');
+    return ids.map(t => t[0] + t[1].name).join('');
   };
 
 ComplexIdentifier
   = head:Identifier tail:ShortIdentifier? {
-    return head + tail;
+    return head.name + tail;
   };
 
 FullTemplateName
@@ -80,6 +77,23 @@ SoyInlineComment
 SoyMultilineComment
   = "/*" chars:(!"*/" .)* "*/" { return chars.map(c => c[1]).join(""); };
 
+SoyTemplateDefComment
+  = "/*" lines:(SoyCommentParamDefinition / SoyCommentText / BlankLine)* "*/" {
+    return lines;
+  };
+
+SoyCommentText
+  = chars:(!("\n" / "*/") .)* "\n" { return { type: 'CommentText', content: chars.map(e => e[1]).join('') }; };
+
+SoyCommentParamDefinition
+  = WS* "*" WS* param:(SoyCommentRequiredParamDef / SoyCommentOptionalParamDef) WS* SoyCommentText? { return param; };
+
+SoyCommentRequiredParamDef
+  = "@param" WS+ name:Identifier { return name; };
+
+SoyCommentOptionalParamDef
+  = "@param?" WS+ name:Identifier { return name; };
+
 NamespaceDecl
   = SoyComment* WS* "{namespace" WS+ name:NamespaceName "}" {
     return name;
@@ -90,7 +104,10 @@ NamespaceName
 
 Identifier
   = head:IdentifierFirstChar tail:IdentifierChar* {
-    return head + tail.join('');
+    return {
+      type: "Identifier",
+      name: head + tail.join('')
+    };
   };
 
 IdentifierFirstChar = [a-zA-Z];
@@ -119,7 +136,7 @@ SoyFilterableAtomicValue
   / SingleQuotedString
   / VariableReference
   / FunctionCall
-  / SoyBooleanUnaryExpression;
+  / SoyMathExpression;
 
 SoySpecialCharacter
   = SoySpecialCharacterSpace
@@ -322,7 +339,6 @@ SoyAtomicValue
 
 SoyValueExpr
   = SoyTernaryOperator
-  / SoyBooleanExpression
   / SoyMathExpression;
 
 SoyArrayExpression
@@ -353,51 +369,40 @@ SoyMapMultipleEntry
 
 SoyNullValue = "null";
 
-SoyBooleanExpression
-  = SoyBooleanBinaryExpression
-  / SoyBooleanUnaryExpression;
-
-SoyBooleanBinaryExpression
-  = leftArg:SoyPrimaryBooleanExpression WS* operator:SoyBooleanBinaryOperator WS* rightArg:(SoyBooleanBinaryExpression / SoyBooleanUnaryExpression) {
-      return {
-        type: "BinaryOperator",
-        operator,
-        args: [ leftArg, rightArg ]
-      };
-    }
-  / SoyPrimaryBooleanExpression;
-
-SoyBooleanUnaryExpression
-  = operator:SoyBooleanUnaryOperator? WS* arg:SoyBooleanBinaryExpression {
-      return {
-        type: "UnaryOperator",
-        operator,
-        args: [ arg ]
-      };
-    }
-  / SoyPrimaryBooleanExpression;
-
-SoyBooleanBinaryOperator
-  = SoyComparisonOperator
-  / SoyLogicOperator;
-
-SoyPrimaryBooleanExpression
-  = "(" WS* expr:SoyBooleanExpression WS* ")" { return expr; }
-  / SoyMathExpression
-  / SoyAtomicValue;
-
 SoyMathExpression
-  = lhs:SoyMathPrimaryExpression WS* operator:SoyArithmeticOperator WS* rhs:SoyMathExpression { return { operator, args: [lhs, rhs] }; }
-  / operator:SoyUnaryMathOperator WS* arg:SoyMathPrimaryExpression { return { operator, args: [ arg ] }; }
-  / SoyMathPrimaryExpression;
+  = SoyBinaryExpression
+  / SoyUnaryExpression;
 
-SoyMathPrimaryExpression
-  = '(' WS* sentence:SoyMathExpression WS* ')' { return sentence; }
-  / SoyMathOperand;
+SoyBinaryExpression
+  = left:SoyPrimaryExpression WS* operator:SoyBinaryOperator WS* right:(SoyBinaryExpression / SoyUnaryExpression) {
+      return {
+        type: "BinaryExpression",
+        operator,
+        left,
+        right
+      };
+    }
+  / SoyPrimaryExpression;
 
-SoyMathOperand
-  // = SoyTernaryOperator
-  = SoyAtomicValue;
+SoyUnaryExpression
+  = operator:SoyUnaryOperator? WS* argument:SoyBinaryExpression {
+      return {
+        type: "UnaryExpression",
+        operator,
+        argument,
+        prefix: true
+      };
+    }
+  / SoyPrimaryExpression;
+
+SoyBinaryOperator
+  = SoyComparisonOperator
+  / SoyLogicOperator
+  / SoyArithmeticOperator;
+
+SoyPrimaryExpression
+  = "(" WS* expr:SoyMathExpression WS* ")" { return expr; }
+  / SoyAtomicValue;
 
 SoyArithmeticOperator
   = "+"
@@ -410,12 +415,10 @@ SoyLogicOperator
   = "and"
   / "or";
 
-SoyUnaryMathOperator
+SoyUnaryOperator
   = "+"
-  / "-";
-
-SoyBooleanUnaryOperator
-  = "not";
+  / "-"
+  / "not";
 
 SoyComparisonOperator
   = "=="
@@ -462,12 +465,12 @@ SoyAttributeIfOperator
   };
 
 SoyAttributeIfClause
-  = "{" WS* "if" WS+ clause:SoyBooleanExpression WS* "}" WS* output:SoyAttributeIfOperatorOutput {
+  = "{" WS* "if" WS+ clause:SoyMathExpression WS* "}" WS* output:SoyAttributeIfOperatorOutput {
     return { clause, output };
   };
 
 SoyAttributeElseifClause
-  = "{" WS* "elseif" WS+ clause:SoyBooleanExpression WS* "}" WS* output:SoyAttributeIfOperatorOutput {
+  = "{" WS* "elseif" WS+ clause:SoyMathExpression WS* "}" WS* output:SoyAttributeIfOperatorOutput {
     return { clause, output };
   };
 
@@ -493,12 +496,12 @@ SoyIfOperator
   };
 
 SoyIfClause
-  = "{" WS* "if" WS+ clause:SoyBooleanExpression WS* "}" WS* output:TemplateBodyElement* {
+  = "{" WS* "if" WS+ clause:SoyMathExpression WS* "}" WS* output:TemplateBodyElement* {
     return { clause, output };
   };
 
 SoyElseifClause
-  = "{" WS* "elseif" WS+ clause:SoyBooleanExpression WS* "}" WS* output:TemplateBodyElement* {
+  = "{" WS* "elseif" WS+ clause:SoyMathExpression WS* "}" WS* output:TemplateBodyElement* {
     return { clause, output };
   };
 
@@ -511,14 +514,12 @@ SoyEndifOperator
   = "{/if}";
 
 SoyTernaryOperator
-  = clause:SoyBooleanExpression WS* "?" WS* trueValue:SoyValueExpr WS* ":" WS* falseValue:SoyValueExpr {
+  = test:SoyMathExpression WS* "?" WS* trueValue:SoyValueExpr WS* ":" WS* falseValue:SoyValueExpr {
     return {
-      type: "IfOperator",
-      clause,
-      values: {
-        true: trueValue,
-        false: falseValue
-      }
+      type: "ConditionalExpression",
+      test,
+      consequent: trueValue,
+      alternate: falseValue
     };
   };
 
@@ -551,30 +552,32 @@ SoyEvaluatedTernaryOperator
   = "{" value:SoyTernaryOperator "}" { return value; };
 
 VariableReference
-  = "$" reference:(ObjectPropertyReference / Identifier) {
-    return {
-        type: "VariableReference",
-        reference
-      };
+  = "$" identifier:(ObjectPropertyReference / Identifier) {
+    return identifier;
   };
 
 ObjectPropertyReference
-  = name:Identifier path:(SubObjectPropertyAccessor / SubArrayAccessor)+ {
-    return {
-      type: "ObjectAccessor",
-      name,
-      path
-    };
+  = object:Identifier property:(SubObjectPropertyAccessor / SubArrayAccessor)+ {
+    return Object.assign({
+        type: "MemberExpression",
+        object,
+      }, property);
   };
 
 SubObjectPropertyAccessor
-  = "." prop:Identifier {
-    return { property: prop };
+  = "." property:Identifier {
+    return {
+      property,
+      computed: false
+    };
   };
 
 SubArrayAccessor
-  = "[" idx:SoyValueExpr "]" {
-    return { index: idx };
+  = "[" property:SoyValueExpr "]" {
+    return {
+      property,
+      computed: true
+    };
   };
 
 IntegerIndex
@@ -618,11 +621,11 @@ SoyFunctionCall
   };
 
 FunctionCall
-  = name:Identifier "(" WS* args:FunctionCallArguments? WS* ")" {
+  = callee:Identifier "(" WS* args:FunctionCallArguments? WS* ")" {
     return {
-      type: "FunctionCall",
-      name,
-      args
+      type: "CallExpression",
+      callee,
+      arguments: args
     };
   };
 
