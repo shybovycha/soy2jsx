@@ -64,8 +64,6 @@ if (stat.isDirectory()) {
                     .map(ast => ast.map(e => e.templates.length).reduce((acc, e) => acc + e, 0))
                     .reduce((acc, e) => acc + e, 0);
 
-                console.log(results.outputs);
-
                 console.log(`Template definitions: ${templateCnt}`);
 
                 const fileCnt = files.length;
