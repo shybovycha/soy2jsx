@@ -100,7 +100,8 @@ SoyMathEvaluationExpression
   = "{" WS* expression:SoyMathExpression WS* "}" { return { type: "MathExpression", expression }; }
 
 SoyBodyExpr
-  = SoyMathEvaluationExpression
+  = SoyComment
+  / SoyMathEvaluationExpression
   / SoySpecialCharacter
   / SoyEvaluatedTernaryOperator
   / SoyVariableInterpolation
@@ -118,7 +119,7 @@ SoyFilterableAtomicValue
   / SingleQuotedString
   / VariableReference
   / FunctionCall
-  / SoyUnaryExpression;
+  / SoyBooleanUnaryExpression;
 
 SoySpecialCharacter
   = SoySpecialCharacterSpace
@@ -139,10 +140,23 @@ SoySpecialCharacterCaretReturn
   = "{\\r}" { return { type: "SpecialCharacter", name: "caret_return" }; };
 
 SoyFilters
-  = (filter:SoyFilter)+;
+  = SoyFilter+;
 
 SoyFilter
-  = WS* "|" WS* name:Identifier { return name; };
+  = SoyFilterWithParams
+  / SoySimpleFilter;
+
+SoySimpleFilter
+  = WS* "|" WS* name:Identifier { return { type: "Filter", name, params: [] }; };
+
+SoyFilterWithParams
+  = WS* "|" WS* name:Identifier params:SoyFilterParams? { return { type: "Filter", name, params: params || [] }; };
+
+SoyFilterParams
+  = SoyFilterParam+;
+
+SoyFilterParam
+  = WS* ":" WS* value:SoyValueExpr { return value; };
 
 SoyStringInterpolateableExpr
   = FloatNumber
@@ -207,8 +221,8 @@ SoySwitchOperatorCase
   };
 
 SoyCaseValues
-  = ((SoyBinaryExpression / SoyAtomicValue) WS* "," WS* SoyCaseValues)
-  / (SoyBinaryExpression / SoyAtomicValue);
+  = SoyValueExpr WS* "," WS* SoyCaseValues
+  / SoyValueExpr;
 
 SoySwitchDefaultClause
   = "{default}" WS* output:TemplateBodyElement* {
@@ -309,11 +323,10 @@ SoyAtomicValue
 SoyValueExpr
   = SoyTernaryOperator
   / SoyBooleanExpression
-  / SoyMathExpression
-  / SoyAtomicValue;
+  / SoyMathExpression;
 
 SoyArrayExpression
-  = "[" WS* elements:SoyArrayElements? WS* "]" { return elements.reduce((acc, e) => acc.concat(e), []); };
+  = "[" WS* elements:SoyArrayElements? WS* "]" { return [].concat(elements).reduce((acc, e) => acc.concat(e), []); };
 
 SoyArrayElements
   = SoyArrayMultipleElements
@@ -341,18 +354,11 @@ SoyMapMultipleEntry
 SoyNullValue = "null";
 
 SoyBooleanExpression
-  = SoyBinaryExpression
-  / SoyUnaryExpression;
+  = SoyBooleanBinaryExpression
+  / SoyBooleanUnaryExpression;
 
-SoyBinaryExpression
-  = leftArg:SoyPrimaryBooleanExpression WS* operator:SoyBinaryOperator WS* rightArg:SoyBinaryExpression {
-      return {
-        type: "BinaryOperator",
-        operator,
-        args: [ leftArg, rightArg ]
-      };
-    }
-  / leftArg:SoyPrimaryBooleanExpression WS* operator:SoyBinaryOperator WS* rightArg:SoyUnaryExpression {
+SoyBooleanBinaryExpression
+  = leftArg:SoyPrimaryBooleanExpression WS* operator:SoyBooleanBinaryOperator WS* rightArg:(SoyBooleanBinaryExpression / SoyBooleanUnaryExpression) {
       return {
         type: "BinaryOperator",
         operator,
@@ -361,8 +367,8 @@ SoyBinaryExpression
     }
   / SoyPrimaryBooleanExpression;
 
-SoyUnaryExpression
-  = operator:SoyUnaryOperator? WS* arg:SoyBinaryExpression {
+SoyBooleanUnaryExpression
+  = operator:SoyBooleanUnaryOperator? WS* arg:SoyBooleanBinaryExpression {
       return {
         type: "UnaryOperator",
         operator,
@@ -371,17 +377,18 @@ SoyUnaryExpression
     }
   / SoyPrimaryBooleanExpression;
 
-SoyBinaryOperator
+SoyBooleanBinaryOperator
   = SoyComparisonOperator
-  / SoyArithmeticOperator
   / SoyLogicOperator;
 
 SoyPrimaryBooleanExpression
   = "(" WS* expr:SoyBooleanExpression WS* ")" { return expr; }
+  / SoyMathExpression
   / SoyAtomicValue;
 
 SoyMathExpression
   = lhs:SoyMathPrimaryExpression WS* operator:SoyArithmeticOperator WS* rhs:SoyMathExpression { return { operator, args: [lhs, rhs] }; }
+  / operator:SoyUnaryMathOperator WS* arg:SoyMathPrimaryExpression { return { operator, args: [ arg ] }; }
   / SoyMathPrimaryExpression;
 
 SoyMathPrimaryExpression
@@ -389,9 +396,8 @@ SoyMathPrimaryExpression
   / SoyMathOperand;
 
 SoyMathOperand
-  = sign:"-"? number:[0-9]+ { return (sign == "-" ? -1 : 1) * parseInt(number); }
-  / VariableReference
-  / FunctionCall
+  // = SoyTernaryOperator
+  = SoyAtomicValue;
 
 SoyArithmeticOperator
   = "+"
@@ -404,10 +410,12 @@ SoyLogicOperator
   = "and"
   / "or";
 
-SoyUnaryOperator
+SoyUnaryMathOperator
   = "+"
-  / "-"
-  / "not";
+  / "-";
+
+SoyBooleanUnaryOperator
+  = "not";
 
 SoyComparisonOperator
   = "=="
@@ -418,7 +426,8 @@ SoyComparisonOperator
   / ">";
 
 SoyAttributeExpr
-  = SoyAttributeIfOperator
+  = SoySpecialCharacter
+  / SoyAttributeIfOperator
   / SoyFunctionCall
   / SoyTemplateCall
   / SoyVariableInterpolation
@@ -674,13 +683,6 @@ TemplateCallInlineValueParam
     };
   };
 
-StringParamValue
-  = SingleQuotedString
-  / DoubleQuotedString;
-
-VariableParamValue
-  = "$" Identifier;
-
 MultilineTemplateCall
   = "{call" WS+ name:TemplateName WS* "}" WS* params:MultilineTemplateCallParams? WS* "{/call}" {
     return {
@@ -699,7 +701,7 @@ MultipleMultilineTemplateCallParams
   = WS* first:SingleMultilineTemplateCallParams WS* rest:MultilineTemplateCallParams { return [ first ].concat(rest); };
 
 SingleMultilineTemplateCallParams
-  = WS* first:MultilineTemplateCallParam WS* { return [ first ]; };
+  = WS* first:MultilineTemplateCallParam WS* SoyComment? WS* { return [ first ]; };
 
 MultilineTemplateCallParam
   = MultilineTemplateCallValueParam
@@ -710,7 +712,8 @@ MultilineTemplateCallBooleanParam
     return {
       Type: 'Param',
       name,
-      value: true
+      value: true,
+      comment
     };
   };
 
@@ -865,7 +868,7 @@ NonClosedElement
   = tag:StartTag { return Object.assign({}, tag, { children: [] }); };
 
 StartTag
-  = "<" name:TagName WS* attributes:Attributes? ">" {
+  = "<" name:TagName WS* attributes:Attributes? WS* ">" {
     return {
       name,
       attributes: attributes || {}

@@ -53,12 +53,13 @@ if (stat.isDirectory()) {
 
         files = files.filter(f => !excluded.some(r => r.test(f)));
 
-        Promise.all(files.map(f => new Promise((resolve, reject) => 
-            parseFile(f)
-                .then(data => resolve(results.successful.push(f)))
-                .catch(err => resolve(results.failed.push(f))))
-        ))
-            .then(data => console.log(`Succeeded: ${results.successful.length} / ${files.length}\nFailed:\n${results.failed.join('\n')}`));
+        Promise
+            .all(files.map(f => new Promise((resolve, reject) =>
+                parseFile(f)
+                    .then(data => resolve(results.successful.push(f)))
+                    .catch(err => resolve(results.failed.push(f))))
+            ))
+            .then(data => console.log(`Succeeded: ${results.successful.length} / ${files.length}\nFailed: ${results.failed.length} / ${files.length}\n${results.failed.join('\n')}`));
     });
 } else if (stat.isFile()) {
     parseFile(process.argv[2]).then(() => process.exit(0)).catch(() => process.exit(1));

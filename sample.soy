@@ -1,87 +1,172 @@
-{namespace ServiceDesk.Templates.Agent.Customer}
-{template .requestTypeWorkflowStatusesEditForm}
-<form class="aui top-label vp-form" method="post">
-    <div class="form-body">
-        <table class="form-table" cellspacing="0" cellpadding="0">
-            <thead>
-            <tr>
-                <th>
-                    <div data-intro="{getText('sd.featuretour.portal.workflow.status.jira')}" data-position="bottom">
-                        {getText('sd.admin.request.workflow.status.issue.label')}
-                        <a href="{contextPath()}/plugins/servlet/project-config/{$projectKey}/issuetypes/{$issueTypeId}/workflow">{getText('sd.admin.request.view.workflow.in.jira')}</a>
-                    </div>
-                </th>
-                <th>
-                    <div data-intro="{getText('sd.featuretour.portal.workflow.status.customer')}" data-position="bottom">
-                        {getText('sd.admin.request.workflow.status.request.label')}
-                    </div>
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-                {foreach $s in $statuses}
-                <tr>
-                    <td class="label">
-                        <label for="workflowStatus:{$s.id}">
-                            {$s.original}
-                        </label>
-                    </td>
-                    <td>
-                        <input type="text" class="text medium-field" name="workflowStatus:{$s.id}" id="workflowStatus:{$s.id}" value="{$s.custom}" placeholder="{$s.original}" />
-                        {if $s.error}
-                            <div class="error">{$s.error}</div>
-                        {/if}
-                    </td>
-                </tr>
-                {/foreach}
-            </tbody>
-        </table>
-        <div class="buttons-container form-footer">
-            <div class="buttons">
-                <input accesskey="{getText('AUI.form.submit.button.accesskey')}" class="button" name="create" title="{getText('AUI.form.submit.button.tooltip', getText('AUI.form.submit.button.accesskey'), $modifierKey)}" type="submit" value="{getText('common.words.save')}">
-                <button type="button" accesskey="{getText('AUI.form.cancel.link.accesskey')}" class="cancel aui-button aui-button-link" title="{getText('AUI.form.cancel.link.tooltip', getText('AUI.form.cancel.link.accesskey'), $modifierKey)}">{getText('sd.admin.standard.form.discard')}</button>
-            </div>
-        </div>
-    </div>
-</form>
+{namespace ServiceDesk.Templates.Shared.Utils}
+
+
+
+/**
+ * Renders the start of a link for documentation on CAC (confluence.atlassian.com)
+ * @param helpLinkKey
+ * @param analyticsKey
+ * @param? extraClasses A string of space-separated class names
+ * @param? newTab
+ */
+{template .helpLinkStart}
+<a class="sd-help-link-docs{if $extraClasses} {$extraClasses}{/if}"
+    href="{sdHelpUrl($helpLinkKey)}"
+    data-analytics-key="page.view.help.docs.{$analyticsKey}"
+    {if $newTab != false}target="_blank"{/if}
+>
+{/template}
+
+/**
+ * Renders the start of a link for documentation on the SD KB space on CAC
+ * @param helpLinkKey
+ * @param analyticsKey
+ * @param? newTab
+ */
+{template .helpKBLinkStart}
+    <a class="sd-help-kb-link-docs"
+        href="{helpKBUrl($helpLinkKey)}"
+        data-analytics-key="page.view.help.docs.{$analyticsKey}"
+        {if $newTab != false}target="_blank"{/if}
+    >
 {/template}
 
 
 /**
- * Render dialog for providing default value
- * @param submitUrl action url for the form
- * @param editHtml edit html for the form field
- * @param isHideAction says whether popup is triggered after a 'Hide field' action or after a 'Set value'.
- * @param modifierKey
+ * Renders the end of a link for documentation on CAC (confluence.atlassian.com)
  */
-{template .defaultValueDialog}
-    <form action="{$submitUrl}" class="aui" method="post">
-        <div class="form-body">
-            <h2 class="dialog-title">
-            {if $isHideAction}
-                {getText('sd.admin.request.fields.value.dialog.hide.field.header')}
-            {else}
-                {getText('sd.admin.request.fields.value.dialog.set.value.header')}
-            {/if}
-            </h2>
-            <p class="sd-set-hidden-value-info">{getText('sd.admin.request.fields.value.dialog.info')}</p>
-            {$editHtml |noAutoescape}
-        </div>
-        <div class="buttons-container form-footer">
-            <div class="buttons">
-                <input accesskey="{getText('AUI.form.submit.button.accesskey')}" class="button" name="submit" title="{getText('AUI.form.submit.button.tooltip', getText('AUI.form.submit.button.accesskey'), $modifierKey)}" type="submit" value="{getText('sd.admin.request.fields.value.dialog.submit')}">
-                <a accesskey="{getText('AUI.form.cancel.link.accesskey')}" class="cancel" href="#" title="{getText('AUI.form.cancel.link.tooltip', getText('AUI.form.cancel.link.accesskey'), $modifierKey)}">{getText('AUI.form.cancel.link.text')}</a>
-            </div>
-        </div>
-    </form>
+{template .helpLinkEnd}
+</a>
+{/template}
+
+
+/**
+ * Renders a link for documentation on CAC (confluence.atlassian.com)
+ * @param helpLinkKey
+ * @param linkText
+ * @param analyticsKey
+ * @param? newTab
+ */
+{template .helpLink}
+    {call .helpLinkStart data="all" /}
+    {$linkText}
+    {call .helpLinkEnd /}
 {/template}
 
 /**
- * error message
- * @param message
+ * Renders a link for documentation on the SD KB space on CAC
+ * @param helpLinkKey
+ * @param linkText
+ * @param analyticsKey
+ * @param? newTab
  */
-{template .requestTypeErrorMessage}
-    {call aui.message.error}
-        {param content: $message /}
-    {/call}
+{template .helpKBLink}
+    {call .helpKBLinkStart data="all" /}
+    {$linkText}
+    {call .helpLinkEnd /}
+{/template}
+
+/**
+* Renders a user, with avatar next to it
+* @param? displayName
+* @param? tag
+* @param? avatarUrl
+* @param? avatarSize
+* @param? isNotActive
+*/
+{template .user}
+<span class="sd-user {if $tag}sd-user-tagged{/if}" title="{$displayName}">
+    {if $avatarSize}
+    <span class="aui-avatar aui-avatar-{$avatarSize} {if $tag}sd-user-cell sd-avatar-cell{/if}">
+        <span class="aui-avatar-inner">
+            <img src="{$avatarUrl}"></img>
+        </span>
+    </span>
+    {/if}
+    {if $tag}
+        <span class="sd-user-cell">
+    {/if}
+    <span class="sd-user-value">
+    {if $isNotActive}
+        <del>{$displayName}</del> ({getText('admin.common.words.inactive')})
+    {else}
+        {$displayName}
+    {/if}
+    </span>
+    {if $tag}
+        <span class="sd-user-tag" title="{$tag}">{$tag}</span>
+        </span>
+    {/if}
+</span>
+{/template}
+
+/**
+* Renders a user, with avatar next to it
+* @param? displayName
+* @param? organisationProfileUrl
+* @param? avatarUrl
+* @param? avatarSize
+*/
+{template .organisation}
+<a href="{$organisationProfileUrl}">
+    <span class="sd-user" title="{$displayName}">
+        {if $avatarSize}
+            <span class="aui-avatar aui-avatar-{$avatarSize}">
+                <span class="aui-avatar-inner">
+                    {if $avatarUrl}
+                        <img alt="{getText('sd.customer.organisation.avatar.url.alt')}"src="{$avatarUrl}"></img>
+                    {else}
+                        <span class="organization-listing-avatar" />
+                    {/if}
+                </span>
+            </span>
+        {/if}
+        <span class="sd-user-value">
+            {$displayName}
+        </span>
+    </span>
+</a>
+{/template}
+
+/**
+* Renders a link for the jira profile page, with or without avatar. Also has correct classes so that user hover gets applied.
+* @param name
+*/
+{template .profileLink}
+<a class="user-hover sd-user-hover" rel="{$name}" href="{contextPath()}/secure/ViewProfile.jspa?name={$name|escapeUri}">
+    {call .user data="all" /}
+</a>
+{/template}
+
+
+/**
+* Renders user with hover
+* @param name
+*/
+{template .userHover}
+<span class="user-hover sd-user-hover" rel="{$name}">
+    {call .user data="all" /}
+</span>
+{/template}
+
+/**
+ * Renders a generic error message with a link to report error.
+ * @param contactLink
+ */
+{template .generalError}
+{let $refreshLink}
+    <a href="#" class="js-sd-reload-page">
+{/let}
+{getText('cv.ajax.error', $refreshLink, '</a>')|noAutoescape}
+<br />
+<br />
+{if $contactLink}
+    {let $contactLinkHtml}
+        <a href="{$contactLink}" class="js-sd-reload-page">
+    {/let}
+    {getText('cv.ajax.error.contact.us', $contactLinkHtml, '</a>')|noAutoescape}
+{else}
+    {getText('cv.ajax.error.contact.admin')}
+{/if}
+
 {/template}

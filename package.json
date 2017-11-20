@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "compile-grammar": "./node_modules/.bin/pegjs -o SOY.js --trace --allowed-start-rules SOY SOY.pegjs ",
+    "compile-grammar-dev": "./node_modules/.bin/pegjs -o SOY.js --trace --allowed-start-rules SOY SOY.pegjs ",
+    "compile-grammar": "./node_modules/.bin/pegjs -o SOY.js --allowed-start-rules SOY SOY.pegjs ",
     "test": "npm run-script compile-grammar && node index.js sample.soy"
   },
   "author": "",

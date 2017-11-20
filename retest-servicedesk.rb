@@ -25,12 +25,6 @@ files = [
     '../servicedesk/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/dialog2.soy',
     '../servicedesk/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/dropdown2.soy',
     '../servicedesk/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/form.soy',
-    '../servicedesk/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/group.soy',
-    '../servicedesk/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/icons.soy',
-    '../servicedesk/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/labels.soy',
-    '../servicedesk/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/lozenges.soy',
-    '../servicedesk/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/message.soy',
-    '../servicedesk/sd-components/core-ui/src/main/resources/servicedesk/vendor/aui-templates/page.soy',
 ]
 
 puts files.select { |f| `node index.js #{f} &>/dev/null`; $?.exitstatus != 0 }.join("\n")
