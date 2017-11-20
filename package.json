@@ -11,9 +11,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "pegjs": "^0.10.0"
-  },
-  "dependencies": {
-    "glob": "^7.1.2"
+    "pegjs": "^0.10.0",
+    "glob": "^7.1.2",
+    "recast": "^0.12.9"
   }
 }

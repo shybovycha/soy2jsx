@@ -42,12 +42,12 @@ const stat = fs.lstatSync(firstArg);
 if (stat.isDirectory()) {
     glob(firstArg + '/**/*.soy', (err, files) => {
         if (err) {
-             console.error('Error: ', err);
-             process.exit(1);
-             return;
+            console.error('Error: ', err);
+            process.exit(1);
+            return;
         }
 
-        const results = { successful: [], failed: [] };
+        const results = { successful: [], failed: [], outputs: [] };
 
         const excluded = [ /sdmakehome/, /\/target\/classes\// ];
 
@@ -56,10 +56,25 @@ if (stat.isDirectory()) {
         Promise
             .all(files.map(f => new Promise((resolve, reject) =>
                 parseFile(f)
-                    .then(data => resolve(results.successful.push(f)))
+                    .then(data => { results.outputs.push(data); resolve(results.successful.push(f)); })
                     .catch(err => resolve(results.failed.push(f))))
             ))
-            .then(data => console.log(`Succeeded: ${results.successful.length} / ${files.length}\nFailed: ${results.failed.length} / ${files.length}\n${results.failed.join('\n')}`));
+            .then(data => {
+                const templateCnt = results.outputs
+                    .map(ast => ast.map(e => e.templates.length).reduce((acc, e) => acc + e, 0))
+                    .reduce((acc, e) => acc + e, 0);
+
+                console.log(results.outputs);
+
+                console.log(`Template definitions: ${templateCnt}`);
+
+                const fileCnt = files.length;
+                const successCnt = results.successful.length;
+                const failureCnt = results.failed.length
+                const failures = results.failed.join('\n');
+
+                console.log(`Succeeded: ${successCnt} / ${fileCnt}\nFailed: ${failureCnt} / ${fileCnt}\n${failures}`);
+            });
     });
 } else if (stat.isFile()) {
     parseFile(process.argv[2]).then(() => process.exit(0)).catch(() => process.exit(1));
