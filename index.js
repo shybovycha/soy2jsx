@@ -60,11 +60,11 @@ if (stat.isDirectory()) {
                     .catch(err => resolve(results.failed.push(f))))
             ))
             .then(data => {
-                const templateCnt = results.outputs
-                    .map(ast => ast.map(e => e.templates.length).reduce((acc, e) => acc + e, 0))
-                    .reduce((acc, e) => acc + e, 0);
+                // const templateCnt = results.outputs
+                //     .map(ast => ast.map(e => e.templates.length).reduce((acc, e) => acc + e, 0))
+                //     .reduce((acc, e) => acc + e, 0);
 
-                console.log(`Template definitions: ${templateCnt}`);
+                // console.log(`Template definitions: ${templateCnt}`);
 
                 const fileCnt = files.length;
                 const successCnt = results.successful.length;

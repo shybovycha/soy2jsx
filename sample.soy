@@ -1,15 +1,15 @@
-{namespace aui.buttons}
+{namespace ServiceDesk.Templates.Components.RequestTypeIcons}
+
 /**
- * Private template for rendering the button attributes
- * @param? type Passed in.
- * @param? tagName Passed in.
- * @param? id Passed in.
- * @param? extraClasses Passed in.
- * @param? extraAttributes Passed in.
- * @param? isDisabled Passed in.
- * @param? isPressed Passed in.
- * @param? dropdown2Target Passed in.
- * @param? splitButtonType Passed in.
+ * Renders a request type icon using the given iconId
+ * @param iconId
+ * @param? class
+ * @param? title
+ * @param? dataKey
+ * @param? dataValue
+ * @param? useCustomerShim
+ * @param? style Specify an inline style. Normally we don't do this, but it is handy for e-mail.
  */
-{template .buttonAttributes private="true"}
+{template .icon}
+    <img aria-hidden="true" {if $style}style="{$style}" {/if}class="{if $class}{$class} {/if}vp-rq-icon" src="{contextPath()}{if $useCustomerShim}/servicedesk/customershim{/if}/secure/viewavatar?avatarType=SD_REQTYPE&amp;avatarId={$iconId}" {if $title}title="{$title}"{/if} {if $dataKey}data-{$dataKey}="{$dataValue}"{/if}>
 {/template}
