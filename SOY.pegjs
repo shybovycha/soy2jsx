@@ -1,9 +1,36 @@
 SOY
-  = Namespace+;
+  = namespaces:Namespace+ {
+    return {
+      type: "Program",
+      body: namespaces.reduce((acc, ns) => acc.concat(ns.templates), [])
+    };
+  };
 
 Namespace
-  = ns:NamespaceDecl WS* templates:TemplateDef* {
-    return { templates: templates.map(tpl => Object.assign(tpl, { name: ns + tpl.name })) };
+  = name:NamespaceDecl WS* templates:TemplateDef* {
+    return {
+      templates: templates
+        .map(tpl => {
+          if (tpl.name.type == "LocalTemplateName")
+            tpl.name = Object.assign(tpl.name, { type: "MemberExpression", object: name });
+
+          return {
+            type: "ExpressionStatement",
+            operator: "=",
+            left: tpl.name,
+            right: {
+              type: "ArrowFunctionExpression",
+              id: null,
+              body: tpl.body,
+              params: {
+                type: "ObjectPattern",
+                properties: tpl.params
+              }
+            }
+          };
+        }),
+      name
+    };
   };
 
 WS
@@ -12,8 +39,25 @@ WS
 TemplateDef
   = comments:SoyTemplateDefComment* WS* "{template " name:TemplateName WS* attributes:Attributes? "}" WS+ body:TemplateBodyElement* "{/template}" WS* {
     return {
-      type: "Template",
-      comments,
+      params: comments.reduce((acc, commentLines) => acc.concat(
+        commentLines
+          .filter(line => line.type == "TemplateParam")
+          .map(param => (
+            {
+              type: "Property",
+              shorthand: true,
+              key: {
+                type: "Identifier",
+                name: param.name
+              },
+              value: {
+                type: "Identifier",
+                name: param.name
+              }
+            }
+          )
+        )
+      ), []),
       name,
       body
     };
@@ -25,20 +69,15 @@ TemplateName
   };
 
 LocalTemplateName
-  = ShortIdentifier;
-
-ShortIdentifier
-  = ids:("." Identifier)+ {
-    return ids.map(t => t[0] + t[1].name).join('');
-  };
-
-ComplexIdentifier
-  = head:Identifier tail:ShortIdentifier? {
-    return head.name + tail;
+  = property:SubObjectPropertyAccessor {
+    return {
+      type: "LocalTemplateName",
+      property
+    };
   };
 
 FullTemplateName
-  = ComplexIdentifier;
+  = ObjectPropertyReference;
 
 TemplateBodyElement
   = BlankLine
@@ -78,7 +117,7 @@ SoyMultilineComment
   = "/*" chars:(!"*/" .)* "*/" { return chars.map(c => c[1]).join(""); };
 
 SoyTemplateDefComment
-  = "/*" lines:(SoyCommentParamDefinition / SoyCommentText / BlankLine)* "*/" {
+  = "/" "*"+ WS* lines:(SoyCommentParamDefinition / SoyCommentText / BlankLine)* WS* "*"+ "/" {
     return lines;
   };
 
@@ -89,18 +128,15 @@ SoyCommentParamDefinition
   = WS* "*" WS* param:(SoyCommentRequiredParamDef / SoyCommentOptionalParamDef) WS* SoyCommentText? { return param; };
 
 SoyCommentRequiredParamDef
-  = "@param" WS+ name:Identifier { return name; };
+  = "@param" WS+ name:Identifier { return { type: "TemplateParam", name }; };
 
 SoyCommentOptionalParamDef
-  = "@param?" WS+ name:Identifier { return name; };
+  = "@param?" WS+ name:Identifier { return { type: "TemplateParam", name }; };
 
 NamespaceDecl
-  = SoyComment* WS* "{namespace" WS+ name:NamespaceName "}" {
+  = SoyComment* WS* "{namespace" WS+ name:ObjectPropertyReference "}" {
     return name;
   };
-
-NamespaceName
-  = ComplexIdentifier;
 
 Identifier
   = head:IdentifierFirstChar tail:IdentifierChar* {
@@ -164,10 +200,22 @@ SoyFilter
   / SoySimpleFilter;
 
 SoySimpleFilter
-  = WS* "|" WS* name:Identifier { return { type: "Filter", name, params: [] }; };
+  = WS* "|" WS* name:Identifier {
+    return {
+      type: "Filter",
+      name,
+      arguments: []
+    };
+  };
 
 SoyFilterWithParams
-  = WS* "|" WS* name:Identifier params:SoyFilterParams? { return { type: "Filter", name, params: params || [] }; };
+  = WS* "|" WS* name:Identifier params:SoyFilterParams? {
+    return {
+      type: "Filter",
+      name,
+      params: params || []
+    };
+  };
 
 SoyFilterParams
   = SoyFilterParam+;
@@ -199,10 +247,10 @@ EscapeableSingleQuoteText
   = chars:[^']+ { return chars.join(''); };
 
 SoyLiteralOperator
-  = "{literal}" content:(!"{/literal}" .)* "{/literal}" {
+  = "{literal}" value:(!"{/literal}" .)* "{/literal}" {
     return {
-      type: 'Raw',
-      content
+      type: "Literal",
+      value
     };
   };
 
@@ -438,13 +486,34 @@ SoyAttributeExpr
   / SoyAttributeGeneratorBooleanAttribute;
 
 SoyAttributeGeneratorValueAttribute
-  = name:SoyGeneratedAttributeName "=" value:SoyCapableString { return { type: 'Attribute', name, value }; };
+  = name:SoyGeneratedAttributeNamePart+ "=" value:SoyCapableString {
+    return {
+      type: "GeneratedAttribute",
+      name: {
+        type: "TemplateLiteral",
+        quasis: name.map(v => ({ type: "TemplateElement", value: v }))
+      },
+      value: {
+        type: "TemplateLiteral",
+        quasis: value.map(v => ({ type: "TemplateElement", value: v }))
+      }
+    };
+  };
 
 SoyAttributeGeneratorBooleanAttribute
-  = name:SoyGeneratedAttributeName { return { type: 'Attribute', name, value: name }; };
-
-SoyGeneratedAttributeName
-  = SoyGeneratedAttributeNamePart+;
+  = name:SoyGeneratedAttributeNamePart+ {
+    return {
+      type: "GeneratedAttribute",
+      key: {
+        type: "TemplateLiteral",
+        quasis: name.map(v => ({ type: "TemplateElement", value: v }))
+      },
+      value: {
+        type: "Literal",
+        value: true
+      }
+    };
+  };
 
 SoyGeneratedAttributeNamePart
   = SoyFunctionCall
@@ -456,70 +525,105 @@ SoyGeneratedAttributeNameStringPart
 
 SoyAttributeIfOperator
   = mainClause:SoyAttributeIfClause otherClauses:SoyAttributeElseifClause* otherwiseClause:SoyAttributeElseClause? SoyEndifOperator {
-    const values = [ mainClause, otherwiseClause ].concat(otherClauses).filter(branch => !!branch);
+    // TODO: handle if statement inside attributes somehow
+    const recursiveReduce = (clauses) => {
+      if (clauses && clauses.length < 2) {
+        return clauses[0].output;
+      } else {
+        return {
+          type: "IfStatement",
+          test: clauses[0].test,
+          consequent: clauses[0].output,
+          alternate: recursiveReduce(clauses.slice(1))
+        };
+      }
+    };
 
     return {
-      type: "IfOperator",
-      values
+      type: "IfStatement",
+      test: mainClause.test,
+      consequent: mainClause.output,
+      alternate: recursiveReduce([].concat(otherClauses || []).concat(otherwiseClause ? [ otherwiseClause ] : [ { output: null } ]))
     };
   };
 
 SoyAttributeIfClause
-  = "{" WS* "if" WS+ clause:SoyMathExpression WS* "}" WS* output:SoyAttributeIfOperatorOutput {
-    return { clause, output };
+  = "{" WS* "if" WS+ test:SoyMathExpression WS* "}" WS* output:SoyAttributeIfOperatorOutput {
+    return { test, output };
   };
 
 SoyAttributeElseifClause
-  = "{" WS* "elseif" WS+ clause:SoyMathExpression WS* "}" WS* output:SoyAttributeIfOperatorOutput {
-    return { clause, output };
+  = "{" WS* "elseif" WS+ test:SoyMathExpression WS* "}" WS* output:SoyAttributeIfOperatorOutput {
+    return { test, output };
   };
 
 SoyAttributeElseClause
   = "{" WS* "else" WS* "}" WS* output:SoyAttributeIfOperatorOutput {
-    return { clause: null, output };
+    return { test: null, output };
   };
 
 SoyAttributeIfOperatorOutput
-  = SoyAttributeIfOperatorOutputSingle+;
+  = outputs:SoyAttributeIfOperatorOutputSingle+ {
+    return {
+      type: "JSXExpressionContainer",
+      expression: {
+        type: "TemplateLiteral",
+        quasis: outputs.map(v => ({ type: "TemplateElement", value: v }))
+      }
+    };
+  };
 
 SoyAttributeIfOperatorOutputSingle
-  = (WS / SoySpecialCharacter)* attr:Attribute (WS / SoySpecialCharacter)* { return [ attr ]; };
+  = (WS / SoySpecialCharacter)* attr:SoyAttributeExpr (WS / SoySpecialCharacter)* { return attr; };
 
 SoyIfOperator
   = mainClause:SoyIfClause otherClauses:SoyElseifClause* otherwiseClause:SoyElseClause? SoyEndifOperator {
-    const values = [ mainClause, otherwiseClause ].concat(otherClauses).filter(branch => !!branch);
+    const recursiveReduce = (clauses) => {
+      if (clauses && clauses.length < 2) {
+        return clauses[0].output;
+      } else {
+        return {
+          type: "IfStatement",
+          test: clauses[0].test,
+          consequent: clauses[0].output,
+          alternate: recursiveReduce(clauses.slice(1))
+        };
+      }
+    };
 
     return {
-      type: "IfOperator",
-      values
+      type: "IfStatement",
+      test: mainClause.test,
+      consequent: mainClause.output,
+      alternate: recursiveReduce([].concat(otherClauses || []).concat(otherwiseClause ? [ otherwiseClause ] : [ { output: null } ]))
     };
   };
 
 SoyIfClause
-  = "{" WS* "if" WS+ clause:SoyMathExpression WS* "}" WS* output:TemplateBodyElement* {
-    return { clause, output };
+  = "{" WS* "if" WS+ test:SoyMathExpression WS* "}" WS* output:TemplateBodyElement* {
+    return { test, output };
   };
 
 SoyElseifClause
-  = "{" WS* "elseif" WS+ clause:SoyMathExpression WS* "}" WS* output:TemplateBodyElement* {
-    return { clause, output };
+  = "{" WS* "elseif" WS+ test:SoyMathExpression WS* "}" WS* output:TemplateBodyElement* {
+    return { test, output };
   };
 
 SoyElseClause
   = "{" WS* "else" WS* "}" WS* output:TemplateBodyElement* {
-    return { clause: null, output };
+    return { test: null, output };
   };
 
 SoyEndifOperator
   = "{/if}";
 
 SoyTernaryOperator
-  = test:SoyMathExpression WS* "?" WS* trueValue:SoyValueExpr WS* ":" WS* falseValue:SoyValueExpr {
+  = test:SoyMathExpression WS* "?" WS* consequent:SoyValueExpr WS* ":" WS* alternate:SoyValueExpr {
     return {
       type: "ConditionalExpression",
       test,
-      consequent: trueValue,
-      alternate: falseValue
+      consequent,
+      alternate
     };
   };
 
@@ -531,8 +635,17 @@ SoyInlineLetOperator
   = "{" WS* "let" WS+ name:VariableReference WS* ":" WS* value:SoyValueExpr WS* "/}" {
     return {
       type: "VariableDeclaration",
-      name,
-      value
+      declarations: [
+        {
+          type: "VariableDeclarator",
+          id: {
+            type: "Identifier",
+            name
+          },
+          init: value
+        }
+      ],
+      kind: "let"
     };
   };
 
@@ -540,16 +653,50 @@ SoyMultilineLetOperator
   = "{" WS* "let" WS+ name:VariableReference WS* "}" WS* value:TemplateBodyElement* WS* "{/let}" {
     return {
       type: "VariableDeclaration",
-      name,
-      value
+      declarations: [
+        {
+          type: "VariableDeclarator",
+          id: {
+            type: "Identifier",
+            name
+          },
+          init: value
+        }
+      ],
+      kind: "let"
     };
   };
 
 SoyVariableInterpolation
-  = "{" reference:VariableReference filters:SoyFilters? "}" { return Object.assign({}, reference, { filters }); };
+  = "{" reference:VariableReference filters:SoyFilters? "}" {
+    const recursiveApplyFilters = (filters, expression) => {
+      if (filters.length < 1) {
+        return expression;
+      } else {
+        return {
+          type: "CallExpression",
+          callee: {
+            type: "Identifier",
+            name: filters[0].name,
+          },
+          arguments: [].concat(filters[0].arguments).concat(recursiveApplyFilters(filters.slice(1), expression))
+        };
+      }
+    };
+
+    return {
+      type: "JSXExpressionContainer",
+      expression: recursiveApplyFilters(filters || [], reference)
+    };
+  };
 
 SoyEvaluatedTernaryOperator
-  = "{" value:SoyTernaryOperator "}" { return value; };
+  = "{" expression:SoyTernaryOperator "}" {
+    return {
+      type: "JSXExpressionContainer",
+      expression
+    };
+  };
 
 VariableReference
   = "$" identifier:(ObjectPropertyReference / Identifier) {
@@ -557,27 +704,39 @@ VariableReference
   };
 
 ObjectPropertyReference
-  = object:Identifier property:(SubObjectPropertyAccessor / SubArrayAccessor)+ {
-    return Object.assign({
-        type: "MemberExpression",
-        object,
-      }, property);
+  = object:Identifier properties:(SubObjectPropertyAccessor / SubArrayAccessor)+ {
+    const recursiveAssign = (properties) => {
+      if (properties && properties.length < 2) {
+        return properties[0];
+      } else {
+        return {
+          type: "MemberExpression",
+          property: properties[0],
+          object: recursiveAssign(properties.slice(1))
+        };
+      }
+    };
+
+    const props = [ object ].concat(properties);
+    props.reverse();
+
+    return recursiveAssign(props);
   };
 
 SubObjectPropertyAccessor
   = "." property:Identifier {
-    return {
+    return Object.assign(
       property,
-      computed: false
-    };
+      { computed: false }
+    );
   };
 
 SubArrayAccessor
   = "[" property:SoyValueExpr "]" {
-    return {
+    return Object.assign(
       property,
-      computed: true
-    };
+      { computed: true }
+    );
   };
 
 IntegerIndex
@@ -589,17 +748,27 @@ IntegerNumber
   = "0"
   / ("-"? [1-9] [0-9]*)
   {
-    return parseInt(text());
+    return {
+      type: "Literal",
+      value: parseInt(text())
+    };
   };
 
 FloatNumber
-  = "-"? [0-9]+ ("." [0-9]+)?
-  {
-      return parseFloat(text());
+  = "-"? [0-9]+ ("." [0-9]+)? {
+    return {
+      type: "Literal",
+      value: parseFloat(text())
+    };
   };
 
 BooleanValue
-  = value:("true" / "false") { return { true: true, false: false }[value]; };
+  = value:("true" / "false") {
+    return {
+      type: "Literal",
+      value: { "true": true, "false": false }[value]
+    };
+  };
 
 FunctionCallArguments
   = MultipleFunctionCallArguments
@@ -617,7 +786,25 @@ MultipleFunctionCallArguments
 
 SoyFunctionCall
   = "{" WS* funcCall:FunctionCall WS* filters:SoyFilters? WS* "}" {
-      return Object.assign({}, funcCall, { filters });
+    const recursiveApplyFilters = (filters, expression) => {
+      if (filters.length < 1) {
+        return expression;
+      } else {
+        return {
+          type: "CallExpression",
+          callee: {
+            type: "Identifier",
+            name: filters[0].name,
+          },
+          arguments: [].concat(filters[0].arguments).concat(recursiveApplyFilters(filters.slice(1), expression))
+        };
+      }
+    };
+
+    return {
+      type: "JSXExpressionContainer",
+      expression: recursiveApplyFilters(filters || [], funcCall)
+    };
   };
 
 FunctionCall
@@ -637,20 +824,18 @@ SoyTemplateCall
 MixedTemplateCall
   = "{call" WS+ name:TemplateName WS+ inlineParams:TemplateCallInlineParams? WS* "}" WS* bodyParams:MultilineTemplateCallParams? WS* "{/call}" {
     return {
-      type: "TemplateRef",
-      name: name,
-      attributes: Object.assign({}, (inlineParams || {}), (bodyParams || {})),
-      content: []
+      type: "CallExpression",
+      callee: name,
+      arguments: [].concat(inlineParams || []).concat(bodyParams || []),
     };
   };
 
 InPlaceTemplateCall
   = "{call" WS+ name:TemplateName WS+ params:TemplateCallInlineParams? WS* "/}" {
     return {
-      type: "TemplateRef",
-      name: name,
-      attributes: params || {},
-      content: []
+      type: "CallExpression",
+      callee: name,
+      arguments: params || [],
     };
   };
 
@@ -671,17 +856,26 @@ TemplateCallInlineParam
 TemplateCallInlineBooleanParam
   = name:Identifier {
     return {
-      type: 'Param',
-      name,
-      value: true
+      type: "Property",
+      key: {
+        type: "Identifier",
+        name,
+      },
+      value: {
+        type: "Literal",
+        value: true
+      }
     };
   };
 
 TemplateCallInlineValueParam
   = name:Identifier WS* "=" WS* value:SoyValueExpr {
     return {
-      type: 'Param',
-      name,
+      type: "Property",
+      key: {
+        type: "Identifier",
+        name
+      },
       value
     };
   };
@@ -689,10 +883,14 @@ TemplateCallInlineValueParam
 MultilineTemplateCall
   = "{call" WS+ name:TemplateName WS* "}" WS* params:MultilineTemplateCallParams? WS* "{/call}" {
     return {
-      type: "TemplateReference",
-      name: name,
-      attributes: params || {},
-      content: []
+      type: "CallExpression",
+      callee: name,
+      arguments: [
+        {
+          type: "ObjectExpression",
+          properties: params
+        }
+      ]
     };
   };
 
@@ -713,10 +911,15 @@ MultilineTemplateCallParam
 MultilineTemplateCallBooleanParam
   = "{param" WS+ name:Identifier WS* "/}" {
     return {
-      Type: 'Param',
-      name,
-      value: true,
-      comment
+      type: "Property",
+      key: {
+        type: "Identifier",
+        name,
+      },
+      value: {
+        type: "Literal",
+        value: true,
+      }
     };
   };
 
@@ -725,23 +928,25 @@ MultilineTemplateCallValueParam
   / MultilineTemplateCallMultilineParam;
 
 MultilineTemplateCallMultilineParam
-  = "{param" WS+ name:Identifier WS* "}" WS* content:TemplateBodyElement* WS* "{/param}" {
+  = "{param" WS+ name:Identifier WS* "}" WS* value:TemplateBodyElement* WS* "{/param}" {
     return {
-      type: 'ContentParam',
-      name,
-      value: {
-        name: name,
-        attributes: [],
-        content: content
-      }
+      type: "Property",
+      key: {
+        type: "Identifier",
+        name,
+      },
+      value
     };
   };
 
 MultilineTemplateCallInlineParam
   = "{param" WS+ name:Identifier WS* ":" WS* value:SoyValueExpr WS* "/}" {
     return {
-      type: 'Param',
-      name,
+      type: "Property",
+      key: {
+        type: "Identifier",
+        name,
+      },
       value
     };
   };
@@ -751,17 +956,14 @@ Attributes
   / SingleAttribute;
 
 SingleAttribute
-  = attr:Attribute {
+  = attr:SoyAttributeExpr {
     return [ attr ];
   };
 
 MultipleAttributes
-  = WS* first:Attribute WS* rest:Attributes WS* {
+  = WS* first:SoyAttributeExpr WS* rest:Attributes WS* {
     return [ first ].concat(rest);
   };
-
-Attribute
-  = SoyAttributeExpr;
 
 AttributeName
   = pre:AttributeNameStartChar post:AttributeNameChar* {
@@ -795,17 +997,34 @@ SingleElementContentChild
   = WS* first:ElementContentChild WS* { return [ first ]; };
 
 ElementContentChild
-  = WS* content:(SoyBodyExpr / HtmlComment / SingleElement / PairElement / NonClosedElement / Text) WS* {
+  = WS* content:(SoyBodyExpr / HtmlComment / HTMLElement / Text) WS* {
     return content;
+  };
+
+HTMLElement
+  = element:(SingleElement / PairElement / NonClosedElement) {
+    return {
+      type: "JSXElement",
+      openingElement: element.openingElement,
+      closingElement: element.closingElement || null,
+      children: element.children || [],
+    };
   };
 
 SingleElement
   = "<" name:TagName WS* attributes:Attributes? WS* "/>" {
+    if (attributes.some(a => a.type == "GeneratedAttribute")) {
+      // TODO: <GenerateTag name={name} attributes={attributes} selfClosing>{content}</GenerateTag>
+      return {};
+    }
+
     return {
-      type: "HTMLElement",
-      name,
-      attributes: attributes || {},
-      children: []
+      openingElement: {
+        type: "JSXOpeningElement",
+        name,
+        attributes: attributes || [],
+        selfClosing: true
+      }
     };
   };
 
@@ -829,9 +1048,52 @@ GeneratedElementTagName
 GeneratedSingleElement
   = "<" name:GeneratedElementTagName WS* attributes:Attributes? WS* "/>" {
     return {
-      type: "HTMLElement",
-      name,
-      attributes,
+      openingElement: {
+        type: "JSXOpeningElement",
+        name: {
+          type: "JSXIdentifier",
+          name: "GenerateTag"
+        },
+        attributes: [
+          {
+            type: "JSXAttribute",
+            name: {
+              type: "JSXIdentifier",
+              name: "name"
+            },
+            value: name // This could be either an expression or just a value
+          },
+          {
+            type: "JSXAttribute",
+            name: {
+              type: "JSXIdentifier",
+              name: "selfClosing"
+            },
+            value: null, // Is set (the boolean attribute)
+          },
+          {
+            type: "JSXAttribute",
+            name: {
+              type: "JSXIdentifier",
+              name: "attributes"
+            },
+            value: {
+              type: "JSXExpressionContainer",
+              expression: {
+                type: "ArrayExpression",
+                elements: attributes
+              }
+            }
+          }
+        ]
+      },
+      closingElement: {
+        type: "JSXClosingElement",
+        name: {
+          type: "JSXIdentifier",
+          name: "GenerateTag"
+        }
+      },
       children: []
     };
   };
@@ -840,46 +1102,139 @@ GeneratedSingleElement
 GeneratedPairElement
   = "<" startTag:GeneratedElementTagName WS* attributes:Attributes? WS* ">" children:TemplateBodyElement* "</" endTag:GeneratedElementTagName ">" {
     return {
-      type: "HTMLElement",
-      name: startTag,
-      attributes,
+      openingElement: {
+        type: "JSXOpeningElement",
+        name: {
+          type: "JSXIdentifier",
+          name: "GenerateTag"
+        },
+        attributes: [
+          {
+            type: "JSXAttribute",
+            name: {
+              type: "JSXIdentifier",
+              name: "name"
+            },
+            value: startTag.name // This could be either an expression or just a value
+          },
+          {
+            type: "JSXAttribute",
+            name: {
+              type: "JSXIdentifier",
+              name: "attributes"
+            },
+            value: {
+              type: "JSXExpressionContainer",
+              expression: attributes // Interpolation made simple
+            }
+          }
+        ]
+      },
+      closingElement: {
+        type: "JSXClosingElement",
+        name: {
+          type: "JSXIdentifier",
+          name: "GenerateTag"
+        }
+      },
       children
     };
   };
 
 GeneratedUnclosedElement
-  = "<" name:GeneratedElementTagName WS* attributes:Attributes? WS* ">"{
+  = "<" name:GeneratedElementTagName WS* attributes:Attributes? WS* ">" {
     return {
-      type: "HTMLElement",
-      name,
-      attributes,
+      openingElement: {
+        type: "JSXOpeningElement",
+        name: {
+          type: "JSXIdentifier",
+          name: "GenerateTag"
+        },
+        attributes: [
+          {
+            type: "JSXAttribute",
+            name: {
+              type: "JSXIdentifier",
+              name: "name"
+            },
+            value: name // This could be either an expression or just a value
+          },
+          {
+            type: "JSXAttribute",
+            name: {
+              type: "JSXIdentifier",
+              name: "selfClosing"
+            },
+            value: null, // Is set (the boolean attribute)
+          },
+          {
+            type: "JSXAttribute",
+            name: {
+              type: "JSXIdentifier",
+              name: "attributes"
+            },
+            value: {
+              type: "JSXExpressionContainer",
+              expression: attributes // Interpolation made simple
+            }
+          }
+        ]
+      },
+      closingElement: {
+        type: "JSXClosingElement",
+        name: {
+          type: "JSXIdentifier",
+          name: "GenerateTag"
+        }
+      },
       children: []
     };
   };
 
+// TODO: deepEqual to match startTag & endTag
 PairElement
-  = startTag:StartTag children:ElementContent? endTag:EndTag & { return startTag.name == endTag } {
+  = startTag:StartTag children:ElementContent? endTag:EndTag & { return startTag.name.type == endTag.name.type && startTag.name.name == endTag.name.name } {
     return {
-      type: "HTMLElement",
-      name: startTag.name,
-      attributes: startTag.attributes || {},
+      openingElement: {
+        type: "JSXOpeningElement",
+        name: startTag.name,
+        attributes: startTag.attributes || {},
+      },
+      closingElement: {
+        type: "JSXClosingElement",
+        name: endTag.name,
+      },
       children: children || [],
     };
   };
 
 NonClosedElement
-  = tag:StartTag { return Object.assign({}, tag, { children: [] }); };
+  = openingElement:StartTag {
+    return {
+      openingElement: Object.assign(openingElement, { type: "JSXOpeningElement", selfClosing: true })
+    };
+  };
 
 StartTag
   = "<" name:TagName WS* attributes:Attributes? WS* ">" {
     return {
-      name,
+      name: {
+        type: "JSXIdentifier",
+        name
+      },
       attributes: attributes || {}
     };
   };
 
 EndTag
-  = "</" name:TagName ">" { return name; };
+  = "</" name:TagName ">" {
+    return {
+      name: {
+        type: "JSXIdentifier",
+        name
+      }
+    };
+  };
 
 TagName
   = head:[a-zA-Z_] tail:[a-zA-Z\-0-9]* {
@@ -889,8 +1244,7 @@ TagName
 Text
   = chars:[^<]+  {
     return {
-      type: "TextNode",
-      attributes: {},
-      content: chars.join("")
+      type: "Literal",
+      value: chars.join("")
     };
   };
