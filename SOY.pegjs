@@ -16,15 +16,18 @@ Namespace
 
           return {
             type: "ExpressionStatement",
-            operator: "=",
-            left: tpl.name,
-            right: {
-              type: "ArrowFunctionExpression",
-              id: null,
-              body: tpl.body,
-              params: {
-                type: "ObjectPattern",
-                properties: tpl.params
+            expression: {
+              type: "AssignmentExpression",
+              operator: "=",
+              left: tpl.name,
+              right: {
+                type: "ArrowFunctionExpression",
+                id: null,
+                body: tpl.body,
+                params: [{
+                  type: "ObjectPattern",
+                  properties: tpl.params
+                }]
               }
             }
           };
@@ -38,6 +41,9 @@ WS
 
 TemplateDef
   = comments:SoyTemplateDefComment* WS* "{template " name:TemplateName WS* attributes:Attributes? "}" WS+ body:TemplateBodyElement* "{/template}" WS* {
+    // body = body
+    //   .filter(elt => elt.type != "BlankLine");
+
     return {
       params: comments.reduce((acc, commentLines) => acc.concat(
         commentLines
@@ -46,20 +52,15 @@ TemplateDef
             {
               type: "Property",
               shorthand: true,
-              key: {
-                type: "Identifier",
-                name: param.name
-              },
-              value: {
-                type: "Identifier",
-                name: param.name
-              }
+              kind: "init",
+              key: param.name,
+              value: param.name
             }
           )
         )
       ), []),
       name,
-      body
+      body: body.length > 1 ? { type: "SequenceExpression", expressions: body, expression: true } : body[0]
     };
   };
 
@@ -97,9 +98,8 @@ TemplateBodyText
 BlankLine
   = chars:WS+ {
     return {
-      type: 'BlankLine',
-      children: chars.join(''),
-      attributes: []
+      type: "Literal",
+      value: chars.join('')
     };
   };
 
@@ -150,7 +150,7 @@ IdentifierFirstChar = [a-zA-Z];
 IdentifierChar = [a-zA-Z0-9_];
 
 SoyMathEvaluationExpression
-  = "{" WS* expression:SoyMathExpression WS* "}" { return { type: "MathExpression", expression }; }
+  = "{" WS* expression:SoyMathExpression WS* "}" { return expression; }
 
 SoyBodyExpr
   = SoyComment
@@ -227,7 +227,8 @@ SoyStringInterpolateableExpr
   = FloatNumber
   / IntegerNumber
   / SoyVariableInterpolation
-  / SoyFunctionCall;
+  / SoyFunctionCall
+  / SoyIfOperator;
 
 SoyCapableString
   = str:(DoubleQuotedSoyCapableString / SingleQuotedSoyCapableString) {
@@ -235,10 +236,28 @@ SoyCapableString
   };
 
 DoubleQuotedSoyCapableString
-  = '"' content:(SoyStringInterpolateableExpr / EscapeableDoubleQuoteText)* '"' { return content; };
+  = '"' content:(SoyStringInterpolateableExpr / EscapeableDoubleQuoteText)* '"' {
+    const expressions = content.filter(v => v.type == "JSXExpressionContainer").map(v => v.expression).concat(content.filter(v => v.type == "CallExpression" || v.type == "IfStatement" || v.type == "ConditionalExpression"));
+    const quasis = (expressions.length > 0 ? ["", ""] : []).concat(content).filter(v => v.type != "JSXExpressionContainer" && v.type != "CallExpression" && v.type != "IfStatement" && v.type != "ConditionalExpression").map(v => ({ type: "TemplateElement", value: { raw: v } }));
+
+    return {
+      type: "TemplateLiteral",
+      quasis,
+      expressions
+    };
+  };
 
 SingleQuotedSoyCapableString
-  = "'" content:(SoyStringInterpolateableExpr / EscapeableSingleQuoteText)* "'" { return content; };
+  = "'" content:(SoyStringInterpolateableExpr / EscapeableSingleQuoteText)* "'" {
+    const expressions = content.filter(v => v.type == "JSXExpressionContainer").map(v => v.expression);
+    const quasis = (expressions.length > 0 ? ["", ""] : []).concat(content).filter(v => v.type != "JSXExpressionContainer").map(v => ({ type: "TemplateElement", value: { raw: v } }));
+
+    return {
+      type: "TemplateLiteral",
+      quasis,
+      expressions
+    };
+  };
 
 EscapeableDoubleQuoteText
   = chars:[^"]+ { return chars.join(''); };
@@ -487,26 +506,31 @@ SoyAttributeExpr
 
 SoyAttributeGeneratorValueAttribute
   = name:SoyGeneratedAttributeNamePart+ "=" value:SoyCapableString {
+    const expressions = name.filter(v => v.type == "JSXExpressionContainer").map(v => v.expression);
+    const quasis = (expressions.length > 0 ? ["", ""] : []).concat(name).filter(v => v.type != "JSXExpressionContainer").map(v => ({ type: "TemplateElement", value: { raw: v } }));
+
     return {
       type: "GeneratedAttribute",
       name: {
         type: "TemplateLiteral",
-        quasis: name.map(v => ({ type: "TemplateElement", value: v }))
+        quasis,
+        expressions
       },
-      value: {
-        type: "TemplateLiteral",
-        quasis: value.map(v => ({ type: "TemplateElement", value: v }))
-      }
+      value
     };
   };
 
 SoyAttributeGeneratorBooleanAttribute
   = name:SoyGeneratedAttributeNamePart+ {
+    const expressions = name.filter(v => v.type == "JSXExpressionContainer").map(v => v.expression);
+    const quasis = (expressions.length > 0 ? ["", ""] : []).concat(name).filter(v => v.type != "JSXExpressionContainer").map(v => ({ type: "TemplateElement", value: { raw: v } }));
+
     return {
       type: "GeneratedAttribute",
       key: {
         type: "TemplateLiteral",
-        quasis: name.map(v => ({ type: "TemplateElement", value: v }))
+        quasis,
+        expressions
       },
       value: {
         type: "Literal",
@@ -525,7 +549,6 @@ SoyGeneratedAttributeNameStringPart
 
 SoyAttributeIfOperator
   = mainClause:SoyAttributeIfClause otherClauses:SoyAttributeElseifClause* otherwiseClause:SoyAttributeElseClause? SoyEndifOperator {
-    // TODO: handle if statement inside attributes somehow
     const recursiveReduce = (clauses) => {
       if (clauses && clauses.length < 2) {
         return clauses[0].output;
@@ -539,11 +562,13 @@ SoyAttributeIfOperator
       }
     };
 
+    const alternate = recursiveReduce([].concat(otherClauses || []).concat(otherwiseClause ? [ otherwiseClause ] : [ { output: null } ]));
+
     return {
       type: "IfStatement",
-      test: mainClause.test,
-      consequent: mainClause.output,
-      alternate: recursiveReduce([].concat(otherClauses || []).concat(otherwiseClause ? [ otherwiseClause ] : [ { output: null } ]))
+      test: mainClause.test.type == "JSXExpressionContainer" ? mainClause.test.expression : mainClause.test,
+      consequent: mainClause.output.type == "JSXExpressionContainer" ? mainClause.output.expression : mainClause.output,
+      alternate: alternate || null
     };
   };
 
@@ -564,12 +589,65 @@ SoyAttributeElseClause
 
 SoyAttributeIfOperatorOutput
   = outputs:SoyAttributeIfOperatorOutputSingle+ {
+    const addAttributeStatement = (attribute) => ({
+        type: "ExpressionStatement",
+        expression: {
+          type: "CallExpression",
+          callee: {
+            type: "MemberExpression",
+            object: {
+              type: "Identifier",
+              name: "attributes"
+            },
+          },
+          property: {
+            type: "Identifier",
+            name: "push"
+          },
+          arguments: [ attribute ]
+        }
+      });
+
+    const expressions = outputs
+      .filter(v => v.type == "JSXExpressionContainer")
+      .map(v => addAttributeStatement(v.expression));
+
+    const quasis = (expressions.length > 0 ? ["", ""] : []).concat(outputs)
+      .filter(v => v.type != "JSXExpressionContainer" && v.type != "GeneratedAttribute")
+      .map(v => ({ type: "TemplateElement", value: { raw: v } }));
+
+    const literal = {
+      type: "TemplateLiteral",
+      quasis: quasis.length > 1 ? quasis : quasis[0],
+      expressions
+    };
+
     return {
-      type: "JSXExpressionContainer",
-      expression: {
-        type: "TemplateLiteral",
-        quasis: outputs.map(v => ({ type: "TemplateElement", value: v }))
-      }
+      type: "BlockStatement",
+      body: (quasis.length > 0 || expressions.length > 0 ? [ literal ] : []).concat(outputs
+        .filter(v => v.type == "GeneratedAttribute")
+        .map(v => ({
+          type: "ObjectExpression",
+          properties: [
+            {
+              type: "Property",
+              key: {
+                type: "Literal",
+                value: "name"
+              },
+              value: v.name
+            },
+            {
+              type: "Property",
+              key: {
+                type: "Literal",
+                value: "value"
+              },
+              value: v.value
+            }
+          ]
+        }))
+      )
     };
   };
 
@@ -595,7 +673,7 @@ SoyIfOperator
       type: "IfStatement",
       test: mainClause.test,
       consequent: mainClause.output,
-      alternate: recursiveReduce([].concat(otherClauses || []).concat(otherwiseClause ? [ otherwiseClause ] : [ { output: null } ]))
+      alternate: recursiveReduce([].concat(otherClauses || []).concat(otherwiseClause ? [ otherwiseClause ] : [ { output: null } ])) || { type: "Literal", value: null }
     };
   };
 
@@ -801,10 +879,7 @@ SoyFunctionCall
       }
     };
 
-    return {
-      type: "JSXExpressionContainer",
-      expression: recursiveApplyFilters(filters || [], funcCall)
-    };
+    return recursiveApplyFilters(filters || [], funcCall);
   };
 
 FunctionCall
@@ -1014,17 +1089,122 @@ HTMLElement
 SingleElement
   = "<" name:TagName WS* attributes:Attributes? WS* "/>" {
     if (attributes.some(a => a.type == "GeneratedAttribute")) {
-      // TODO: <GenerateTag name={name} attributes={attributes} selfClosing>{content}</GenerateTag>
-      return {};
+      attributes = attributes
+        .map(a => {
+          if (a.type == "GeneratedAttribute") {
+            let name = a.name;
+            let value = a.value;
+
+            if (a.name.type == "TemplateLiteral" && a.name.quasis.length == 1 && a.name.expressions.length == 0) {
+              name = {
+                type: "Literal",
+                value: a.name.quasis[0].value.raw,
+              };
+            }
+
+            if (a.value.type == "TemplateLiteral" && a.value.quasis.length == 1 && a.value.expressions.length == 0) {
+              value = {
+                type: "Literal",
+                value: a.value.quasis[0].value.raw
+              };
+            }
+
+            return {
+              type: "ObjectExpression",
+              properties: [
+                {
+                  type: "Property",
+                  key: {
+                    type: "Literal",
+                    value: "name"
+                  },
+                  value: name,
+                  kind: "init"
+                },
+                {
+                  type: "Property",
+                  key: {
+                    type: "Literal",
+                    value: "value"
+                  },
+                  value: value,
+                  kind: "init"
+                }
+              ]
+            };
+          }
+
+          return a;
+        });
+
+      return {
+        type: "JSXElement",
+        openingElement: {
+          type: "JSXOpeningElement",
+          name: {
+            type: "JSXIdentifier",
+            name: "GenerateTag"
+          },
+          attributes: [
+            {
+              type: "JSXAttribute",
+              name: {
+                type: "JSXIdentifier",
+                name: "name"
+              },
+              value: name // This could be either an expression or just a value
+            },
+            {
+              type: "JSXAttribute",
+              name: {
+                type: "JSXIdentifier",
+                name: "selfClosing"
+              },
+              value: null, // Is set (the boolean attribute)
+            },
+            {
+              type: "JSXAttribute",
+              name: {
+                type: "JSXIdentifier",
+                name: "attributes"
+              },
+              value: {
+                type: "JSXExpressionContainer",
+                expression: {
+                  type: "ArrayExpression",
+                  elements: attributes
+                }
+              }
+            }
+          ]
+        },
+        closingElement: {
+          type: "JSXClosingElement",
+          name: {
+            type: "JSXIdentifier",
+            name: "GenerateTag"
+          }
+        },
+        children: []
+      };
     }
 
     return {
+      type: "JSXElement",
       openingElement: {
         type: "JSXOpeningElement",
         name,
         attributes: attributes || [],
         selfClosing: true
-      }
+      },
+      closingElement: {
+        type: "JSXClosingElement",
+        name: {
+          type: "JSXIdentifier",
+          name: "GenerateTag"
+        }
+      },
+      children: []
     };
   };
 
@@ -1048,6 +1228,7 @@ GeneratedElementTagName
 GeneratedSingleElement
   = "<" name:GeneratedElementTagName WS* attributes:Attributes? WS* "/>" {
     return {
+      type: "JSXElement",
       openingElement: {
         type: "JSXOpeningElement",
         name: {
@@ -1102,6 +1283,7 @@ GeneratedSingleElement
 GeneratedPairElement
   = "<" startTag:GeneratedElementTagName WS* attributes:Attributes? WS* ">" children:TemplateBodyElement* "</" endTag:GeneratedElementTagName ">" {
     return {
+      type: "JSXElement",
       openingElement: {
         type: "JSXOpeningElement",
         name: {
@@ -1144,6 +1326,7 @@ GeneratedPairElement
 GeneratedUnclosedElement
   = "<" name:GeneratedElementTagName WS* attributes:Attributes? WS* ">" {
     return {
+      type: "JSXElement",
       openingElement: {
         type: "JSXOpeningElement",
         name: {
@@ -1194,7 +1377,109 @@ GeneratedUnclosedElement
 // TODO: deepEqual to match startTag & endTag
 PairElement
   = startTag:StartTag children:ElementContent? endTag:EndTag & { return startTag.name.type == endTag.name.type && startTag.name.name == endTag.name.name } {
+    if (startTag.attributes.some(a => a.type == "GeneratedAttribute")) {
+      const attributes = startTag.attributes
+        .map(a => {
+          if (a.type == "GeneratedAttribute") {
+            let name = a.name;
+            let value = a.value;
+
+            if (a.name.type == "TemplateLiteral" && a.name.quasis.length == 1 && a.name.expressions.length == 0) {
+              name = {
+                type: "Literal",
+                value: a.name.quasis[0].value.raw,
+              };
+            }
+
+            if (a.value.type == "TemplateLiteral" && a.value.quasis.length == 1 && a.value.expressions.length == 0) {
+              value = {
+                type: "Literal",
+                value: a.value.quasis[0].value.raw
+              };
+            }
+
+            return {
+              type: "ObjectExpression",
+              properties: [
+                {
+                  type: "Property",
+                  key: {
+                    type: "Literal",
+                    value: "name"
+                  },
+                  value: name,
+                  kind: "init"
+                },
+                {
+                  type: "Property",
+                  key: {
+                    type: "Literal",
+                    value: "value"
+                  },
+                  value: value,
+                  kind: "init"
+                }
+              ]
+            };
+          }
+
+          return a;
+        });
+
+      return {
+        type: "JSXElement",
+        openingElement: {
+          type: "JSXOpeningElement",
+          name: {
+            type: "JSXIdentifier",
+            name: "GenerateTag"
+          },
+          attributes: [
+            {
+              type: "JSXAttribute",
+              name: {
+                type: "JSXIdentifier",
+                name: "name"
+              },
+              value: startTag.name // This could be either an expression or just a value
+            },
+            {
+              type: "JSXAttribute",
+              name: {
+                type: "JSXIdentifier",
+                name: "selfClosing"
+              },
+              value: null, // Is set (the boolean attribute)
+            },
+            {
+              type: "JSXAttribute",
+              name: {
+                type: "JSXIdentifier",
+                name: "attributes"
+              },
+              value: {
+                type: "JSXExpressionContainer",
+                expression: {
+                  type: "ArrayExpression",
+                  elements: attributes
+                }
+              }
+            }
+          ]
+        },
+        closingElement: {
+          type: "JSXClosingElement",
+          name: {
+            type: "JSXIdentifier",
+            name: "GenerateTag"
+          }
+        },
+        children: children || []
+      };
+    }
+
     return {
+      type: "JSXElement",
       openingElement: {
         type: "JSXOpeningElement",
         name: startTag.name,
@@ -1209,9 +1494,113 @@ PairElement
   };
 
 NonClosedElement
-  = openingElement:StartTag {
+  = startTag:StartTag {
+    if (startTag.attributes.some(a => a.type == "GeneratedAttribute")) {
+      const attributes = startTag.attributes
+        .map(a => {
+          if (a.type == "GeneratedAttribute") {
+            let name = a.name;
+            let value = a.value;
+
+            if (a.name.type == "TemplateLiteral" && a.name.quasis.length == 1 && a.name.expressions.length == 0) {
+              name = {
+                type: "Literal",
+                value: a.name.quasis[0].value.raw,
+              };
+            }
+
+            if (a.value.type == "TemplateLiteral" && a.value.quasis.length == 1 && a.value.expressions.length == 0) {
+              value = {
+                type: "Literal",
+                value: a.value.quasis[0].value.raw
+              };
+            }
+
+            return {
+              type: "ObjectExpression",
+              properties: [
+                {
+                  type: "Property",
+                  key: {
+                    type: "Literal",
+                    value: "name"
+                  },
+                  value: name,
+                  kind: "init"
+                },
+                {
+                  type: "Property",
+                  key: {
+                    type: "Literal",
+                    value: "value"
+                  },
+                  value: value,
+                  kind: "init"
+                }
+              ]
+            };
+          }
+
+          return a;
+        });
+
+      return {
+        type: "JSXElement",
+        openingElement: {
+          type: "JSXOpeningElement",
+          name: {
+            type: "JSXIdentifier",
+            name: "GenerateTag"
+          },
+          attributes: [
+            {
+              type: "JSXAttribute",
+              name: {
+                type: "JSXIdentifier",
+                name: "name"
+              },
+              value: startTag.name // This could be either an expression or just a value
+            },
+            {
+              type: "JSXAttribute",
+              name: {
+                type: "JSXIdentifier",
+                name: "selfClosing"
+              },
+              value: null, // Is set (the boolean attribute)
+            },
+            {
+              type: "JSXAttribute",
+              name: {
+                type: "JSXIdentifier",
+                name: "attributes"
+              },
+              value: {
+                type: "JSXExpressionContainer",
+                expression: {
+                  type: "ArrayExpression",
+                  elements: attributes
+                }
+              }
+            }
+          ]
+        },
+        closingElement: {
+          type: "JSXClosingElement",
+          name: {
+            type: "JSXIdentifier",
+            name: "GenerateTag"
+          }
+        },
+        children: []
+      };
+    }
+
     return {
-      openingElement: Object.assign(openingElement, { type: "JSXOpeningElement", selfClosing: true })
+      type: "JSXElement",
+      openingElement: Object.assign(startTag, { type: "JSXOpeningElement", selfClosing: true }),
+      closingElement: null,
+      children: []
     };
   };
 
@@ -1219,8 +1608,8 @@ StartTag
   = "<" name:TagName WS* attributes:Attributes? WS* ">" {
     return {
       name: {
-        type: "JSXIdentifier",
-        name
+        type: "Literal",
+        value: name
       },
       attributes: attributes || {}
     };
@@ -1230,8 +1619,8 @@ EndTag
   = "</" name:TagName ">" {
     return {
       name: {
-        type: "JSXIdentifier",
-        name
+        type: "Literal",
+        value: name
       }
     };
   };
