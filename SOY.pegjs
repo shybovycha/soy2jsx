@@ -422,14 +422,26 @@ SoyArrayMultipleElements
   = first:SoyArraySingleElement "," rest:SoyArrayElements { return [ first ].concat(rest); };
 
 SoyMapExpression
-  = "[" WS* entries:SoyMapEntries? WS* "]" { return entries; } //.reduce((acc, e) => Object.assign(acc, { [e.key]: e.value }), {}); };
+  = "[" WS* properties:SoyMapEntries? WS* "]" {
+    return {
+      type: "ObjectExpression",
+      properties
+    };
+  }
 
 SoyMapEntries
   = SoyMapMultipleEntry
   / SoyMapSingleEntry;
 
 SoyMapSingleEntry
-  = WS* key:SoyValueExpr WS* ":" WS* value:SoyValueExpr WS* { return [{ key, value }]; };
+  = WS* key:SoyValueExpr WS* ":" WS* value:SoyValueExpr WS* {
+    return {
+      type: "Property",
+      key,
+      value,
+      computed: true
+    };
+  };
 
 SoyMapMultipleEntry
   = first:SoyMapSingleEntry "," rest:SoyMapEntries { return [ first ].concat(rest); };
@@ -588,68 +600,7 @@ SoyAttributeElseClause
   };
 
 SoyAttributeIfOperatorOutput
-  = outputs:SoyAttributeIfOperatorOutputSingle+ {
-    const addAttributeStatement = (attribute) => ({
-        type: "ExpressionStatement",
-        expression: {
-          type: "CallExpression",
-          callee: {
-            type: "MemberExpression",
-            object: {
-              type: "Identifier",
-              name: "attributes"
-            },
-          },
-          property: {
-            type: "Identifier",
-            name: "push"
-          },
-          arguments: [ attribute ]
-        }
-      });
-
-    const expressions = outputs
-      .filter(v => v.type == "JSXExpressionContainer")
-      .map(v => addAttributeStatement(v.expression));
-
-    const quasis = (expressions.length > 0 ? ["", ""] : []).concat(outputs)
-      .filter(v => v.type != "JSXExpressionContainer" && v.type != "GeneratedAttribute")
-      .map(v => ({ type: "TemplateElement", value: { raw: v } }));
-
-    const literal = {
-      type: "TemplateLiteral",
-      quasis: quasis.length > 1 ? quasis : quasis[0],
-      expressions
-    };
-
-    return {
-      type: "BlockStatement",
-      body: (quasis.length > 0 || expressions.length > 0 ? [ literal ] : []).concat(outputs
-        .filter(v => v.type == "GeneratedAttribute")
-        .map(v => ({
-          type: "ObjectExpression",
-          properties: [
-            {
-              type: "Property",
-              key: {
-                type: "Literal",
-                value: "name"
-              },
-              value: v.name
-            },
-            {
-              type: "Property",
-              key: {
-                type: "Literal",
-                value: "value"
-              },
-              value: v.value
-            }
-          ]
-        }))
-      )
-    };
-  };
+  = outputs:SoyAttributeIfOperatorOutputSingle+;
 
 SoyAttributeIfOperatorOutputSingle
   = (WS / SoySpecialCharacter)* attr:SoyAttributeExpr (WS / SoySpecialCharacter)* { return attr; };
@@ -1089,112 +1040,29 @@ HTMLElement
 SingleElement
   = "<" name:TagName WS* attributes:Attributes? WS* "/>" {
     if (attributes.some(a => a.type == "GeneratedAttribute")) {
-      attributes = attributes
-        .map(a => {
-          if (a.type == "GeneratedAttribute") {
-            let name = a.name;
-            let value = a.value;
-
-            if (a.name.type == "TemplateLiteral" && a.name.quasis.length == 1 && a.name.expressions.length == 0) {
-              name = {
-                type: "Literal",
-                value: a.name.quasis[0].value.raw,
-              };
-            }
-
-            if (a.value.type == "TemplateLiteral" && a.value.quasis.length == 1 && a.value.expressions.length == 0) {
-              value = {
-                type: "Literal",
-                value: a.value.quasis[0].value.raw
-              };
-            }
-
-            return {
-              type: "ObjectExpression",
-              properties: [
-                {
-                  type: "Property",
-                  key: {
-                    type: "Literal",
-                    value: "name"
-                  },
-                  value: name,
-                  kind: "init"
-                },
-                {
-                  type: "Property",
-                  key: {
-                    type: "Literal",
-                    value: "value"
-                  },
-                  value: value,
-                  kind: "init"
-                }
-              ]
-            };
-          }
-
-          return a;
-        });
-
-      return {
-        type: "JSXElement",
-        openingElement: {
-          type: "JSXOpeningElement",
-          name: {
-            type: "JSXIdentifier",
-            name: "GenerateTag"
-          },
-          attributes: [
-            {
-              type: "JSXAttribute",
-              name: {
-                type: "JSXIdentifier",
-                name: "name"
-              },
-              value: name // This could be either an expression or just a value
-            },
-            {
-              type: "JSXAttribute",
-              name: {
-                type: "JSXIdentifier",
-                name: "selfClosing"
-              },
-              value: null, // Is set (the boolean attribute)
-            },
-            {
-              type: "JSXAttribute",
-              name: {
-                type: "JSXIdentifier",
-                name: "attributes"
-              },
-              value: {
-                type: "JSXExpressionContainer",
-                expression: {
-                  type: "ArrayExpression",
-                  elements: attributes
-                }
-              }
-            }
-          ]
-        },
-        closingElement: {
-          type: "JSXClosingElement",
-          name: {
-            type: "JSXIdentifier",
-            name: "GenerateTag"
-          }
-        },
-        children: []
-      };
+      // throw `We do not support tags with generated attributes. Do your bite and refactor that monster`;
+      console.warn("Generated attributes found:\n", JSON.stringify(attributes), "\n\n");
     }
+
+    attributes = attributes.map(attr => ({
+      type: "ObjectExpression",
+      properties: [
+        {
+          key: attr.name,
+          value: attr.value
+        }
+      ]
+    }));
 
     return {
       type: "JSXElement",
       openingElement: {
         type: "JSXOpeningElement",
         name,
-        attributes: attributes || [],
+        attributes: {
+          type: "ArrayExpression",
+          elements: attributes || [],
+        },
         selfClosing: true
       },
       closingElement: {
@@ -1227,6 +1095,16 @@ GeneratedElementTagName
 
 GeneratedSingleElement
   = "<" name:GeneratedElementTagName WS* attributes:Attributes? WS* "/>" {
+    attributes = attributes.map(attr => ({
+      type: "ObjectExpression",
+      properties: [
+        {
+          key: attr.name,
+          value: attr.value
+        }
+      ]
+    }));
+
     return {
       type: "JSXElement",
       openingElement: {
@@ -1243,14 +1121,6 @@ GeneratedSingleElement
               name: "name"
             },
             value: name // This could be either an expression or just a value
-          },
-          {
-            type: "JSXAttribute",
-            name: {
-              type: "JSXIdentifier",
-              name: "selfClosing"
-            },
-            value: null, // Is set (the boolean attribute)
           },
           {
             type: "JSXAttribute",
@@ -1282,6 +1152,16 @@ GeneratedSingleElement
 // & { return deepEqual(startTag, endTag); }
 GeneratedPairElement
   = "<" startTag:GeneratedElementTagName WS* attributes:Attributes? WS* ">" children:TemplateBodyElement* "</" endTag:GeneratedElementTagName ">" {
+    attributes = attributes.map(attr => ({
+      type: "ObjectExpression",
+      properties: [
+        {
+          key: attr.name,
+          value: attr.value
+        }
+      ]
+    }));
+
     return {
       type: "JSXElement",
       openingElement: {
@@ -1325,6 +1205,16 @@ GeneratedPairElement
 
 GeneratedUnclosedElement
   = "<" name:GeneratedElementTagName WS* attributes:Attributes? WS* ">" {
+    attributes = attributes.map(attr => ({
+      type: "ObjectExpression",
+      properties: [
+        {
+          key: attr.name,
+          value: attr.value
+        }
+      ]
+    }));
+
     return {
       type: "JSXElement",
       openingElement: {
@@ -1341,14 +1231,6 @@ GeneratedUnclosedElement
               name: "name"
             },
             value: name // This could be either an expression or just a value
-          },
-          {
-            type: "JSXAttribute",
-            name: {
-              type: "JSXIdentifier",
-              name: "selfClosing"
-            },
-            value: null, // Is set (the boolean attribute)
           },
           {
             type: "JSXAttribute",
@@ -1378,104 +1260,8 @@ GeneratedUnclosedElement
 PairElement
   = startTag:StartTag children:ElementContent? endTag:EndTag & { return startTag.name.type == endTag.name.type && startTag.name.name == endTag.name.name } {
     if (startTag.attributes.some(a => a.type == "GeneratedAttribute")) {
-      const attributes = startTag.attributes
-        .map(a => {
-          if (a.type == "GeneratedAttribute") {
-            let name = a.name;
-            let value = a.value;
-
-            if (a.name.type == "TemplateLiteral" && a.name.quasis.length == 1 && a.name.expressions.length == 0) {
-              name = {
-                type: "Literal",
-                value: a.name.quasis[0].value.raw,
-              };
-            }
-
-            if (a.value.type == "TemplateLiteral" && a.value.quasis.length == 1 && a.value.expressions.length == 0) {
-              value = {
-                type: "Literal",
-                value: a.value.quasis[0].value.raw
-              };
-            }
-
-            return {
-              type: "ObjectExpression",
-              properties: [
-                {
-                  type: "Property",
-                  key: {
-                    type: "Literal",
-                    value: "name"
-                  },
-                  value: name,
-                  kind: "init"
-                },
-                {
-                  type: "Property",
-                  key: {
-                    type: "Literal",
-                    value: "value"
-                  },
-                  value: value,
-                  kind: "init"
-                }
-              ]
-            };
-          }
-
-          return a;
-        });
-
-      return {
-        type: "JSXElement",
-        openingElement: {
-          type: "JSXOpeningElement",
-          name: {
-            type: "JSXIdentifier",
-            name: "GenerateTag"
-          },
-          attributes: [
-            {
-              type: "JSXAttribute",
-              name: {
-                type: "JSXIdentifier",
-                name: "name"
-              },
-              value: startTag.name // This could be either an expression or just a value
-            },
-            {
-              type: "JSXAttribute",
-              name: {
-                type: "JSXIdentifier",
-                name: "selfClosing"
-              },
-              value: null, // Is set (the boolean attribute)
-            },
-            {
-              type: "JSXAttribute",
-              name: {
-                type: "JSXIdentifier",
-                name: "attributes"
-              },
-              value: {
-                type: "JSXExpressionContainer",
-                expression: {
-                  type: "ArrayExpression",
-                  elements: attributes
-                }
-              }
-            }
-          ]
-        },
-        closingElement: {
-          type: "JSXClosingElement",
-          name: {
-            type: "JSXIdentifier",
-            name: "GenerateTag"
-          }
-        },
-        children: children || []
-      };
+      // throw `We do not support tags with generated attributes. Do your bite and refactor that monster`;
+      console.warn("Generated attributes found:\n", JSON.stringify(attributes), "\n\n");
     }
 
     return {
@@ -1496,104 +1282,8 @@ PairElement
 NonClosedElement
   = startTag:StartTag {
     if (startTag.attributes.some(a => a.type == "GeneratedAttribute")) {
-      const attributes = startTag.attributes
-        .map(a => {
-          if (a.type == "GeneratedAttribute") {
-            let name = a.name;
-            let value = a.value;
-
-            if (a.name.type == "TemplateLiteral" && a.name.quasis.length == 1 && a.name.expressions.length == 0) {
-              name = {
-                type: "Literal",
-                value: a.name.quasis[0].value.raw,
-              };
-            }
-
-            if (a.value.type == "TemplateLiteral" && a.value.quasis.length == 1 && a.value.expressions.length == 0) {
-              value = {
-                type: "Literal",
-                value: a.value.quasis[0].value.raw
-              };
-            }
-
-            return {
-              type: "ObjectExpression",
-              properties: [
-                {
-                  type: "Property",
-                  key: {
-                    type: "Literal",
-                    value: "name"
-                  },
-                  value: name,
-                  kind: "init"
-                },
-                {
-                  type: "Property",
-                  key: {
-                    type: "Literal",
-                    value: "value"
-                  },
-                  value: value,
-                  kind: "init"
-                }
-              ]
-            };
-          }
-
-          return a;
-        });
-
-      return {
-        type: "JSXElement",
-        openingElement: {
-          type: "JSXOpeningElement",
-          name: {
-            type: "JSXIdentifier",
-            name: "GenerateTag"
-          },
-          attributes: [
-            {
-              type: "JSXAttribute",
-              name: {
-                type: "JSXIdentifier",
-                name: "name"
-              },
-              value: startTag.name // This could be either an expression or just a value
-            },
-            {
-              type: "JSXAttribute",
-              name: {
-                type: "JSXIdentifier",
-                name: "selfClosing"
-              },
-              value: null, // Is set (the boolean attribute)
-            },
-            {
-              type: "JSXAttribute",
-              name: {
-                type: "JSXIdentifier",
-                name: "attributes"
-              },
-              value: {
-                type: "JSXExpressionContainer",
-                expression: {
-                  type: "ArrayExpression",
-                  elements: attributes
-                }
-              }
-            }
-          ]
-        },
-        closingElement: {
-          type: "JSXClosingElement",
-          name: {
-            type: "JSXIdentifier",
-            name: "GenerateTag"
-          }
-        },
-        children: []
-      };
+      // throw `We do not support tags with generated attributes. Do your bite and refactor that monster`;
+      console.warn("Generated attributes found:\n", JSON.stringify(attributes), "\n\n");
     }
 
     return {
