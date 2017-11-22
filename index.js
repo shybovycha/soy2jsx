@@ -4,29 +4,29 @@ const fs = require('fs');
 const util = require('util');
 const process = require('process');
 const glob = require('glob');
+const recast = require('recast');
 
 function parseFile(filename) {
-    // console.log('Parsing file', filename);
-
     return new Promise((resolve, reject) => {
         fs.readFile(filename, 'utf8', (err, sample) => {
             if (err) {
-                // console.error('Could not read input file');
                 return reject(err);
             }
 
             try {
-                const data = parser.parse(sample);
+                const ast = parser.parse(sample);
 
-                if (data) {
-                    // console.log(`File ${filename} parsed successfully`);
+                if (ast) {
                     if (!!process.env.DEBUG) {
-                        console.log('Parser result: ', util.inspect(data, { depth: null, showHidden: false }));
+                        console.log(util.inspect(ast, { depth: null, showHidden: false }));
+                        const jsx = recast.print(ast).code;
+                        console.log('');
+                        console.log(jsx);
                     }
 
-                    return resolve(data);
+                    return resolve(ast);
                 } else {
-                    throw `Parsing ${filename} failed. Data does not exist: ` + JSON.stringify(data);
+                    throw `Parsing ${filename} failed. Data does not exist: ` + JSON.stringify(ast);
                 }
             } catch (e) {
                 console.error(`ERROR: Could not parse file ${filename}.`, e);
@@ -56,16 +56,13 @@ if (stat.isDirectory()) {
         Promise
             .all(files.map(f => new Promise((resolve, reject) =>
                 parseFile(f)
-                    .then(data => { results.outputs.push(data); resolve(results.successful.push(f)); })
+                    .then(data => {
+                        results.outputs.push(data);
+                        resolve(results.successful.push(f));
+                    })
                     .catch(err => resolve(results.failed.push(f))))
             ))
             .then(data => {
-                // const templateCnt = results.outputs
-                //     .map(ast => ast.map(e => e.templates.length).reduce((acc, e) => acc + e, 0))
-                //     .reduce((acc, e) => acc + e, 0);
-
-                // console.log(`Template definitions: ${templateCnt}`);
-
                 const fileCnt = files.length;
                 const successCnt = results.successful.length;
                 const failureCnt = results.failed.length
