@@ -41,7 +41,7 @@ if (stat.isDirectory()) {
             });
     });
 } else if (stat.isFile()) {
-    console.log(recast.parse(fs.readFileSync(process.argv[2])));
+    console.log(JSON.stringify(recast.parse(fs.readFileSync(process.argv[2])), null, 4));
 } else {
     console.error(`${firstArg} does not exist or is not a file or a directory`);
 }

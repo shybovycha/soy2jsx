@@ -239,6 +239,8 @@ function peg$parse(input, options) {
               )
             ), []);
 
+          body = body.filter(e => !!e);
+
           return {
             params,
             name,
@@ -262,10 +264,7 @@ function peg$parse(input, options) {
       peg$c14 = peg$classExpectation(["<", "{"], true, false),
       peg$c15 = function(chars) { return chars.join(''); },
       peg$c16 = function(chars) {
-          return {
-            type: "JSXText",
-            value: chars.join('')
-          };
+          return undefined;
         },
       peg$c17 = "<!--",
       peg$c18 = peg$literalExpectation("<!--", false),
@@ -642,12 +641,16 @@ function peg$parse(input, options) {
           };
         },
       peg$c184 = function(test, output) {
+          output = output.filter(e => !!e);
+
           return {
             test,
             output: output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
           };
         },
       peg$c185 = function(output) {
+          output = output.filter(e => !!e);
+
           return {
             test: null,
             output: output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
@@ -851,7 +854,7 @@ function peg$parse(input, options) {
           return {
             type: "JSXAttribute",
             name,
-            value: value.type ? value : { type: "Literal", value }
+            value: value.type ? (value.type == "Literal" ? value : { type: "JSXExpressionContainer", expression: value }) : { type: "Literal", value }
           };
         },
       peg$c235 = function(name, params) {
@@ -871,12 +874,21 @@ function peg$parse(input, options) {
       peg$c239 = "{/param}",
       peg$c240 = peg$literalExpectation("{/param}", false),
       peg$c241 = function(name, value) {
-          console.log("Multiline param :: ", JSON.stringify(value));
+          value = value.filter(e => !!e);
+
+          if (value.length == 1) {
+            value = value[0];
+          } else {
+            value = {
+              type: "SequenceExpression",
+              expressions: value
+            };
+          }
 
           return {
             type: "JSXAttribute",
             name,
-            value: value.length == 1 ? value[0] : { type: "SequenceExpression", expressions: value }
+            value: { type: "JSXExpressionContainer", expression: value }
           };
         },
       peg$c242 = function(name, value) {
