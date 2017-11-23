@@ -1,6 +1,7 @@
 const parser = require('./SOY.js');
 
 const fs = require('fs');
+const path = require('path');
 const util = require('util');
 const process = require('process');
 const glob = require('glob');
@@ -22,6 +23,17 @@ function parseFile(filename) {
                         const jsx = recast.print(ast).code;
                         console.log('');
                         console.log(jsx);
+
+                        const dirname = path.dirname(filename);
+                        const baseFileName = path.basename(filename);
+
+                        const jsxFilename = path.join(dirname, baseFileName + '.jsx');
+                        const astFilename = path.join(dirname, baseFileName + '.ast');
+
+                        fs.writeFileSync(jsxFilename, jsx);
+                        fs.writeFileSync(astFilename, JSON.stringify(ast, null, 4));
+
+                        // to validate JSX, check if `recast.parse(jsx)` returns no errors
                     }
 
                     return resolve(ast);

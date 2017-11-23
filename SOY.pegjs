@@ -1,19 +1,60 @@
 SOY
   = namespaces:Namespace+ {
+    const namespaceObjDecl = {
+      type: "VariableDeclaration",
+      declarations: [
+        {
+          type: "VariableDeclarator",
+          id: {
+            type: "Identifier",
+            name: "__namespace__"
+          }
+        }
+      ],
+      kind: "let"
+    };
+
+    const namespaceReset = {
+      type: "ExpressionStatement",
+      expression: {
+        type: "AssignmentExpression",
+        operator: "=",
+        left: {
+          type: "Identifier",
+          name: "__namespace__"
+        },
+        right: {
+          type: "ObjectExpression",
+          properties: []
+        }
+      }
+    };
+
+    const namespaceAssign = (namespaceName) => ({
+      type: "ExpressionStatement",
+      expression: {
+        type: "AssignmentExpression",
+        operator: "=",
+        left: namespaceName,
+        right: {
+          type: "Identifier",
+          name: "__namespace__"
+        }
+      }
+    });
+
     return {
       type: "Program",
-      body: namespaces.reduce((acc, ns) => acc.concat(ns.templates), [])
+      body: namespaces.reduce((acc, ns) => acc.concat([ namespaceReset ]).concat(ns.templates).concat([ namespaceAssign(ns.name) ]), [ namespaceObjDecl ])
     };
   };
 
 Namespace
   = name:NamespaceDecl WS* templates:TemplateDef* {
     return {
+      name,
       templates: templates
         .map(tpl => {
-          if (tpl.name.type == "LocalTemplateName")
-            tpl.name = Object.assign(tpl.name, { type: "MemberExpression", object: name });
-
           return {
             type: "ExpressionStatement",
             expression: {
@@ -32,7 +73,6 @@ Namespace
             }
           };
         }),
-      name
     };
   };
 
@@ -71,7 +111,11 @@ TemplateName
 LocalTemplateName
   = property:SubObjectPropertyAccessor {
     return {
-      type: "LocalTemplateName",
+      type: "MemberExpression",
+      object: {
+        type: "Identifier",
+        name: "__namespace__"
+      },
       property
     };
   };
@@ -611,7 +655,7 @@ SoyIfOperator
         return clauses[0].output;
       } else {
         return {
-          type: "IfStatement",
+          type: "ConditionalExpression",
           test: clauses[0].test,
           consequent: clauses[0].output,
           alternate: recursiveReduce(clauses.slice(1))
@@ -620,7 +664,7 @@ SoyIfOperator
     };
 
     return {
-      type: "IfStatement",
+      type: "ConditionalExpression",
       test: mainClause.test,
       consequent: mainClause.output,
       alternate: recursiveReduce([].concat(otherClauses || []).concat(otherwiseClause ? [ otherwiseClause ] : [ { output: null } ])) || { type: "Literal", value: null }
@@ -629,17 +673,26 @@ SoyIfOperator
 
 SoyIfClause
   = "{" WS* "if" WS+ test:SoyMathExpression WS* "}" WS* output:TemplateBodyElement* {
-    return { test, output };
+    return {
+      test,
+      output: output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
+    };
   };
 
 SoyElseifClause
   = "{" WS* "elseif" WS+ test:SoyMathExpression WS* "}" WS* output:TemplateBodyElement* {
-    return { test, output };
+    return {
+      test,
+      output: output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
+    };
   };
 
 SoyElseClause
   = "{" WS* "else" WS* "}" WS* output:TemplateBodyElement* {
-    return { test: null, output };
+    return {
+      test: null,
+      output: output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
+    };
   };
 
 SoyEndifOperator
@@ -650,8 +703,8 @@ SoyTernaryOperator
     return {
       type: "ConditionalExpression",
       test,
-      consequent,
-      alternate
+      consequent: consequent.length == 1 ? consequent[0] : { type: "SequenceExpression", expressions: consequent },
+      alternate: alternate.length == 1 ? alternate[0] : { type: "SequenceExpression", expressions: alternate }
     };
   };
 
@@ -946,10 +999,12 @@ MultilineTemplateCallValueParam
 
 MultilineTemplateCallMultilineParam
   = "{param" WS+ name:Identifier WS* "}" WS* value:TemplateBodyElement* WS* "{/param}" {
+    console.log("Multiline param :: ", JSON.stringify(value));
+
     return {
       type: "JSXAttribute",
       name,
-      value: value.type ? (value.type == "JSXExpressionContainer" ? value : { type: "JSXExpressionContainer", expression: value }) : { type: "Literal", value }
+      value: value.length == 1 ? value[0] : { type: "SequenceExpression", expressions: value }
     };
   };
 
@@ -1041,6 +1096,8 @@ GeneratedElementTagName
 
 GeneratedSingleElement
   = "<" name:GeneratedElementTagName WS* attributes:Attributes? WS* "/>" {
+    attributes = attributes || [];
+
     if (attributes.some(a => a.type == "GeneratedAttribute")) {
       console.warn("GeneratedSingleElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
     }
@@ -1104,6 +1161,8 @@ GeneratedSingleElement
 // & { return deepEqual(startTag, endTag); }
 GeneratedPairElement
   = "<" startTag:GeneratedElementTagName WS* attributes:Attributes? WS* ">" children:TemplateBodyElement* "</" endTag:GeneratedElementTagName ">" {
+    attributes = attributes || [];
+
     if (attributes.some(a => a.type == "GeneratedAttribute")) {
       console.warn("GeneratedPairElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
     }
@@ -1161,6 +1220,8 @@ GeneratedPairElement
 
 GeneratedUnclosedElement
   = "<" name:GeneratedElementTagName WS* attributes:Attributes? WS* ">" {
+    attributes = attributes || [];
+
     if (attributes.some(a => a.type == "GeneratedAttribute")) {
       console.warn("GeneratedUnclosedElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
     }
@@ -1218,6 +1279,8 @@ GeneratedUnclosedElement
 
 SingleElement
   = "<" name:TagName WS* attributes:Attributes? WS* "/>" {
+    attributes = attributes || [];
+
     if (attributes.some(a => a.type == "GeneratedAttribute")) {
       console.warn("SingleElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
     }
@@ -1255,7 +1318,7 @@ SingleElement
 PairElement
   = startTag:StartTag children:ElementContent? endTag:EndTag & { return startTag.name.type == endTag.name.type && startTag.name.name == endTag.name.name } {
     if (startTag.attributes.some(a => a.type == "GeneratedAttribute")) {
-      console.warn("PairElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+      console.warn("PairElement :: generated attributes found:\n\n", JSON.stringify(startTag.attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
     }
 
     return {
@@ -1276,7 +1339,7 @@ PairElement
 NonClosedElement
   = startTag:StartTag {
     if (startTag.attributes.some(a => a.type == "GeneratedAttribute")) {
-      console.warn("NonClosedElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+      console.warn("NonClosedElement :: generated attributes found:\n\n", JSON.stringify(startTag.attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
     }
 
     return {
@@ -1289,7 +1352,7 @@ NonClosedElement
 
 StartTag
   = "<" name:TagName WS* attributes:Attributes? WS* ">" {
-    attributes = attributes
+    attributes = (attributes || [])
       .filter(attr => (attr.name.type == "TemplateLiteral" && attr.name.expressions.length == 0) || (attr.name.type == "JSXIdentifier"))
       .map(attr => ({
         type: "JSXAttribute",
@@ -1302,8 +1365,8 @@ StartTag
 
     return {
       name: {
-        type: "Literal",
-        value: name
+        type: "JSXIdentifier",
+        name
       },
       attributes: attributes || {}
     };
@@ -1313,15 +1376,15 @@ EndTag
   = "</" name:TagName ">" {
     return {
       name: {
-        type: "Literal",
-        value: name
+        type: "JSXIdentifier",
+        name
       }
     };
   };
 
 TagName
   = head:[a-zA-Z_] tail:[a-zA-Z\-0-9]* {
-      return head + tail.join("");
+    return head + tail.join("");
   };
 
 Text
