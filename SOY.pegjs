@@ -41,11 +41,7 @@ WS
 
 TemplateDef
   = comments:SoyTemplateDefComment* WS* "{template " name:TemplateName WS* attributes:Attributes? "}" WS+ body:TemplateBodyElement* "{/template}" WS* {
-    // body = body
-    //   .filter(elt => elt.type != "BlankLine");
-
-    return {
-      params: comments.reduce((acc, commentLines) => acc.concat(
+    const params = comments.reduce((acc, commentLines) => acc.concat(
         commentLines
           .filter(line => line.type == "TemplateParam")
           .map(param => (
@@ -58,7 +54,10 @@ TemplateDef
             }
           )
         )
-      ), []),
+      ), []);
+
+    return {
+      params,
       name,
       body: body.length > 1 ? { type: "SequenceExpression", expressions: body, expression: true } : body[0]
     };
@@ -98,7 +97,7 @@ TemplateBodyText
 BlankLine
   = chars:WS+ {
     return {
-      type: "Literal",
+      type: "JSXText",
       value: chars.join('')
     };
   };
@@ -181,16 +180,16 @@ SoySpecialCharacter
   / SoySpecialCharacterNewline;
 
 SoySpecialCharacterSpace
-  = "{sp}" { return { type: "SpecialCharacter", name: "space" }; };
+  = "{sp}" { return { type: "Literal", value: " " }; };
 
 SoySpecialCharacterNewline
-  = "{\\n}" { return { type: "SpecialCharacter", name: "newline" }; };
+  = "{\\n}" { return { type: "Literal", value: "\n" }; };
 
 SoySpecialCharacterIndentation
-  = "{\\t}" { return { type: "SpecialCharacter", name: "indentation" }; };
+  = "{\\t}" { return {  type: "Literal", value: "  "  }; };
 
 SoySpecialCharacterCaretReturn
-  = "{\\r}" { return { type: "SpecialCharacter", name: "caret_return" }; };
+  = "{\\r}" { return {  type: "Literal", value: "\r"  }; };
 
 SoyFilters
   = SoyFilter+;
@@ -435,12 +434,12 @@ SoyMapEntries
 
 SoyMapSingleEntry
   = WS* key:SoyValueExpr WS* ":" WS* value:SoyValueExpr WS* {
-    return {
+    return [ {
       type: "Property",
-      key,
-      value,
-      computed: true
-    };
+      key: key.type ? key : { type: "Literal", value: key },
+      value: value.type ? value : { type: "Literal", value: value },
+      computed: !!key.type
+    } ];
   };
 
 SoyMapMultipleEntry
@@ -838,7 +837,7 @@ FunctionCall
     return {
       type: "CallExpression",
       callee,
-      arguments: args
+      arguments: args.map(a => a.type ? a : { type: "Literal", value: a })
     };
   };
 
@@ -850,18 +849,26 @@ SoyTemplateCall
 MixedTemplateCall
   = "{call" WS+ name:TemplateName WS+ inlineParams:TemplateCallInlineParams? WS* "}" WS* bodyParams:MultilineTemplateCallParams? WS* "{/call}" {
     return {
-      type: "CallExpression",
-      callee: name,
-      arguments: [].concat(inlineParams || []).concat(bodyParams || []),
+      type: "JSXElement",
+      openingElement: {
+        type: "JSXOpeningElement",
+        name,
+        attributes: [].concat(inlineParams || []).concat(bodyParams || []),
+        selfClosing: true
+      }
     };
   };
 
 InPlaceTemplateCall
   = "{call" WS+ name:TemplateName WS+ params:TemplateCallInlineParams? WS* "/}" {
     return {
-      type: "CallExpression",
-      callee: name,
-      arguments: params || [],
+      type: "JSXElement",
+      openingElement: {
+        type: "JSXOpeningElement",
+        name,
+        attributes: params || [],
+        selfClosing: true
+      }
     };
   };
 
@@ -882,41 +889,31 @@ TemplateCallInlineParam
 TemplateCallInlineBooleanParam
   = name:Identifier {
     return {
-      type: "Property",
-      key: {
-        type: "Identifier",
-        name,
-      },
-      value: {
-        type: "Literal",
-        value: true
-      }
+      type: "JSXAttribute",
+      name,
+      value: null
     };
   };
 
 TemplateCallInlineValueParam
   = name:Identifier WS* "=" WS* value:SoyValueExpr {
     return {
-      type: "Property",
-      key: {
-        type: "Identifier",
-        name
-      },
-      value
+      type: "JSXAttribute",
+      name,
+      value: value.type ? value : { type: "Literal", value }
     };
   };
 
 MultilineTemplateCall
   = "{call" WS+ name:TemplateName WS* "}" WS* params:MultilineTemplateCallParams? WS* "{/call}" {
     return {
-      type: "CallExpression",
-      callee: name,
-      arguments: [
-        {
-          type: "ObjectExpression",
-          properties: params
-        }
-      ]
+      type: "JSXElement",
+      openingElement: {
+        type: "JSXOpeningElement",
+        name: name,
+        attributes: params || [],
+        selfClosing: true
+      }
     };
   };
 
@@ -928,7 +925,7 @@ MultipleMultilineTemplateCallParams
   = WS* first:SingleMultilineTemplateCallParams WS* rest:MultilineTemplateCallParams { return [ first ].concat(rest); };
 
 SingleMultilineTemplateCallParams
-  = WS* first:MultilineTemplateCallParam WS* SoyComment? WS* { return [ first ]; };
+  = WS* first:MultilineTemplateCallParam WS* SoyComment? WS* { return first; };
 
 MultilineTemplateCallParam
   = MultilineTemplateCallValueParam
@@ -937,15 +934,9 @@ MultilineTemplateCallParam
 MultilineTemplateCallBooleanParam
   = "{param" WS+ name:Identifier WS* "/}" {
     return {
-      type: "Property",
-      key: {
-        type: "Identifier",
-        name,
-      },
-      value: {
-        type: "Literal",
-        value: true,
-      }
+      type: "JSXAttribute",
+      name,
+      value: null
     };
   };
 
@@ -956,24 +947,18 @@ MultilineTemplateCallValueParam
 MultilineTemplateCallMultilineParam
   = "{param" WS+ name:Identifier WS* "}" WS* value:TemplateBodyElement* WS* "{/param}" {
     return {
-      type: "Property",
-      key: {
-        type: "Identifier",
-        name,
-      },
-      value
+      type: "JSXAttribute",
+      name,
+      value: value.type ? (value.type == "JSXExpressionContainer" ? value : { type: "JSXExpressionContainer", expression: value }) : { type: "Literal", value }
     };
   };
 
 MultilineTemplateCallInlineParam
   = "{param" WS+ name:Identifier WS* ":" WS* value:SoyValueExpr WS* "/}" {
     return {
-      type: "Property",
-      key: {
-        type: "Identifier",
-        name,
-      },
-      value
+      type: "JSXAttribute",
+      name,
+      value: value.type ? (value.type == "JSXExpressionContainer" ? value : { type: "JSXExpressionContainer", expression: value }) : { type: "Literal", value }
     };
   };
 
@@ -1037,45 +1022,6 @@ HTMLElement
     };
   };
 
-SingleElement
-  = "<" name:TagName WS* attributes:Attributes? WS* "/>" {
-    if (attributes.some(a => a.type == "GeneratedAttribute")) {
-      // throw `We do not support tags with generated attributes. Do your bite and refactor that monster`;
-      console.warn("Generated attributes found:\n", JSON.stringify(attributes), "\n\n");
-    }
-
-    attributes = attributes.map(attr => ({
-      type: "ObjectExpression",
-      properties: [
-        {
-          key: attr.name,
-          value: attr.value
-        }
-      ]
-    }));
-
-    return {
-      type: "JSXElement",
-      openingElement: {
-        type: "JSXOpeningElement",
-        name,
-        attributes: {
-          type: "ArrayExpression",
-          elements: attributes || [],
-        },
-        selfClosing: true
-      },
-      closingElement: {
-        type: "JSXClosingElement",
-        name: {
-          type: "JSXIdentifier",
-          name: "GenerateTag"
-        }
-      },
-      children: []
-    };
-  };
-
 DoctypeElement
   = "<!" ("doctype" / "DOCTYPE") WS+ attributes:DoctypeAttributes ">" { return { type: 'Doctype', attributes }; }
 
@@ -1095,15 +1041,21 @@ GeneratedElementTagName
 
 GeneratedSingleElement
   = "<" name:GeneratedElementTagName WS* attributes:Attributes? WS* "/>" {
-    attributes = attributes.map(attr => ({
-      type: "ObjectExpression",
-      properties: [
-        {
-          key: attr.name,
-          value: attr.value
-        }
-      ]
-    }));
+    if (attributes.some(a => a.type == "GeneratedAttribute")) {
+      console.warn("GeneratedSingleElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+    }
+
+    attributes = attributes
+      // .filter(attr => attr.type == "GeneratedAttribute" && attr.name.expressions.length == 0)
+      .map(attr => ({
+        type: "ObjectExpression",
+        properties: [
+          {
+            key: attr.name,
+            value: attr.value
+          }
+        ]
+      }));
 
     return {
       type: "JSXElement",
@@ -1152,6 +1104,10 @@ GeneratedSingleElement
 // & { return deepEqual(startTag, endTag); }
 GeneratedPairElement
   = "<" startTag:GeneratedElementTagName WS* attributes:Attributes? WS* ">" children:TemplateBodyElement* "</" endTag:GeneratedElementTagName ">" {
+    if (attributes.some(a => a.type == "GeneratedAttribute")) {
+      console.warn("GeneratedPairElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+    }
+
     attributes = attributes.map(attr => ({
       type: "ObjectExpression",
       properties: [
@@ -1205,6 +1161,10 @@ GeneratedPairElement
 
 GeneratedUnclosedElement
   = "<" name:GeneratedElementTagName WS* attributes:Attributes? WS* ">" {
+    if (attributes.some(a => a.type == "GeneratedAttribute")) {
+      console.warn("GeneratedUnclosedElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+    }
+
     attributes = attributes.map(attr => ({
       type: "ObjectExpression",
       properties: [
@@ -1256,12 +1216,46 @@ GeneratedUnclosedElement
     };
   };
 
+SingleElement
+  = "<" name:TagName WS* attributes:Attributes? WS* "/>" {
+    if (attributes.some(a => a.type == "GeneratedAttribute")) {
+      console.warn("SingleElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+    }
+
+    attributes = attributes
+      .filter(attr => (attr.name.type == "TemplateLiteral" && attr.name.quasis.length == 1) || (attr.name.type == "JSXIdentifier"))
+      .map(attr => ({
+        type: "JSXAttribute",
+        name: {
+          type: "JSXIdentifier",
+          name: attr.name.type == "TemplateLiteral" ? attr.name.quasis.reduce((acc, elt) => acc + elt.value.raw, "") : attr.name
+        },
+        value: (attr.value.type == "TemplateLiteral" && attr.value.quasis.length == 1) ? { type: "Literal", value: attr.value.quasis[0].value.raw } : { type: "JSXExpressionContainer", expression: attr.value }
+      }));
+
+    return {
+      type: "JSXElement",
+      openingElement: {
+        type: "JSXOpeningElement",
+        name,
+        attributes: attributes || [],
+      },
+      closingElement: {
+        type: "JSXClosingElement",
+        name: {
+          type: "JSXIdentifier",
+          name
+        }
+      },
+      children: []
+    };
+  };
+
 // TODO: deepEqual to match startTag & endTag
 PairElement
   = startTag:StartTag children:ElementContent? endTag:EndTag & { return startTag.name.type == endTag.name.type && startTag.name.name == endTag.name.name } {
     if (startTag.attributes.some(a => a.type == "GeneratedAttribute")) {
-      // throw `We do not support tags with generated attributes. Do your bite and refactor that monster`;
-      console.warn("Generated attributes found:\n", JSON.stringify(attributes), "\n\n");
+      console.warn("PairElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
     }
 
     return {
@@ -1282,8 +1276,7 @@ PairElement
 NonClosedElement
   = startTag:StartTag {
     if (startTag.attributes.some(a => a.type == "GeneratedAttribute")) {
-      // throw `We do not support tags with generated attributes. Do your bite and refactor that monster`;
-      console.warn("Generated attributes found:\n", JSON.stringify(attributes), "\n\n");
+      console.warn("NonClosedElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
     }
 
     return {
@@ -1296,6 +1289,17 @@ NonClosedElement
 
 StartTag
   = "<" name:TagName WS* attributes:Attributes? WS* ">" {
+    attributes = attributes
+      .filter(attr => (attr.name.type == "TemplateLiteral" && attr.name.expressions.length == 0) || (attr.name.type == "JSXIdentifier"))
+      .map(attr => ({
+        type: "JSXAttribute",
+        name: {
+          type: "JSXIdentifier",
+          name: attr.name.type == "TemplateLiteral" ? attr.name.quasis.reduce((acc, elt) => acc + elt.value.raw, "") : attr.name
+        },
+        value: (attr.value.type == "TemplateLiteral" && attr.value.quasis.length == 1) ? { type: "Literal", value: attr.value.quasis[0].value.raw } : { type: "JSXExpressionContainer", expression: attr.value }
+      }));
+
     return {
       name: {
         type: "Literal",
