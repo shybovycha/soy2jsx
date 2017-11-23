@@ -50,8 +50,35 @@
                     "type": "ArrowFunctionExpression",
                     "id": null,
                     "body": {
-                        "type": "SequenceExpression",
-                        "expressions": [
+                        "type": "JSXElement",
+                        "openingElement": {
+                            "type": "JSXOpeningElement",
+                            "name": {
+                                "type": "JSXIdentifier",
+                                "name": "div"
+                            },
+                            "attributes": [
+                                {
+                                    "type": "JSXAttribute",
+                                    "name": {
+                                        "type": "JSXIdentifier",
+                                        "name": "class"
+                                    },
+                                    "value": {
+                                        "type": "Literal",
+                                        "value": "sd-invite-customer-wrapper-dialog"
+                                    }
+                                }
+                            ]
+                        },
+                        "closingElement": {
+                            "type": "JSXClosingElement",
+                            "name": {
+                                "type": "JSXIdentifier",
+                                "name": "div"
+                            }
+                        },
+                        "children": [
                             {
                                 "type": "JSXElement",
                                 "openingElement": {
@@ -69,7 +96,7 @@
                                             },
                                             "value": {
                                                 "type": "Literal",
-                                                "value": "sd-invite-customer-wrapper-dialog"
+                                                "value": "js-error-wrapper"
                                             }
                                         }
                                     ]
@@ -81,235 +108,183 @@
                                         "name": "div"
                                     }
                                 },
-                                "children": [
-                                    {
-                                        "type": "JSXElement",
-                                        "openingElement": {
-                                            "type": "JSXOpeningElement",
-                                            "name": {
-                                                "type": "JSXIdentifier",
-                                                "name": "div"
-                                            },
-                                            "attributes": [
-                                                {
-                                                    "type": "JSXAttribute",
-                                                    "name": {
-                                                        "type": "JSXIdentifier",
-                                                        "name": "class"
-                                                    },
-                                                    "value": {
-                                                        "type": "Literal",
-                                                        "value": "js-error-wrapper"
-                                                    }
-                                                }
-                                            ]
-                                        },
-                                        "closingElement": {
-                                            "type": "JSXClosingElement",
-                                            "name": {
-                                                "type": "JSXIdentifier",
-                                                "name": "div"
-                                            }
-                                        },
-                                        "children": []
-                                    },
-                                    {
-                                        "type": "ConditionalExpression",
-                                        "test": {
-                                            "type": "Identifier",
-                                            "name": "showInviteForm"
-                                        },
-                                        "consequent": {
-                                            "type": "SequenceExpression",
-                                            "expressions": [
-                                                {
-                                                    "type": "JSXElement",
-                                                    "openingElement": {
-                                                        "type": "JSXOpeningElement",
-                                                        "name": {
-                                                            "type": "MemberExpression",
-                                                            "property": {
-                                                                "type": "Identifier",
-                                                                "name": "form",
-                                                                "computed": false
-                                                            },
-                                                            "object": {
-                                                                "type": "MemberExpression",
-                                                                "property": {
-                                                                    "type": "Identifier",
-                                                                    "name": "form",
-                                                                    "computed": false
-                                                                },
-                                                                "object": {
-                                                                    "type": "Identifier",
-                                                                    "name": "aui"
-                                                                }
-                                                            }
-                                                        },
-                                                        "attributes": [
-                                                            {
-                                                                "type": "JSXAttribute",
-                                                                "name": {
-                                                                    "type": "Identifier",
-                                                                    "name": "action"
-                                                                },
-                                                                "value": {
-                                                                    "type": "Literal",
-                                                                    "value": "#"
-                                                                }
-                                                            },
-                                                            {
-                                                                "type": "JSXAttribute",
-                                                                "name": {
-                                                                    "type": "Identifier",
-                                                                    "name": "isTopLabels"
-                                                                },
-                                                                "value": {
-                                                                    "type": "JSXExpressionContainer",
-                                                                    "expression": {
-                                                                        "type": "Literal",
-                                                                        "value": true
-                                                                    }
-                                                                }
-                                                            },
-                                                            {
-                                                                "type": "JSXAttribute",
-                                                                "name": {
-                                                                    "type": "Identifier",
-                                                                    "name": "extraClasses"
-                                                                },
-                                                                "value": {
-                                                                    "type": "Literal",
-                                                                    "value": "js-invite-customer sd-invite-customer"
-                                                                }
-                                                            },
-                                                            {
-                                                                "type": "JSXAttribute",
-                                                                "name": {
-                                                                    "type": "Identifier",
-                                                                    "name": "content"
-                                                                },
-                                                                "value": {
-                                                                    "type": "SequenceExpression",
-                                                                    "expressions": [
-                                                                        {
-                                                                            "type": "JSXElement",
-                                                                            "openingElement": {
-                                                                                "type": "JSXOpeningElement",
-                                                                                "name": {
-                                                                                    "type": "MemberExpression",
-                                                                                    "object": {
-                                                                                        "type": "Identifier",
-                                                                                        "name": "__namespace__"
-                                                                                    },
-                                                                                    "property": {
-                                                                                        "type": "Identifier",
-                                                                                        "name": "dialogContent",
-                                                                                        "computed": false
-                                                                                    }
-                                                                                },
-                                                                                "attributes": [
-                                                                                    {
-                                                                                        "type": "JSXAttribute",
-                                                                                        "name": {
-                                                                                            "type": "Identifier",
-                                                                                            "name": "errorContentHtml"
-                                                                                        },
-                                                                                        "value": {
-                                                                                            "type": "JSXExpressionContainer",
-                                                                                            "expression": {
-                                                                                                "type": "MemberExpression",
-                                                                                                "property": {
-                                                                                                    "type": "Identifier",
-                                                                                                    "name": "html",
-                                                                                                    "computed": false
-                                                                                                },
-                                                                                                "object": {
-                                                                                                    "type": "Identifier",
-                                                                                                    "name": "errorContent"
-                                                                                                }
-                                                                                            }
-                                                                                        }
-                                                                                    },
-                                                                                    {
-                                                                                        "type": "JSXAttribute",
-                                                                                        "name": {
-                                                                                            "type": "Identifier",
-                                                                                            "name": "successCount"
-                                                                                        },
-                                                                                        "value": {
-                                                                                            "type": "JSXExpressionContainer",
-                                                                                            "expression": {
-                                                                                                "type": "MemberExpression",
-                                                                                                "property": {
-                                                                                                    "type": "Identifier",
-                                                                                                    "name": "successCount",
-                                                                                                    "computed": false
-                                                                                                },
-                                                                                                "object": {
-                                                                                                    "type": "Identifier",
-                                                                                                    "name": "errorContent"
-                                                                                                }
-                                                                                            }
-                                                                                        }
-                                                                                    },
-                                                                                    {
-                                                                                        "type": "JSXAttribute",
-                                                                                        "name": {
-                                                                                            "type": "Identifier",
-                                                                                            "name": "failedCount"
-                                                                                        },
-                                                                                        "value": {
-                                                                                            "type": "JSXExpressionContainer",
-                                                                                            "expression": {
-                                                                                                "type": "MemberExpression",
-                                                                                                "property": {
-                                                                                                    "type": "Identifier",
-                                                                                                    "name": "failedCount",
-                                                                                                    "computed": false
-                                                                                                },
-                                                                                                "object": {
-                                                                                                    "type": "Identifier",
-                                                                                                    "name": "errorContent"
-                                                                                                }
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                ],
-                                                                                "selfClosing": true
-                                                                            }
-                                                                        },
-                                                                        {
-                                                                            "type": "JSXText",
-                                                                            "value": "\n                "
-                                                                        }
-                                                                    ]
-                                                                }
-                                                            }
-                                                        ],
-                                                        "selfClosing": true
-                                                    }
-                                                },
-                                                {
-                                                    "type": "JSXText",
-                                                    "value": "\n        "
-                                                }
-                                            ]
-                                        },
-                                        "alternate": {
-                                            "type": "Literal",
-                                            "value": null
-                                        }
-                                    },
-                                    null
-                                ]
+                                "children": []
                             },
                             {
-                                "type": "JSXText",
-                                "value": "\n"
-                            }
-                        ],
-                        "expression": true
+                                "type": "ConditionalExpression",
+                                "test": {
+                                    "type": "Identifier",
+                                    "name": "showInviteForm"
+                                },
+                                "consequent": {
+                                    "type": "JSXElement",
+                                    "openingElement": {
+                                        "type": "JSXOpeningElement",
+                                        "name": {
+                                            "type": "MemberExpression",
+                                            "property": {
+                                                "type": "Identifier",
+                                                "name": "form",
+                                                "computed": false
+                                            },
+                                            "object": {
+                                                "type": "MemberExpression",
+                                                "property": {
+                                                    "type": "Identifier",
+                                                    "name": "form",
+                                                    "computed": false
+                                                },
+                                                "object": {
+                                                    "type": "Identifier",
+                                                    "name": "aui"
+                                                }
+                                            }
+                                        },
+                                        "attributes": [
+                                            {
+                                                "type": "JSXAttribute",
+                                                "name": {
+                                                    "type": "Identifier",
+                                                    "name": "action"
+                                                },
+                                                "value": {
+                                                    "type": "Literal",
+                                                    "value": "#"
+                                                }
+                                            },
+                                            {
+                                                "type": "JSXAttribute",
+                                                "name": {
+                                                    "type": "Identifier",
+                                                    "name": "isTopLabels"
+                                                },
+                                                "value": {
+                                                    "type": "JSXExpressionContainer",
+                                                    "expression": {
+                                                        "type": "Literal",
+                                                        "value": true
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "JSXAttribute",
+                                                "name": {
+                                                    "type": "Identifier",
+                                                    "name": "extraClasses"
+                                                },
+                                                "value": {
+                                                    "type": "Literal",
+                                                    "value": "js-invite-customer sd-invite-customer"
+                                                }
+                                            },
+                                            {
+                                                "type": "JSXAttribute",
+                                                "name": {
+                                                    "type": "Identifier",
+                                                    "name": "content"
+                                                },
+                                                "value": {
+                                                    "type": "JSXExpressionContainer",
+                                                    "expression": {
+                                                        "type": "JSXElement",
+                                                        "openingElement": {
+                                                            "type": "JSXOpeningElement",
+                                                            "name": {
+                                                                "type": "MemberExpression",
+                                                                "object": {
+                                                                    "type": "Identifier",
+                                                                    "name": "__namespace__"
+                                                                },
+                                                                "property": {
+                                                                    "type": "Identifier",
+                                                                    "name": "dialogContent",
+                                                                    "computed": false
+                                                                }
+                                                            },
+                                                            "attributes": [
+                                                                {
+                                                                    "type": "JSXAttribute",
+                                                                    "name": {
+                                                                        "type": "Identifier",
+                                                                        "name": "errorContentHtml"
+                                                                    },
+                                                                    "value": {
+                                                                        "type": "JSXExpressionContainer",
+                                                                        "expression": {
+                                                                            "type": "MemberExpression",
+                                                                            "property": {
+                                                                                "type": "Identifier",
+                                                                                "name": "html",
+                                                                                "computed": false
+                                                                            },
+                                                                            "object": {
+                                                                                "type": "Identifier",
+                                                                                "name": "errorContent"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "type": "JSXAttribute",
+                                                                    "name": {
+                                                                        "type": "Identifier",
+                                                                        "name": "successCount"
+                                                                    },
+                                                                    "value": {
+                                                                        "type": "JSXExpressionContainer",
+                                                                        "expression": {
+                                                                            "type": "MemberExpression",
+                                                                            "property": {
+                                                                                "type": "Identifier",
+                                                                                "name": "successCount",
+                                                                                "computed": false
+                                                                            },
+                                                                            "object": {
+                                                                                "type": "Identifier",
+                                                                                "name": "errorContent"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "type": "JSXAttribute",
+                                                                    "name": {
+                                                                        "type": "Identifier",
+                                                                        "name": "failedCount"
+                                                                    },
+                                                                    "value": {
+                                                                        "type": "JSXExpressionContainer",
+                                                                        "expression": {
+                                                                            "type": "MemberExpression",
+                                                                            "property": {
+                                                                                "type": "Identifier",
+                                                                                "name": "failedCount",
+                                                                                "computed": false
+                                                                            },
+                                                                            "object": {
+                                                                                "type": "Identifier",
+                                                                                "name": "errorContent"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            ],
+                                                            "selfClosing": true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ],
+                                        "selfClosing": true
+                                    }
+                                },
+                                "alternate": {
+                                    "type": "Literal",
+                                    "value": null
+                                }
+                            },
+                            null
+                        ]
                     },
                     "params": [
                         {

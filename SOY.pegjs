@@ -96,6 +96,8 @@ TemplateDef
         )
       ), []);
 
+    body = body.filter(e => !!e);
+
     return {
       params,
       name,
@@ -140,10 +142,7 @@ TemplateBodyText
 
 BlankLine
   = chars:WS+ {
-    return {
-      type: "JSXText",
-      value: chars.join('')
-    };
+    return undefined;
   };
 
 HtmlComment
@@ -673,6 +672,8 @@ SoyIfOperator
 
 SoyIfClause
   = "{" WS* "if" WS+ test:SoyMathExpression WS* "}" WS* output:TemplateBodyElement* {
+    output = output.filter(e => !!e);
+
     return {
       test,
       output: output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
@@ -681,6 +682,8 @@ SoyIfClause
 
 SoyElseifClause
   = "{" WS* "elseif" WS+ test:SoyMathExpression WS* "}" WS* output:TemplateBodyElement* {
+    output = output.filter(e => !!e);
+
     return {
       test,
       output: output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
@@ -689,6 +692,8 @@ SoyElseifClause
 
 SoyElseClause
   = "{" WS* "else" WS* "}" WS* output:TemplateBodyElement* {
+    output = output.filter(e => !!e);
+
     return {
       test: null,
       output: output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
@@ -953,7 +958,7 @@ TemplateCallInlineValueParam
     return {
       type: "JSXAttribute",
       name,
-      value: value.type ? value : { type: "Literal", value }
+      value: value.type ? (value.type == "Literal" ? value : { type: "JSXExpressionContainer", expression: value }) : { type: "Literal", value }
     };
   };
 
@@ -999,12 +1004,21 @@ MultilineTemplateCallValueParam
 
 MultilineTemplateCallMultilineParam
   = "{param" WS+ name:Identifier WS* "}" WS* value:TemplateBodyElement* WS* "{/param}" {
-    console.log("Multiline param :: ", JSON.stringify(value));
+    value = value.filter(e => !!e);
+
+    if (value.length == 1) {
+      value = value[0];
+    } else {
+      value = {
+        type: "SequenceExpression",
+        expressions: value
+      };
+    }
 
     return {
       type: "JSXAttribute",
       name,
-      value: value.length == 1 ? value[0] : { type: "SequenceExpression", expressions: value }
+      value: { type: "JSXExpressionContainer", expression: value }
     };
   };
 
