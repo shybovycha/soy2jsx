@@ -1,25 +1,26 @@
-{namespace ServiceDesk.Templates.Shared.Components.Search}
+{namespace ServiceDesk.Templates.Agent.People.Customers.Pagination.InviteCustomerDialog}
 
 /**
- * @param placeholder placeholder text for the search input
- * Renders the search input box
- */
-{template .searchInputView}
-    <input class="cv-smart-portal-search-input js-cv-smart-portal-search-input empty" type="text" placeholder-{$moo}="{$placeholder}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-
-    {call aui.icons.icon}
-        {param extraClasses: 'cv-smart-portal-search-icon js-cv-smart-portal-search-icon' /}
-        {param useIconFont: true /}
-        {param icon: 'search' /}
-    {/call}
-
-    {call aui.buttons.button}
-        {param extraClasses: 'cv-smart-portal-search-clear js-cv-smart-portal-search-clear' /}
-        {param extraAttributes: ['style': 'display: none;'] /}
-        {param iconType: 'aui' /}
-        {param iconClass: 'aui-icon aui-icon-small aui-iconfont-remove' /}
-        {param iconText: getText('sd.common.words.remove') /}
-        {param type: 'link' /}
-        {param text: '' /}
-    {/call}
+* Renders contents of Customer Invite inline dialog
+* @param showInviteForm boolean to show/hide the form, depending on if there are errors
+* @param errorContent
+*/
+{template .content}
+    <div class="sd-invite-customer-wrapper-dialog">
+        <div class="js-error-wrapper"></div>
+        {if $showInviteForm}
+            {call aui.form.form}
+                {param action: '#' /}
+                {param isTopLabels: true /}
+                {param extraClasses: 'js-invite-customer sd-invite-customer' /}
+                {param content}
+                    {call .dialogContent}
+                        {param errorContentHtml: $errorContent.html /}
+                        {param successCount: $errorContent.successCount /}
+                        {param failedCount: $errorContent.failedCount /}
+                    {/call}
+                {/param}
+            {/call}
+        {/if}
+    </div>
 {/template}
