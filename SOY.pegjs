@@ -82,9 +82,10 @@ WS
 TemplateDef
   = comments:(SoyTemplateDefComment / SoyComment / BlankLine)* WS* "{template " name:TemplateName WS* attributes:Attributes? "}" WS+ body:TemplateBodyElement* "{/template}" WS* {
     const params = comments
-      .filter(e => !!e && Array.isArray(e))
-      .reduce((acc, commentLines) => acc.concat(
-        commentLines
+      .filter(e => !!e && Array.isArray(e.value))
+      .reduce((acc, comment) => acc.concat(
+        comment
+          .value
           .filter(line => !!line && line.type == "TemplateParam")
           .map(param => (
             {
@@ -172,7 +173,12 @@ TemplateBodyElement
   / TemplateBodyText;
 
 TemplateBodyText
-  = chars:[^<{]+ { return chars.join(''); };
+  = chars:[^<{]+ {
+    return {
+      type: "Literal",
+      value: chars.join('')
+    };
+  };
 
 BlankLine
   = chars:WS+ {
@@ -180,21 +186,30 @@ BlankLine
   };
 
 HtmlComment
-  = "<!--" chars:(!"-->" .)* "-->" { return chars.map(c => c[1]).join(""); };
+  = "<!--" chars:(!"-->" .)* "-->" {
+    return null;
+  };
 
 SoyComment
   = SoyInlineComment
   / SoyMultilineComment;
 
 SoyInlineComment
-  = "//" chars:[^\n]* { return chars.join(''); };
+  = "//" chars:[^\n]* {
+    return null;
+  };
 
 SoyMultilineComment
-  = "/*" chars:(!"*/" .)* "*/" { return chars.map(c => c[1]).join(""); };
+  = "/*" chars:(!"*/" .)* "*/" {
+    return null;
+  };
 
 SoyTemplateDefComment
   = "/" "*"+ WS* lines:(SoyCommentParamDefinition / SoyCommentText / BlankLine)* WS* "*"+ "/" {
-    return lines;
+    return {
+      type: "Comment",
+      value: lines
+    };
   };
 
 SoyCommentText
@@ -257,16 +272,16 @@ SoySpecialCharacter
   / SoySpecialCharacterNewline;
 
 SoySpecialCharacterSpace
-  = "{sp}" { return { type: "JSXText", value: " " }; };
+  = "{sp}" { return null; };
 
 SoySpecialCharacterNewline
-  = "{\\n}" { return { type: "JSXText", value: "\n" }; };
+  = "{\\n}" { return null; };
 
 SoySpecialCharacterIndentation
-  = "{\\t}" { return { type: "JSXText", value: "  " }; };
+  = "{\\t}" { return null; };
 
 SoySpecialCharacterCaretReturn
-  = "{\\r}" { return { type: "JSXText", value: "\r" }; };
+  = "{\\r}" { return null; };
 
 SoyFilters
   = SoyFilter+;
@@ -313,8 +328,17 @@ SoyCapableString
 
 DoubleQuotedSoyCapableString
   = '"' content:(SoyStringInterpolateableExpr / EscapeableDoubleQuoteText)* '"' {
-    const expressions = content.filter(v => !!v && v.type == "JSXExpressionContainer").map(v => v.expression).concat(content.filter(v => !!v && v.type == "CallExpression" || v.type == "IfStatement" || v.type == "ConditionalExpression"));
-    const quasis = (expressions.length > 0 ? ["", ""] : []).concat(content).filter(v => !!v && v.type != "JSXExpressionContainer" && v.type != "CallExpression" && v.type != "IfStatement" && v.type != "ConditionalExpression").map(v => ({ type: "TemplateElement", value: { raw: v } }));
+    const expressions = content
+      .filter(v => !!v && v.type == "JSXExpressionContainer")
+      .map(v => v.expression)
+      .concat(content
+        .filter(v => !!v && v.type == "CallExpression" || v.type == "IfStatement" || v.type == "ConditionalExpression")
+      );
+
+    const quasis = (expressions.length > 0 ? ["", ""] : [])
+      .concat(content)
+      .filter(v => !!v && v.type != "JSXExpressionContainer" && v.type != "CallExpression" && v.type != "IfStatement" && v.type != "ConditionalExpression")
+      .map(v => ({ type: "TemplateElement", value: { raw: (v.type ? "" + v.value : v) } }));
 
     return {
       type: "TemplateLiteral",
@@ -325,8 +349,14 @@ DoubleQuotedSoyCapableString
 
 SingleQuotedSoyCapableString
   = "'" content:(SoyStringInterpolateableExpr / EscapeableSingleQuoteText)* "'" {
-    const expressions = content.filter(v => !!v && v.type == "JSXExpressionContainer").map(v => v.expression);
-    const quasis = (expressions.length > 0 ? ["", ""] : []).concat(content).filter(v => !!v && v.type != "JSXExpressionContainer").map(v => ({ type: "TemplateElement", value: { raw: v } }));
+    const expressions = content
+      .filter(v => !!v && v.type == "JSXExpressionContainer")
+      .map(v => v.expression);
+
+    const quasis = (expressions.length > 0 ? ["", ""] : [])
+      .concat(content)
+      .filter(v => !!v && v.type != "JSXExpressionContainer")
+      .map(v => ({ type: "TemplateElement", value: { raw: (v.type ? "" + v.value : v) } }));
 
     return {
       type: "TemplateLiteral",
@@ -375,7 +405,30 @@ SoySwithWithDefault
 SoySwitchOperatorCase
   = "{case" WS+ clause:SoyCaseValues WS* "}" WS* output:TemplateBodyElement* {
     const normalizeTemplateBodyElementList = (elements) => {
-      const output = (elements || []).filter(e => !!e);
+      let output = (elements || []).filter(e => !!e && e.type && e.type != "Comment");
+      const variables = output.filter(e => e.type == "VariableDeclaration");
+
+      output = output.filter(e => e.type != "VariableDeclaration");
+
+      if (output.length == 1) {
+        return output[0];
+      }
+
+      if (variables.length > 0) {
+        return {
+          type: "BlockStatement",
+          body: variables.concat([
+            {
+              type: "ReturnStatement",
+              argument: {
+                type: "SequenceExpression",
+                expressions: output
+              }
+            }
+          ])
+        }
+      }
+
       return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
     };
 
@@ -392,7 +445,30 @@ SoyCaseValues
 SoySwitchDefaultClause
   = "{default}" WS* output:TemplateBodyElement* {
     const normalizeTemplateBodyElementList = (elements) => {
-      const output = (elements || []).filter(e => !!e);
+      let output = (elements || []).filter(e => !!e && e.type && e.type != "Comment");
+      const variables = output.filter(e => e.type == "VariableDeclaration");
+
+      output = output.filter(e => e.type != "VariableDeclaration");
+
+      if (output.length == 1) {
+        return output[0];
+      }
+
+      if (variables.length > 0) {
+        return {
+          type: "BlockStatement",
+          body: variables.concat([
+            {
+              type: "ReturnStatement",
+              argument: {
+                type: "SequenceExpression",
+                expressions: output
+              }
+            }
+          ])
+        }
+      }
+
       return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
     };
 
@@ -409,7 +485,30 @@ SoyForeachOperator
 SoySimpleForeachOperator
   = "{" WS* "foreach" WS+ iterator:VariableReference WS+ "in" WS+ range:SoyAtomicValue WS* "}" WS* output:TemplateBodyElement* WS* "{/foreach}" {
     const normalizeTemplateBodyElementList = (elements) => {
-      const output = (elements || []).filter(e => !!e);
+      let output = (elements || []).filter(e => !!e && e.type && e.type != "Comment");
+      const variables = output.filter(e => e.type == "VariableDeclaration");
+
+      output = output.filter(e => e.type != "VariableDeclaration");
+
+      if (output.length == 1) {
+        return output[0];
+      }
+
+      if (variables.length > 0) {
+        return {
+          type: "BlockStatement",
+          body: variables.concat([
+            {
+              type: "ReturnStatement",
+              argument: {
+                type: "SequenceExpression",
+                expressions: output
+              }
+            }
+          ])
+        }
+      }
+
       return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
     };
 
@@ -437,7 +536,30 @@ SoySimpleForeachOperator
 SoyForeachWithEmptySectionOperator
   = "{" WS* "foreach" WS+ iterator:VariableReference WS+ "in" WS+ range:SoyAtomicValue WS* "}" WS* output:TemplateBodyElement* WS* "{ifempty}" WS* defaultOutput:TemplateBodyElement* WS* "{/foreach}" {
     const normalizeTemplateBodyElementList = (elements) => {
-      const output = (elements || []).filter(e => !!e);
+      let output = (elements || []).filter(e => !!e && e.type && e.type != "Comment");
+      const variables = output.filter(e => e.type == "VariableDeclaration");
+
+      output = output.filter(e => e.type != "VariableDeclaration");
+
+      if (output.length == 1) {
+        return output[0];
+      }
+
+      if (variables.length > 0) {
+        return {
+          type: "BlockStatement",
+          body: variables.concat([
+            {
+              type: "ReturnStatement",
+              argument: {
+                type: "SequenceExpression",
+                expressions: output
+              }
+            }
+          ])
+        }
+      }
+
       return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
     };
 
@@ -470,7 +592,30 @@ SoyForeachWithEmptySectionOperator
 SoyForOperator
   = "{" WS* "for" WS+ iterator:VariableReference WS+ "in" WS+ range:SoyRangeExpr WS* "}" WS* output:TemplateBodyElement* WS* "{/for}" {
     const normalizeTemplateBodyElementList = (elements) => {
-      const output = (elements || []).filter(e => !!e);
+      let output = (elements || []).filter(e => !!e && e.type && e.type != "Comment");
+      const variables = output.filter(e => e.type == "VariableDeclaration");
+
+      output = output.filter(e => e.type != "VariableDeclaration");
+
+      if (output.length == 1) {
+        return output[0];
+      }
+
+      if (variables.length > 0) {
+        return {
+          type: "BlockStatement",
+          body: variables.concat([
+            {
+              type: "ReturnStatement",
+              argument: {
+                type: "SequenceExpression",
+                expressions: output
+              }
+            }
+          ])
+        }
+      }
+
       return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
     };
 
@@ -611,12 +756,12 @@ SoyMapEntries
 
 SoyMapSingleEntry
   = WS* key:SoyValueExpr WS* ":" WS* value:SoyValueExpr WS* {
-    return [ {
+    return {
       type: "Property",
       key: key.type ? key : { type: "Literal", value: key },
       value: value.type ? value : { type: "Literal", value: value },
       computed: !!key.type
-    } ];
+    };
   };
 
 SoyMapMultipleEntry
@@ -632,7 +777,7 @@ SoyBinaryExpression
   = left:SoyPrimaryExpression WS* operator:SoyBinaryOperator WS* right:(SoyBinaryExpression / SoyUnaryExpression) {
       return {
         type: "BinaryExpression",
-        operator,
+        operator: operator == "and" ? "&&" : (operator == "or" ? "||" : operator),
         left: left.type ? left : { type: "Literal", value: left },
         right: right.type ? right : { type: "Literal", value: right }
       };
@@ -643,7 +788,7 @@ SoyUnaryExpression
   = operator:SoyUnaryOperator? WS* argument:SoyBinaryExpression {
       return {
         type: "UnaryExpression",
-        operator,
+        operator: operator == "not" ? "!" : operator,
         argument: argument.type ? argument : { type: "Literal", value: argument },
         prefix: true
       };
@@ -783,14 +928,26 @@ SoyAttributeIfOperatorOutputSingle
 
 SoyIfOperator
   = mainClause:SoyIfClause otherClauses:SoyElseifClause* otherwiseClause:SoyElseClause? SoyEndifOperator {
+    const flattenOutput = (output) => {
+      if (output.type == "JSXExpressionContainer") {
+        return output.expression;
+      }
+
+      if (output.type == "SequenceExpression") {
+        output.expressions = output.expressions.map(flattenOutput);
+      }
+
+      return output;
+    };
+
     const recursiveReduce = (clauses) => {
       if (clauses && clauses.length < 2) {
-        return clauses[0].output;
+        return clauses[0].output || { type: "Literal", value: null };
       } else {
         return {
           type: "ConditionalExpression",
-          test: clauses[0].test,
-          consequent: clauses[0].output,
+          test: clauses[0].test.type ? clauses[0].test : { type: "Literal", value: clauses[0].test },
+          consequent: flattenOutput(clauses[0].output),
           alternate: recursiveReduce(clauses.slice(1))
         };
       }
@@ -798,48 +955,153 @@ SoyIfOperator
 
     return {
       type: "ConditionalExpression",
-      test: mainClause.test,
-      consequent: mainClause.output,
+      test: mainClause.test.type ? mainClause.test : { type: "Literal", value: mainClause.test },
+      consequent: flattenOutput(mainClause.output),
       alternate: recursiveReduce([].concat(otherClauses || []).concat(otherwiseClause ? [ otherwiseClause ] : [ { output: null } ])) || { type: "Literal", value: null }
     };
   };
 
 SoyIfClause
   = "{" WS* "if" WS+ test:SoyMathExpression WS* "}" WS* output:TemplateBodyElement* {
+    const flattenOutput = (output) => {
+      if (output.type == "JSXExpressionContainer") {
+        return output.expression;
+      }
+
+      if (output.type == "SequenceExpression") {
+        output.expressions = output.expressions.map(flattenOutput);
+      }
+
+      return output;
+    };
+
     const normalizeTemplateBodyElementList = (elements) => {
-      const output = elements.filter(e => !!e);
+      let output = (elements || []).filter(e => !!e && e.type && e.type != "Comment");
+      const variables = output.filter(e => e.type == "VariableDeclaration");
+
+      output = output.filter(e => e.type != "VariableDeclaration");
+
+      if (output.length == 1) {
+        return output[0];
+      }
+
+      if (variables.length > 0) {
+        return {
+          type: "BlockStatement",
+          body: variables.concat([
+            {
+              type: "ReturnStatement",
+              argument: {
+                type: "SequenceExpression",
+                expressions: output
+              }
+            }
+          ])
+        }
+      }
+
       return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
     };
 
     return {
       test,
-      output: normalizeTemplateBodyElementList(output)
+      output: flattenOutput(normalizeTemplateBodyElementList(output))
     };
   };
 
 SoyElseifClause
   = "{" WS* "elseif" WS+ test:SoyMathExpression WS* "}" WS* output:TemplateBodyElement* {
+    const flattenOutput = (output) => {
+      if (output.type == "JSXExpressionContainer") {
+        return output.expression;
+      }
+
+      if (output.type == "SequenceExpression") {
+        output.expressions = output.expressions.map(flattenOutput);
+      }
+
+      return output;
+    };
+
     const normalizeTemplateBodyElementList = (elements) => {
-      const output = elements.filter(e => !!e);
+      let output = (elements || []).filter(e => !!e && e.type && e.type != "Comment");
+      const variables = output.filter(e => e.type == "VariableDeclaration");
+
+      output = output.filter(e => e.type != "VariableDeclaration");
+
+      if (output.length == 1) {
+        return output[0];
+      }
+
+      if (variables.length > 0) {
+        return {
+          type: "BlockStatement",
+          body: variables.concat([
+            {
+              type: "ReturnStatement",
+              argument: {
+                type: "SequenceExpression",
+                expressions: output
+              }
+            }
+          ])
+        }
+      }
+
       return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
     };
 
     return {
       test,
-      output: normalizeTemplateBodyElementList(output)
+      output: flattenOutput(normalizeTemplateBodyElementList(output))
     };
   };
 
 SoyElseClause
   = "{" WS* "else" WS* "}" WS* output:TemplateBodyElement* {
+    const flattenOutput = (output) => {
+      if (output.type == "JSXExpressionContainer") {
+        return output.expression;
+      }
+
+      if (output.type == "SequenceExpression") {
+        output.expressions = output.expressions.map(flattenOutput);
+      }
+
+      return output;
+    };
+
     const normalizeTemplateBodyElementList = (elements) => {
-      const output = elements.filter(e => !!e);
+      let output = (elements || []).filter(e => !!e && e.type && e.type != "Comment");
+      const variables = output.filter(e => e.type == "VariableDeclaration");
+
+      output = output.filter(e => e.type != "VariableDeclaration");
+
+      if (output.length == 1) {
+        return output[0];
+      }
+
+      if (variables.length > 0) {
+        return {
+          type: "BlockStatement",
+          body: variables.concat([
+            {
+              type: "ReturnStatement",
+              argument: {
+                type: "SequenceExpression",
+                expressions: output
+              }
+            }
+          ])
+        }
+      }
+
       return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
     };
 
     return {
       test: null,
-      output: normalizeTemplateBodyElementList(output)
+      output: flattenOutput(normalizeTemplateBodyElementList(output))
     };
   };
 
@@ -850,9 +1112,9 @@ SoyTernaryOperator
   = test:SoyMathExpression WS* "?" WS* consequent:SoyValueExpr WS* ":" WS* alternate:SoyValueExpr {
     return {
       type: "ConditionalExpression",
-      test,
-      consequent: consequent.length == 1 ? consequent[0] : { type: "SequenceExpression", expressions: consequent },
-      alternate: alternate.length == 1 ? alternate[0] : { type: "SequenceExpression", expressions: alternate }
+      test: test.type ? test : { type: "Literal", value: test },
+      consequent: consequent,
+      alternate: alternate.type ? alternate : { type: "Literal", value: alternate }
     };
   };
 
@@ -898,7 +1160,30 @@ SoyInlineLetOperator
 SoyMultilineLetOperator
   = "{" WS* "let" WS+ name:VariableReference WS* "}" WS* value:TemplateBodyElement* WS* "{/let}" {
     const normalizeTemplateBodyElementList = (elements) => {
-      const output = (elements || []).filter(e => !!e);
+      let output = (elements || []).filter(e => !!e && e.type && e.type != "Comment");
+      const variables = output.filter(e => e.type == "VariableDeclaration");
+
+      output = output.filter(e => e.type != "VariableDeclaration");
+
+      if (output.length == 1) {
+        return output[0];
+      }
+
+      if (variables.length > 0) {
+        return {
+          type: "BlockStatement",
+          body: variables.concat([
+            {
+              type: "ReturnStatement",
+              argument: {
+                type: "SequenceExpression",
+                expressions: output
+              }
+            }
+          ])
+        }
+      }
+
       return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
     };
 
@@ -964,7 +1249,8 @@ ObjectPropertyReference
         return {
           type: "MemberExpression",
           property: properties[0],
-          object: recursiveAssign(properties.slice(1))
+          object: recursiveAssign(properties.slice(1)),
+          computed: properties[0].computed
         };
       }
     };
@@ -985,10 +1271,11 @@ SubObjectPropertyAccessor
 
 SubArrayAccessor
   = "[" property:SoyValueExpr "]" {
-    return Object.assign(
-      property,
-      { computed: true }
-    );
+    return {
+      type: "Literal",
+      value: property,
+      computed: true
+    };
   };
 
 IntegerIndex
@@ -1168,7 +1455,30 @@ MultilineTemplateCallValueParam
 MultilineTemplateCallMultilineParam
   = "{param" WS+ name:Identifier WS* "}" WS* value:TemplateBodyElement* WS* "{/param}" {
     const normalizeTemplateBodyElementList = (elements) => {
-      const output = (elements || []).filter(e => !!e);
+      let output = (elements || []).filter(e => !!e && e.type && e.type != "Comment");
+      const variables = output.filter(e => e.type == "VariableDeclaration");
+
+      output = output.filter(e => e.type != "VariableDeclaration");
+
+      if (output.length == 1) {
+        return output[0];
+      }
+
+      if (variables.length > 0) {
+        return {
+          type: "BlockStatement",
+          body: variables.concat([
+            {
+              type: "ReturnStatement",
+              argument: {
+                type: "SequenceExpression",
+                expressions: output
+              }
+            }
+          ])
+        }
+      }
+
       return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
     };
 
@@ -1289,6 +1599,7 @@ GeneratedSingleElement
       type: "JSXElement",
       openingElement: {
         type: "JSXOpeningElement",
+        selfClosing: true,
         name: {
           type: "JSXIdentifier",
           name: "GenerateTag"
@@ -1317,15 +1628,7 @@ GeneratedSingleElement
             }
           }
         ]
-      },
-      closingElement: {
-        type: "JSXClosingElement",
-        name: {
-          type: "JSXIdentifier",
-          name: "GenerateTag"
-        }
-      },
-      children: []
+      }
     };
   };
 
@@ -1347,6 +1650,13 @@ GeneratedPairElement
         }
       ]
     }));
+
+    const normalizeElementChildren = (elements) => {
+      let output = (elements || [])
+        .filter(e => !!e && e.type && e.type != "Comment")
+        .map(e => e.type != "JSXExpressionContainer" && e.type != "JSXElement" && e.type != "JSXText" ? { type: "JSXExpressionContainer", expression: e } : e);
+      return output;
+    };
 
     return {
       type: "JSXElement",
@@ -1385,7 +1695,7 @@ GeneratedPairElement
           name: "GenerateTag"
         }
       },
-      children
+      children: normalizeElementChildren(children)
     };
   };
 
@@ -1411,6 +1721,7 @@ GeneratedUnclosedElement
       type: "JSXElement",
       openingElement: {
         type: "JSXOpeningElement",
+        selfClosing: true,
         name: {
           type: "JSXIdentifier",
           name: "GenerateTag"
@@ -1436,15 +1747,7 @@ GeneratedUnclosedElement
             }
           }
         ]
-      },
-      closingElement: {
-        type: "JSXClosingElement",
-        name: {
-          type: "JSXIdentifier",
-          name: "GenerateTag"
-        }
-      },
-      children: []
+      }
     };
   };
 
@@ -1474,15 +1777,8 @@ SingleElement
         type: "JSXOpeningElement",
         name,
         attributes: attributes || [],
-      },
-      closingElement: {
-        type: "JSXClosingElement",
-        name: {
-          type: "JSXIdentifier",
-          name
-        }
-      },
-      children: []
+        selfClosing: true
+      }
     };
   };
 
@@ -1492,6 +1788,13 @@ PairElement
     if (startTag.attributes.some(a => a.type == "GeneratedAttribute")) {
       console.warn("PairElement :: generated attributes found:\n\n", JSON.stringify(startTag.attributes.filter(a => !!a && a.type == "GeneratedAttribute"), null, 4), "\n\n");
     }
+
+    const normalizeElementChildren = (elements) => {
+      let output = (elements || [])
+        .filter(e => !!e && e.type && e.type != "Comment")
+        .map(e => e.type != "JSXExpressionContainer" && e.type != "JSXElement" && e.type != "JSXText" ? { type: "JSXExpressionContainer", expression: e } : e);
+      return output;
+    };
 
     return {
       type: "JSXElement",
@@ -1504,7 +1807,7 @@ PairElement
         type: "JSXClosingElement",
         name: endTag.name,
       },
-      children: (children || []).filter(e => !!e).map(e => e.type != "JSXExpressionContainer" && e.type != "JSXElement" && e.type != "JSXText" ? { type: "JSXExpressionContainer", expression: e } : e),
+      children: normalizeElementChildren(children),
     };
   };
 
@@ -1517,8 +1820,6 @@ NonClosedElement
     return {
       type: "JSXElement",
       openingElement: Object.assign(startTag, { type: "JSXOpeningElement", selfClosing: true }),
-      closingElement: null,
-      children: []
     };
   };
 
@@ -1527,14 +1828,41 @@ StartTag
     attributes = (attributes || [])
       .filter(attr => attr && attr.name)
       .filter(attr => (attr.name.type == "TemplateLiteral" && attr.name.expressions.length == 0) || (attr.name.type == "JSXIdentifier"))
-      .map(attr => ({
-        type: "JSXAttribute",
-        name: {
-          type: "JSXIdentifier",
-          name: attr.name.type == "TemplateLiteral" ? attr.name.quasis.reduce((acc, elt) => acc + elt.value.raw, "") : attr.name
-        },
-        value: (attr.value.type == "TemplateLiteral" && attr.value.quasis.length == 1) ? { type: "Literal", value: attr.value.quasis[0].value.raw } : { type: "JSXExpressionContainer", expression: attr.value }
-      }));
+      .map(({ name, value }) => {
+        name = name.type == "TemplateLiteral" ? name.quasis.reduce((acc, elt) => acc + elt.value.raw, "") : name;
+
+        if (value.type == "TemplateLiteral") {
+          if (value.quasis.length == 1) {
+            value = {
+              type: "Literal",
+              value: value.quasis[0].value.raw
+            };
+          } else if (value.expressions.length == 1) {
+            if (value.expressions[0].type && value.expressions[0].type == "JSXExpressionContainer") {
+              value = value.expressions[0];
+            } else {
+              value = {
+                type: "JSXExpressionContainer",
+                expression: value.expressions[0]
+              };
+            }
+          } else if (value.expressions.length == 0 && value.quasis.length == 0) {
+            value = {
+              type: "Literal",
+              value: ""
+            }
+          }
+        }
+
+        return {
+          type: "JSXAttribute",
+          name: {
+            type: "JSXIdentifier",
+            name
+          },
+          value
+        };
+    });
 
     return {
       name: {
