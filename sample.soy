@@ -1,242 +1,352 @@
-{namespace ServiceDesk.Templates.Customer.HelpCenterBranding}
+{namespace ServiceDesk.Templates.Agent.Reports}
+
+
 
 /**
- * Help center branding page content
- * @param announcement
- * @param user
+ * This is the main template for th`e reports view. It draws in the containers for each section then calls the respective soy templates for each bit.
+ * This ought to be called from the server only.
+ * @param projectKey can the user edit reports?
+ * @param projectName the name of the project to which the report relates
+ * @param selectedReport can the user edit reports?
+ * @param selectedTimescale list of timescales usable by reports
+ * @param canEditReports can the user edit reports?
+ * @param isEditing if currently editing or creating new report
+ * @param showHelpBubble whether to show the help bubble
  */
-{template .content}
-    {if $user.canAdministerJIRA and not $announcement.portalId}
-        <h3>{getText('sd.common.words.customize')}</h3>
+{template .reportMainView}
+<div id="sd-report-content">
+    {if $isEditing}
+        <div class="sdr-editing">
+            <div class="sdr-edit-form-container js-edit-report-form"></div>
+            <div class="js-report-graph sd-graph-container"></div>
+            <div class="js-graph-options-container sd-graph-options-container"></div>
+            <div class="js-report-drilldown"></div>
+        </div>
     {else}
-        <h3>{getText('sd.customerview.branding.announcement.customize.title')}</h3>
+        {call ServiceDesk.Templates.InternalApi.Panel.panel}
+            {param title: $selectedReport.name /}
+            {param includeHelpBubbleContainer: $showHelpBubble /}
+            {param actionsContent}
+                <div class="sdr-actions aui-buttons">
+                {if $canEditReports and $selectedReport}
+                    <a href="{sdProjectUrl($projectKey, '/reports/custom/' + $selectedReport.id + '/edit')}" class="aui-button sd-edit-reports"><span class="aui-icon aui-icon-small aui-iconfont-edit"></span> {getText('sd.common.words.edit')}</a>
+                {/if}
+                </div>
+            {/param}
+            {param bodyContent}
+                <h3 class="sd-print-only sd-print-only-h2 sd-project-name">{$projectName}</h3>
+                <h4 class="sd-print-only sd-print-only-h3 sd-timescale-name">{$selectedTimescale.name}</h4>
+                <div class="js-report-graph sd-graph-container"></div>
+                <div class="js-graph-options-container sd-graph-options-container {if isFeatureFlagEnabled('sd.report.custom.date.range')}sd-custom-date-range-enabled{/if}"></div>
+                <div class="js-report-drilldown"></div>
+            {/param}
+        {/call}
     {/if}
-    {call aui.form.form}
-        {param action: '' /}
-        {param id: 'js-help-center-branding-submit' /}
-        {param extraClasses: 'cv-help-center-branding-form' /}
-        {param isTopLabels: true /}
-        {param isLongLabels: true/}
-        {param content}
-            {if $user.canAdministerJIRA and not $announcement.portalId}
-                {call aui.form.fieldset}
-                    {param legendContent: '' /}
-                    {param content}
-                    <div class="cv-front-page-title-container js-front-page-title-container"></div>
-                    {/param}
-                {/call}
-                {call aui.form.fieldset}
-                    {param legendContent: '' /}
-                    {param content}
-                    <div class="js-header-option-container cv-header-option-container"></div>
-                    {/param}
-                {/call}
-                {call aui.form.fieldset}
-                    {param isGroup: 'true' /}
-                    {param legendContent: getText('sd.customerview.helpcenterbranding.headerbar.color.header') /}
-                    {param content}
-                    <div class="js-header-bar-color-container cv-header-color-container"></div>
-                    {/param}
-                {/call}
-            {elseif $announcement.canEditAnnouncement}
-                {call aui.form.fieldset}
-                    {param legendContent: '' /}
-                    {param content}
-                        <div class="js-header-option-container cv-header-option-container"></div>
-                    {/param}
-                {/call}
+</div>
+{/template}
+
+/**
+ * Renders the contents of the reports info bubble displayed in the top right oof the Reports pages
+ */
+{template .helpBubbleContents}
+    <h2 class="aui-nav-heading">{getText('sd.project.sidebar.reports')}</h2>
+    <p>{getText('sd.renaissance.page.bubble.report')}</p>
+    <p>
+        {call ServiceDesk.Templates.Shared.Utils.helpLinkStart}
+            {param helpLinkKey: 'setting.up.reports' /}
+            {param analyticsKey: 'page.view.onboarding.bubble.reports' /}
+            {param newTab: true /}
+        {/call}
+        {getText('sd.renaissance.page.bubble.report.doc.link')}
+        {call ServiceDesk.Templates.Shared.Utils.helpLinkEnd /}
+    </p>
+{/template}
+
+/**
+ * Draws in the report edit form. Used when the user clicks on the edit button
+ * @param selectedReport
+ * @param href
+ */
+{template .editReportForm}
+<form class="aui top-label sdr-edit-form">
+    {if $selectedReport.isNew}
+        <h2>{getText('sd.report.new')}</h2>
+    {/if}
+
+    {let $targetValue}
+        {if $selectedReport.target and $selectedReport.target > 0}
+            {$selectedReport.target}
+        {else}
+            80
+        {/if}
+    {/let}
+
+    <div class="field-group">
+        <label for="report-name">{getText('sd.report.field.name')}</label>
+        <input class="text js-name-field" type="text" id="report-name" name="name" value="{$selectedReport.name}">
+        <span class="report-name-errors"></span>
+    </div>
+
+    <div class="js-sd-graph-summary-container sd-graph-summary-container"></div>
+
+    <div class="buttons-container">
+        <div class="buttons">
+            <span class="sd-report-actions">
+                <button class="aui-button sd-new-series js-new-series" type="button">
+                    <span class="aui-icon aui-icon-small aui-iconfont-add" data-unicode="UTF+E002">Add</span>{sp}{getText('sd.report.series.add.button.text')}
+                </button>
+                <span class="sd-target-fields">
+                    <input id="sd-report-target-checkbox" class="checkbox" type="checkbox" value="hasTarget">
+                    {getText('sd.report.target.label')}
+                    <input id="sd-report-target" class="text" name="target" value="{$targetValue}" disabled type="number" min="0" max="100">%
+                </span>
+            </span>
+            <span class="sd-form-actions">
+                <button type="submit" class="aui-button aui-button-primary" id="d-save-btn1">{if $selectedReport.isNew}{getText('sd.common.words.create')}{else}{getText('sd.common.words.save')}{/if}</button>
+                <a class="cancel js-cancel" data-replace-state="true" href="{if $selectedReport.isNew}{$href}{else}{$selectedReport.href}{/if}">{getText('sd.common.words.cancel')}</a>
+                <span class="sd-progress"></span>
+            </span>
+        </div>
+    </div>
+</form>
+{/template}
+
+/**
+ * Draws the statistic for the edit form
+ * @param index index of the series in the model
+ * @param statistic the big number
+ * @param color the colour of the big number
+ * @param label the thing that gives the big number meaning
+ */
+{template .editStatistic}
+    <div class="sdr-statistic-container sdr-edit-container">
+        <div class="sdr-statistic" style="color: {$color};">
+            {$statistic.value} {if $statistic.units}
+                <span class="sdr-units">{$statistic.units}</span>
             {/if}
-            <div class="cv-help-center-branding-buttons">
-                {call ServiceDesk.Templates.Shared.Form.submitButtons}
-                    {param submitButtonLabel: getText('sd.customerview.helpcenterbranding.save') /}
-                    {param submitExtraClasses: 'js-help-center-branding-submit-button' /}
-                    {param cancelExtraClasses: 'js-help-center-branding-cancel-button' /}
-                    {param cancelText: getText('sd.common.words.cancel') /}
-                {/call}
-            </div>
-        {/param}
-    {/call}
+        </div>
+        <div class="sdr-reporttype">{$label}</div>
+        <span class="sdr-series-ops">
+            <a href="#" class="sdr-edit-series-link js-edit-series" data-series-index="{$index}">{getText('sd.common.words.edit')}</a>
+            <a href="#" class="sdr-delete-series-link js-delete-series" data-series-index="{$index}">{getText('sd.common.words.remove')}</a>
+        </span>
+    </div>
+{/template}
+
+
+/**
+ * Draws in the empty div that will hold the contents of our form
+ */
+{template .seriesFormContainer}
+    <div class="series-form-container">
+    </div>
 {/template}
 
 /**
- * Help center branding header options
- * @param canAdministerJIRA
- * @param? currentHelpCenterName the current name of the help center, defaults to 'Help Center'
- * @param? currentAnnouncementHeader the current announcement header, defaults to blank
- * @param? currentAnnouncementMessage the current announcement message, defaults to blank
- * @param isHelpCenter
+ * Draws in the form for adding a series
+ * @param seriesCategories list of series types
+ * @param colors Valid colours for the series
+ * @param? series data for the current series - if it is passed in
  */
-{template .headerOptions}
-    // We can't use aui .radioField soy here because we need to put markup between the radio buttons
-    {if $canAdministerJIRA and $isHelpCenter}
+{template .seriesForm}
+    <form class="aui series-form">
         <div class="field-group">
-            <label for="help-center-header-option-text-only-text">{getText('sd.customerview.helpcenterbranding.portalcontentareaoptions.headeroptions.display.text.only.label')}</label>
-            <input id="help-center-header-option-text-only-text" class="text full-width-field" type="text" name="sharedPortalName"
-                value="{$currentHelpCenterName}"
-                data-aui-validation-field=""
-                data-aui-form-notification-position="bottom"
-                data-aui-validation-when="input"
-                data-aui-validation-trimmaxlength="30"
-                data-aui-validation-trimminlength="1">
-            <div class="description">({getText('sd.customerview.helpcenterbranding.portalcontentareaoptions.headeroptions.display.text.only.desc')})</div>
+            <label for="series-type">{getText('sd.report.series.add.seriestype.label')}</label>
+            <select id="series-type" class="hidden" name="series-type">
+                {foreach $seriesCategory in $seriesCategories}
+                    <optgroup label="{$seriesCategory.name}">
+                        {foreach $seriesType in $seriesCategory.seriesTypes}
+                            <option value="{$seriesType.typeKey}" {if $series and $series.seriesKey == $seriesType.typeKey} selected="selected" {/if} title="{$seriesType.typeName}">{$seriesType.typeName}</option>
+                        {/foreach}
+                    </optgroup>
+                {/foreach}
+            </select>
+            <div class="errors s-type"></div>
         </div>
-    {/if}
-    <div class="field-group">
-        <label for="help-center-header-option-announcement-header">{getText('sd.customerview.helpcenterbranding.portalcontentareaoptions.headeroptions.announcement.header.label')}</label>
-        <input id="help-center-header-option-announcement-header" class="text full-width-field" type="text" name="announcementHeader"
-            value="{$currentAnnouncementHeader}"
-            placeholder="{getText('sd.customerview.helpcenterbranding.portalcontentareaoptions.headeroptions.announcement.placeholder')}">
-    </div>
-    <legend><span>{getText('sd.customerview.helpcenterbranding.portalcontentareaoptions.headeroptions.announcement.message.label')}</span></legend>
-    <div class="field-group">
-        <label for="help-center-header-option-announcement-message">{getText('sd.customerview.helpcenterbranding.portalcontentareaoptions.headeroptions.announcement.message.label')}</label>
-        <textarea class="textarea full-width-field" name="announcementMessage" id="help-center-header-option-announcement-message">
-            {$currentAnnouncementMessage}
-        </textarea>
-        <div class="announement-description">
-            {getText('sd.admin.standard.linkshelp.text.intro')}{sp}<span class="wiki-example">{getText('sd.admin.standard.linkshelp.text.example.helpcenter')}</span>
+        <div class="field-group">
+            <label for="series-label">{getText('sd.report.series.add.label.label')}</label>
+            <input id="series-label" name="series-label" type="text" class="text" {if $series}value="{$series.label}"{/if}>
+            <div class="errors s-label"></div>
         </div>
+        <div class="field-group">
+            <label for="series-colour">{getText('sd.report.series.add.label.colour')}</label>
+            <div name="series-colour">
+                {foreach $color in $colors}
+                    <div class="series-set-container">
+                        {call .seriesColour}
+                            {param color: $color.full /}
+                            {param series: $series /}
+                        {/call}
+                        {call .seriesColour}
+                            {param color: $color.half /}
+                            {param series: $series /}
+                        {/call}
+                    </div>
+                {/foreach}
+            </div>
+            <div class="errors s-colour"></div>
+        </div>
+        <div id="sd-filter-panel" class="js-filter-panel sd-filter-panel"></div>
+    </form>
+    <div class="series-errors"></div>
+{/template}
+
+/**
+ * Draw the filter section in the series create/edit dialog
+ * @param? canFilterByGoal Should show the goals dropdown
+ * @param? goals The list of possible goals for series filter, grouped by calendar name
+ * @param? selectedGoalId The selected goal id.
+ * @param? jql Current jql string, edit mode only.
+ */
+{template .seriesFilter}
+    <div class="field-group">
+        <label for="sd-series-filter-radio-group">{getText('sd.report.series.filter.label')}</label>
+
+        // render the radio buttons and goal dropdown only when necessary
+        {if $canFilterByGoal and length($goals) > 0}
+            <div class="radio sd-series-filter-radio-group" id="sd-series-filter-radio-group">
+                <label for="sd-series-filter-jql" class="sd-series-filter-option-label">{getText('sd.report.series.add.label.specific.issues')}</label>
+                <input name="sd-series-filter-radio" value="filter-by-jql" id="sd-series-filter-jql" class="radio js-series-filter-option js-filter-by-jql" type="radio"{if not $selectedGoalId} checked="checked"{/if}>
+                <div class="sd-radio-option-container">
+                    <div id="series-jql" name="series-jql" data-value="{$jql}"{if $selectedGoalId} disabled="disabled"{/if}></div>
+                    <div class="errors s-jql"></div>
+                </div>
+
+                <label for="sd-series-filter-goal" class="sd-series-filter-option-label">{getText('sd.report.series.add.label.goal')}</label>
+                <input name="sd-series-filter-radio" value="filter-by-goal" id="sd-series-filter-goal" class="radio js-series-filter-option js-filter-by-goal" type="radio"{if $selectedGoalId} checked="checked"{/if}>
+                <div class="sd-radio-option-container">
+                    <select id="series-goal" class="hidden" name="series-goal" {if not $selectedGoalId} disabled="disabled"{/if}>
+                        {foreach $goal in $goals}
+                            <option value="{$goal.id}"{if $goal.id == $selectedGoalId} selected="selected"{/if}>{$goal.displayName} ({$goal.calendarName})</option>
+                        {/foreach}
+                    </select>
+                    <div class="errors s-goal"></div>
+                </div>
+            </div>
+        {else}
+            <div id="series-jql" name="series-jql" data-value="{$jql}"></div>
+            <div class="errors s-jql"></div>
+        {/if}
     </div>
-    {if $canAdministerJIRA and $isHelpCenter}
-        <div class="checkbox cv-help-center-header-option-logo-container" id="help-center-header-option-logo-container">
-            <input id="help-center-header-option-logo" class="checkbox" type="checkbox" name="help-center-header-options">
-            <label for="help-center-header-option-logo">{getText('sd.customerview.helpcenterbranding.portalcontentareaoptions.headeroptions.upload.logo.label')}</label>
-            <div id="help-center-header-option-logo-uploader" class="js-help-center-header-option-logo cv-help-center-header-option-logo">
-                {call aui.buttons.button}
-                    {param extraAttributes: ['type': 'button'] /}
-                    {param extraClasses: 'js-choose-logo' /}
-                    {param text}
-                        {getText('sd.admin.details.logo.change')}
-                    {/param}
-                {/call}{sp}
-                <span id="cv-logo-upload-status" class="cv-sd-status"></span>
-                <input type="hidden" name="logoDataURI" class="js-logo-data-uri" >
+{/template}
+
+/**
+ * Draw a single colour dot
+ * @param color Valid colour for the series
+ * @param? series data for the current series - if it is passed in
+ */
+{template .seriesColour}
+    <div class="series-colour {if $series and $color == $series.color}colour-selected{/if}" style="background-color:{$color}" data-value="{$color}"></div>
+{/template}
+
+/**
+ * Draw in REST errors in error message boxes
+ * @param errors
+ */
+{template .error}
+    {foreach $error in $errors}
+        <div class="aui-message error shadowed">
+            <p class="title">{getText('sd.form.error.header')}</p>
+            <span class="aui-icon icon-error"></span>
+            <p>{$error.errorMessage}</p>
+        </div>
+    {/foreach}
+{/template}
+
+/**
+ * Draw in REST errors inline. Used for form errors and such
+ * @param errors
+ */
+{template .inlineError}
+    {foreach $error in $errors}
+        <div class="error">{$error.errorMessage}</div>
+    {/foreach}
+{/template}
+
+/**
+ * Shows a confirmation message to make sure the user really means to delete the series
+ */
+{template .deleteSeriesConfirmation}
+  <h2 class="dialog-title">{getText('sd.report.series.remove.confirm.title')}</h2>
+  <form class="aui" action="#" method="post">
+      <div class="form-body">
+        <p>{getText('sd.report.series.remove.confirm.body')}</p>
+      </div>
+      <div class="form-footer buttons-container">
+          <div class="buttons">
+              <input type="button" class="aui-button aui-button-primary sd-confirm-series-remove" value="{getText('sd.common.words.remove')}" />
+              <a href='#' class="cancel">{getText('sd.common.words.cancel')}</a>
+          </div>
+      </div>
+  </form>
+{/template}
+
+/**
+ * Furniture for issues.
+ */
+{template .viewIssue}
+    <div id="issue-container"></div>
+{/template}
+
+/**
+* Dialog for when we failed to retrieve issue
+*/
+{template .issueError}
+    <h2 class="dialog-title">{getText('sd.project.reports.issue.error.title')}</h2>
+    <form class="aui" action="#" method="post">
+        <div class="form-body">
+            <div class="aui-message error">
+                <span class="aui-icon icon-error"></span>
+                <p>{getText('sd.project.reports.issue.error.desc')}</p>
             </div>
         </div>
-        <div id="help-center-header-option-generate-color-container" class="cv-hc-branding-generate-color-container">
-            <button id="help-center-header-option-generate-color" type="button" class="aui-button aui-button-link">{getText('sd.customerview.helpcenterbranding.logo.generate.color')}</button>
-            <span id="cv-generate-color-status" class="cv-sd-status"></span>
+        <div class="form-footer buttons-container">
+            <div class="buttons">
+                <button type="button" class="aui-button cancel">{getText('sd.common.words.acknowledge')}</button>
+            </div>
         </div>
-    {/if}
+    </form>
 {/template}
 
 /**
- * Help center page title editing view in sidepanel.
- * @param helpCenterTitle
+ * Custom Date Range picker
+ * @param minDate
+ * @param maxDate
+ * @param fromDate
+ * @param toDate
  */
-{template .frontPageTitle}
-    {call aui.form.fieldGroup}
-        {param content}
-            {call aui.form.label}
-                {param content: getText('sd.customerview.helpcenterbranding.frontpagetitle.title') /}
-                {param forField: 'cv-front-page-title' /}
-                {param isRequired: false /}
-            {/call}
-            {call aui.form.input}
-                {param type: 'text' /}
-                {param id: 'cv-front-page-title' /}
-                {param name: 'helpCenterTitle' /}
-                {param extraAttributes: [
-                    'data-aui-form-notification-position': 'bottom',
-                    'data-aui-validation-field': '',
-                    'data-aui-validation-when': 'input',
-                    'data-aui-validation-trimminlength': 1,
-                    'data-aui-validation-trimmaxlength': 100
-                ] /}
-                {param value: $helpCenterTitle /}
-                {param extraClasses: ['cv-front-page-title-input', 'js-front-page-title-input', 'full-width-field'] /}
-            {/call}
-        {/param}
-    {/call}
+{template .customDateRange}
+    <form class="aui">
+        <div class="sd-custom-date-range-date-field-group">
+            <label for="sd-custom-date-range-from">{getText('sd.project.reports.customdate.from')}</label>
+            <input id="sd-custom-date-range-from" class="aui-date-picker text" type="date" readonly value="{$fromDate}" min="{$minDate}" max="{$maxDate}" />
+            <span class="aui-icon aui-icon-small aui-iconfont-calendar"></span>
+        </div>
+
+        <div class="sd-custom-date-range-date-field-group">
+            <label id="sd-custom-date-range-to-label" for="sd-custom-date-range-to">{getText('sd.project.reports.customdate.to')}</label>
+            <input id="sd-custom-date-range-to" class="aui-date-picker text" type="date" readonly value="{$toDate}" min="{$minDate}" max="{$maxDate}" />
+            <span class="aui-icon aui-icon-small aui-iconfont-calendar"></span>
+        </div>
+
+        <div class="sd-custom-date-range-split-field-group js-custom-date-range-split-field-group">
+
+        </div>
+
+        <button id="sd-custom-date-range-update-button" class="aui-button aui-button-primary" aria-disabled="true">{getText('sd.common.words.update')}</button>
+    </form>
 {/template}
 
 /**
-* Help Center Branding Header Bar Color Picker Area
-* @param? headerBGColor
-* @param? headerLinkColor
-* @param? headerLinkHoverColor
-* @param? headerLinkHoverBGColor
-*/
-{template .headerBarColor}
-    <div class="cv-help-center-color-picker">
-        <sd-color-picker id="help-center-header-bg-color-picker" class="help-center-header-color-picker" name="headerBGColor" value="{$headerBGColor}"></sd-color-picker>
-        <label for="help-center-header-bg-color-picker">{getText('sd.customerview.helpcenterbranding.headercolor.headerbg')}</label>
-    </div>
-
-    <div class="cv-help-center-color-picker">
-        <sd-color-picker id="help-center-header-link-color-picker" class="help-center-header-color-picker" name="headerLinkColor" value="{$headerLinkColor}"></sd-color-picker>
-        <label for="help-center-header-link-color-picker">{getText('sd.customerview.helpcenterbranding.headercolor.headerlink')}</label>
-    </div>
-
-    <div class="cv-help-center-color-picker">
-        <sd-color-picker id="help-center-link-hover-bg-color-picker" class="help-center-header-color-picker" name="headerLinkHoverBGColor" value="{$headerLinkHoverBGColor}"></sd-color-picker>
-        <label for="help-center-link-hover-bg-color-picker">{getText('sd.customerview.helpcenterbranding.headercolor.headerlinkhoverbg')}</label>
-    </div>
-
-    <div class="cv-help-center-color-picker">
-        <sd-color-picker id="help-center-link-hover-color-picker" class="help-center-header-color-picker" name="headerLinkHoverColor" value="{$headerLinkHoverColor}"></sd-color-picker>
-        <label for="help-center-link-hover-color-picker">{getText('sd.customerview.helpcenterbranding.headercolor.headerlinkhover')}</label>
-    </div>
-
-{/template}
-
-/**
-* Renders all preview themes style for help center branding
-* adding additional theme style for other color picker here.
-* @param headerBGColor
-* @param headerLinkColor
-* @param headerLinkHoverColor
-* @param headerLinkHoverBGColor
-*/
-{template .helpCenterBrandingPreviewTheme}
-/*    <style id="help-center-branding-preview">
-        .help-center-custom-theme .aui-header {lb}
-            background-color: {$headerBGColor};
-            border-bottom-color: {$headerLinkColor};
-        {rb}
-        {\n}
-        .help-center-custom-theme .aui-header .header-feedback-link,
-        .help-center-custom-theme .aui-header a {lb}
-            color: {$headerLinkColor}
-        {rb}
-        {\n}
-
-        .help-center-custom-theme .aui-dropdown2.aui-style-default .active,
-        .help-center-custom-theme .aui-header .aui-dropdown2-trigger.active,
-        .help-center-custom-theme .aui-header a:focus .header-feedback-link,
-        .help-center-custom-theme .aui-header a:active .header-feedback-link,
-        .help-center-custom-theme .aui-header a:hover .header-feedback-link,
-        .help-center-custom-theme .aui-header a:focus,
-        .help-center-custom-theme .aui-header a:active,
-        .help-center-custom-theme .aui-header a:hover,
-        .help-center-custom-theme .aui-dropdown2.aui-style-default.aui-dropdown2-in-header .aui-dropdown2-section a:hover{lb}
-            color: {$headerLinkHoverColor};
-            background-color: {$headerLinkHoverBGColor};
-        {rb}
-        {\n}
-
-        .help-center-custom-theme .aui-header .aui-dropdown2-trigger:after {lb}
-            border-top-color: {$headerLinkColor};
-        {rb}
-        {\n}
-
-        .help-center-custom-theme .aui-header .aui-dropdown2-trigger:hover:after,
-        .help-center-custom-theme .aui-header .aui-dropdown2-trigger.active::after {lb}
-            border-top-color: {$headerLinkHoverColor};
-        {rb}
-        {\n}
-
-        .help-center-custom-theme .aui-header .aui-badge.sd-cv-badge,
-        .help-center-custom-theme .aui-badge {lb}
-            background-color: {$headerLinkColor};
-            color: {$headerBGColor};
-        {rb}
-
-        .help-center-custom-theme .aui-header a:hover .aui-badge.sd-cv-badge {lb}
-            color: {$headerLinkColor};
-            background-color: {$headerBGColor};
-
-        {rb}
-    <style>
-*/
+ * Split-by options selector
+ * @param options
+ * @param default
+ */
+{template .splitBySelector}
+    <label id="sd-custom-date-range-split-by-label" for="sd-custom-date-range-split-by">{getText('sd.project.reports.customdate.splitby')}</label>
+    <select id="sd-custom-date-range-split-by" name="sd-custom-date-range-split-by" class="select">
+        {foreach $option in $options}
+            <option value="{$option.name}"{if not $option.enabled} disabled{/if}{if $option.name == $default} selected{/if}>{$option.name}</option>
+        {/foreach}
+    </select>
 {/template}
