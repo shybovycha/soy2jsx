@@ -80,8 +80,10 @@ WS
   = [\r\n \t];
 
 TemplateDef
-  = comments:SoyTemplateDefComment* WS* "{template " name:TemplateName WS* attributes:Attributes? "}" WS+ body:TemplateBodyElement* "{/template}" WS* {
-    const params = comments.reduce((acc, commentLines) => acc.concat(
+  = comments:(SoyTemplateDefComment / SoyComment / BlankLine)* WS* "{template " name:TemplateName WS* attributes:Attributes? "}" WS+ body:TemplateBodyElement* "{/template}" WS* {
+    const params = comments
+      .filter(e => !!e && Array.isArray(e))
+      .reduce((acc, commentLines) => acc.concat(
         commentLines
           .filter(line => !!line && line.type == "TemplateParam")
           .map(param => (
@@ -208,7 +210,7 @@ SoyCommentOptionalParamDef
   = "@param?" WS+ name:Identifier { return { type: "TemplateParam", name }; };
 
 NamespaceDecl
-  = SoyComment* WS* "{namespace" WS+ name:ObjectPropertyReference "}" {
+  = SoyComment* WS* "{namespace" WS+ name:(ObjectPropertyReference / Identifier) "}" {
     return name;
   };
 
@@ -751,7 +753,7 @@ SoyLetOperator
 
 SoyInlineLetOperator
   = "{" WS* "let" WS+ name:VariableReference WS* ":" WS* value:SoyValueExpr WS* "/}" {
-    if (!value.type && value.length && value.length > 0) {
+    if (!value.type && Array.isArray(value)) {
       value = value.filter(e => !!e);
 
       if (value.length == 1) {
@@ -786,7 +788,7 @@ SoyInlineLetOperator
 
 SoyMultilineLetOperator
   = "{" WS* "let" WS+ name:VariableReference WS* "}" WS* value:TemplateBodyElement* WS* "{/let}" {
-    if (!value.type && value.length && value.length > 0) {
+    if (!value.type && Array.isArray(value)) {
       value = value.filter(e => !!e);
 
       if (value.length == 1) {
