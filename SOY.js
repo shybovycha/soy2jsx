@@ -224,7 +224,9 @@ function peg$parse(input, options) {
       peg$c8 = "{/template}",
       peg$c9 = peg$literalExpectation("{/template}", false),
       peg$c10 = function(comments, name, attributes, body) {
-          const params = comments.reduce((acc, commentLines) => acc.concat(
+          const params = comments
+            .filter(e => !!e && Array.isArray(e))
+            .reduce((acc, commentLines) => acc.concat(
               commentLines
                 .filter(line => !!line && line.type == "TemplateParam")
                 .map(param => (
@@ -705,7 +707,7 @@ function peg$parse(input, options) {
       peg$c193 = "/}",
       peg$c194 = peg$literalExpectation("/}", false),
       peg$c195 = function(name, value) {
-          if (!value.type && value.length && value.length > 0) {
+          if (!value.type && Array.isArray(value)) {
             value = value.filter(e => !!e);
 
             if (value.length == 1) {
@@ -1479,9 +1481,21 @@ function peg$parse(input, options) {
     s0 = peg$currPos;
     s1 = [];
     s2 = peg$parseSoyTemplateDefComment();
+    if (s2 === peg$FAILED) {
+      s2 = peg$parseSoyComment();
+      if (s2 === peg$FAILED) {
+        s2 = peg$parseBlankLine();
+      }
+    }
     while (s2 !== peg$FAILED) {
       s1.push(s2);
       s2 = peg$parseSoyTemplateDefComment();
+      if (s2 === peg$FAILED) {
+        s2 = peg$parseSoyComment();
+        if (s2 === peg$FAILED) {
+          s2 = peg$parseBlankLine();
+        }
+      }
     }
     if (s1 !== peg$FAILED) {
       s2 = [];
@@ -2474,6 +2488,9 @@ function peg$parse(input, options) {
           }
           if (s4 !== peg$FAILED) {
             s5 = peg$parseObjectPropertyReference();
+            if (s5 === peg$FAILED) {
+              s5 = peg$parseIdentifier();
+            }
             if (s5 !== peg$FAILED) {
               if (input.charCodeAt(peg$currPos) === 125) {
                 s6 = peg$c6;
