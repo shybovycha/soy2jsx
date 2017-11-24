@@ -374,9 +374,14 @@ SoySwithWithDefault
 
 SoySwitchOperatorCase
   = "{case" WS+ clause:SoyCaseValues WS* "}" WS* output:TemplateBodyElement* {
+    const normalizeTemplateBodyElementList = (elements) => {
+      const output = (elements || []).filter(e => !!e);
+      return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
+    };
+
     return {
       clause,
-      output
+      output: normalizeTemplateBodyElementList(output)
     }
   };
 
@@ -386,9 +391,14 @@ SoyCaseValues
 
 SoySwitchDefaultClause
   = "{default}" WS* output:TemplateBodyElement* {
+    const normalizeTemplateBodyElementList = (elements) => {
+      const output = (elements || []).filter(e => !!e);
+      return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
+    };
+
     return {
       clause: null,
-      output
+      output: normalizeTemplateBodyElementList(output)
     }
   };
 
@@ -398,32 +408,90 @@ SoyForeachOperator
 
 SoySimpleForeachOperator
   = "{" WS* "foreach" WS+ iterator:VariableReference WS+ "in" WS+ range:SoyAtomicValue WS* "}" WS* output:TemplateBodyElement* WS* "{/foreach}" {
+    const normalizeTemplateBodyElementList = (elements) => {
+      const output = (elements || []).filter(e => !!e);
+      return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
+    };
+
     return {
-      type: "ForeachOperator",
-      range,
-      output,
-      defaultOutput: []
+      type: "CallExpression",
+      callee: {
+        type: "MemberExpression",
+        object: range,
+        property: {
+          type: "Identifier",
+          name: "map"
+        }
+      },
+      arguments: [
+        {
+          type: "ArrowFunctionExpression",
+          id: null,
+          params: [ iterator ],
+          body: normalizeTemplateBodyElementList(output)
+        }
+      ]
     };
   };
 
 SoyForeachWithEmptySectionOperator
   = "{" WS* "foreach" WS+ iterator:VariableReference WS+ "in" WS+ range:SoyAtomicValue WS* "}" WS* output:TemplateBodyElement* WS* "{ifempty}" WS* defaultOutput:TemplateBodyElement* WS* "{/foreach}" {
+    const normalizeTemplateBodyElementList = (elements) => {
+      const output = (elements || []).filter(e => !!e);
+      return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
+    };
+
     return {
-      type: "ForeachOperator",
-      iterator: iterator.name,
-      range,
-      output,
-      defaultOutput
+      type: "LogicalExpression",
+      operator: "||",
+      left: {
+        type: "CallExpression",
+        callee: {
+          type: "MemberExpression",
+          object: range,
+          property: {
+            type: "Identifier",
+            name: "map"
+          }
+        },
+        arguments: [
+          {
+            type: "ArrowFunctionExpression",
+            id: null,
+            params: [ iterator ],
+            body: normalizeTemplateBodyElementList(output)
+          }
+        ]
+      },
+      right: normalizeTemplateBodyElementList(defaultOutput)
     };
   };
 
 SoyForOperator
   = "{" WS* "for" WS+ iterator:VariableReference WS+ "in" WS+ range:SoyRangeExpr WS* "}" WS* output:TemplateBodyElement* WS* "{/for}" {
+    const normalizeTemplateBodyElementList = (elements) => {
+      const output = (elements || []).filter(e => !!e);
+      return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
+    };
+
     return {
-      type: "ForOperator",
-      iterator: iterator.name,
-      range,
-      output
+      type: "CallExpression",
+      callee: {
+        type: "MemberExpression",
+        object: range,
+        property: {
+          type: "Identifier",
+          name: "map"
+        }
+      },
+      arguments: [
+        {
+          type: "ArrowFunctionExpression",
+          id: null,
+          params: [ iterator ],
+          body: normalizeTemplateBodyElementList(output)
+        }
+      ]
     };
   };
 
@@ -439,32 +507,64 @@ SoyRangeParams
   / InListParams;
 
 InListParams
-  = list:SoyValueExpr { return { list }; };
+  = list:SoyValueExpr {
+    return list;
+  };
 
 FromZeroToHeroRangeParams
   = endIndex:SoyMathExpression {
     return {
-      startIndex: 0,
-      endIndex,
-      step: 1
+      type: "CallExpression",
+      callee: {
+        type: "Identifier",
+        name: "range"
+      },
+      arguments: [
+        {
+          type: "Literal",
+          value: 0
+        },
+        endIndex,
+        {
+          type: "Literal",
+          value: 1
+        }
+      ]
     };
   };
 
 BetweenTwoValuesRangeParams
   = startIndex:SoyMathExpression WS* "," WS* endIndex:SoyMathExpression {
     return {
-      startIndex,
-      endIndex,
-      step: (startIndex < endIndex) ? 1 : -1
+      type: "CallExpression",
+      callee: {
+        type: "Identifier",
+        name: "range"
+      },
+      arguments: [
+        startIndex,
+        endIndex,
+        {
+          type: "Literal",
+          value: (startIndex < endIndex) ? 1 : -1
+        }
+      ]
     };
   };
 
 BetweenWithStepRangeParams
   = startIndex:SoyMathExpression WS* "," WS* endIndex:SoyMathExpression WS* "," WS* step:SoyMathExpression {
     return {
-      startIndex,
-      endIndex,
-      step
+      type: "CallExpression",
+      callee: {
+        type: "Identifier",
+        name: "range"
+      },
+      arguments: [
+        startIndex,
+        endIndex,
+        step
+      ]
     };
   };
 
@@ -706,31 +806,40 @@ SoyIfOperator
 
 SoyIfClause
   = "{" WS* "if" WS+ test:SoyMathExpression WS* "}" WS* output:TemplateBodyElement* {
-    output = output.filter(e => !!e);
+    const normalizeTemplateBodyElementList = (elements) => {
+      const output = elements.filter(e => !!e);
+      return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
+    };
 
     return {
       test,
-      output: output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
+      output: normalizeTemplateBodyElementList(output)
     };
   };
 
 SoyElseifClause
   = "{" WS* "elseif" WS+ test:SoyMathExpression WS* "}" WS* output:TemplateBodyElement* {
-    output = output.filter(e => !!e);
+    const normalizeTemplateBodyElementList = (elements) => {
+      const output = elements.filter(e => !!e);
+      return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
+    };
 
     return {
       test,
-      output: output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
+      output: normalizeTemplateBodyElementList(output)
     };
   };
 
 SoyElseClause
   = "{" WS* "else" WS* "}" WS* output:TemplateBodyElement* {
-    output = output.filter(e => !!e);
+    const normalizeTemplateBodyElementList = (elements) => {
+      const output = elements.filter(e => !!e);
+      return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
+    };
 
     return {
       test: null,
-      output: output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
+      output: normalizeTemplateBodyElementList(output)
     };
   };
 
@@ -788,18 +897,10 @@ SoyInlineLetOperator
 
 SoyMultilineLetOperator
   = "{" WS* "let" WS+ name:VariableReference WS* "}" WS* value:TemplateBodyElement* WS* "{/let}" {
-    if (!value.type && Array.isArray(value)) {
-      value = value.filter(e => !!e);
-
-      if (value.length == 1) {
-        value = value[0];
-      } else {
-        value = {
-          type: "SequenceExpression",
-          expressions: value.filter(e => !!e)
-        };
-      }
-    }
+    const normalizeTemplateBodyElementList = (elements) => {
+      const output = (elements || []).filter(e => !!e);
+      return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
+    };
 
     if (!name.type) {
       name = {
@@ -814,7 +915,7 @@ SoyMultilineLetOperator
         {
           type: "VariableDeclarator",
           id: name,
-          init: value
+          init: normalizeTemplateBodyElementList(value)
         }
       ],
       kind: "let"
@@ -1066,21 +1167,15 @@ MultilineTemplateCallValueParam
 
 MultilineTemplateCallMultilineParam
   = "{param" WS+ name:Identifier WS* "}" WS* value:TemplateBodyElement* WS* "{/param}" {
-    value = value.filter(e => !!e);
-
-    if (value.length == 1) {
-      value = value[0];
-    } else {
-      value = {
-        type: "SequenceExpression",
-        expressions: value
-      };
-    }
+    const normalizeTemplateBodyElementList = (elements) => {
+      const output = (elements || []).filter(e => !!e);
+      return output.length == 1 ? output[0] : { type: "SequenceExpression", expressions: output }
+    };
 
     return {
       type: "JSXAttribute",
       name,
-      value: { type: "JSXExpressionContainer", expression: value }
+      value: { type: "JSXExpressionContainer", expression: normalizeTemplateBodyElementList(value) }
     };
   };
 

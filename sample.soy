@@ -1,228 +1,242 @@
-{namespace ServiceDesk.Templates.Agent.Customer.IncomingEmailSetup.AddEmailAccountDialog}
+{namespace ServiceDesk.Templates.Customer.HelpCenterBranding}
 
 /**
- * Generate content for Add Agent Dialog
- * @param isEditing - View is in Editing mode
+ * Help center branding page content
+ * @param announcement
+ * @param user
  */
 {template .content}
-<div class="jira-dialog-heading">
-    <h2 class="dialog-title">
-        {if $isEditing}
-            {getText('sd.admin.incoming.email.setup.add.email.dialog.title')}
-        {else}
-            {getText('sd.admin.incoming.email.setup.edit.email.account')}
-        {/if}
-    </h2>
-</div>
-<form class="aui sd-add-email-account-form js-add-email-account-form ajs-dirty-warning-exempt">
-    <div class="form-body">
-        <div class="sd-error-message js-error-message"/>
-        <div class="sd-set-email-account-details js-set-email-account-details"/>
-        <div class="sd-set-email-account-request-type js-set-email-account-request-type"/>
-    </div>
-</form>
-{/template}
-
-/**
- * Incoming email details
- * @param incomingEmail - An Empty incoming email model when adding new email account, or the incoming email being updated.
- * @param definedProtocols - Map of defined protocols
- * @param definedProviders - Map of provided services
- * @param isEditing - View is in Editing mode
- * @param dummyPassword - A fake password displayed in replacement of actual password
- */
-{template .emailAccountDetails}
-    <div class="sd-email-panel-body js-email-settings-detail">
-        {if not $isEditing}
-            <h3>{getText('sd.admin.incoming.email.setup.add.email.dialog.email.details.title')}</h3>
-            <p>{getText('sd.admin.incoming.email.setup.add.email.dialog.email.details.desc')}</p>
-        {/if}
-        <fieldset class="sd-fieldset-container">
-            <fieldset>
-                <div class="field-group">
-                    <label for="">{getText('sd.admin.incoming.email.setup.add.email.dialog.email.service.provider.label')}</label>
-                    <div class="aui-buttons js-email-provider sd-email-provider">
-                        {foreach $key in keys($definedProviders)}
-                            <button type="button" class="aui-button js-provider-button no-outline" data-service-key="{$key}">
-                            <span class="sd-email-icon-{$key}"></span>
-                            {$definedProviders[$key].text}
-                            </button>
-                        {/foreach}
-                        <button type="button" class="aui-button js-other-provider-button">Other</button>
-                    </div>
-                </div>
-            </fieldset>
-            <fieldset>
-                <div class="field-group">
-                    <label for="emailAddress">{getText('sd.admin.incoming.email.setup.add.email.dialog.email.address.label')}</label>
-                    <input class="text js-email-address" type="email" name="emailAddress" id="emailAddress" value="{$incomingEmail.emailAddress}">
-                </div>
-            </fieldset>
-            <fieldset class="js-username-field hidden">
-                <div class="field-group">
-                    <label for="username">{getText('sd.admin.incoming.email.setup.add.email.dialog.username.label')}</label>
-                    <input class="text js-username" type="text" name="username" id="username" value="{$incomingEmail.username}">
-                    <input type="hidden" name="id" value="{if $isEditing}{$incomingEmail.id}{/if}">
-                </div>
-            </fieldset>
-            <fieldset class="js-password-field">
-                <div class="field-group">
-                    <label for="password">{getText('sd.admin.incoming.email.setup.add.email.dialog.password.label')}</label>
-                    <input class="text js-password" type="password" name="password" id="password" {if $isEditing}value="{$dummyPassword}"{/if}>
-                    {let $linkStart}
-                        <a class="js-email-2fa-link" target="_blank">
-                    {/let}
-                    {let $linkEnd}
-                        </a>
-                    {/let}
-                    <small class="js-email-2fa-description sd-email-2fa-description hidden">
-                        {getText('sd.admin.incoming.email.setup.add.email.dialog.password.caption', $linkStart, $linkEnd)|noAutoescape}
-                    </small>
-                </div>
-            </fieldset>
-            <fieldset class="js-protocol-field hidden">
-                <div class="field-group">
-                    <label for="protocol">{getText('sd.admin.incoming.email.setup.add.email.dialog.email.protocol.label')}</label>
-                    <select name="protocol" class="select js-mail-protocol" id="protocol" value="{$incomingEmail.protocol}">
-                        {foreach $key in keys($definedProtocols)}
-                            {let $protocol: $definedProtocols[$key] /}
-                            <option value="{$key}">{$protocol.text}</option>
-                        {/foreach}
-                    </select>{sp}
-                    <button class="aui-button aui-button-link sd-no-outline js-protocol-info-button hidden">
-                        <span class="aui-icon aui-icon-small aui-iconfont-error"></span>
-                    </button>
-                </div>
-            </fieldset>
-            <fieldset class="js-host-field hidden">
-                <div class="field-group">
-                    <label for="host">{getText('sd.admin.incoming.email.setup.add.email.dialog.mail.server.label')}</label>
-                    <input class="text" type="text" name="host" id="host" value="{$incomingEmail.host}">
-                </div>
-            </fieldset>
-            <fieldset class="js-port-field hidden">
-                <div class="field-group">
-                    <label for="port">{getText('sd.admin.incoming.email.setup.add.email.dialog.port.number.label')}</label>
-                    <input class="text" type="text" name="port" id="port" value="{$incomingEmail.port}">
-                </div>
-            </fieldset>
-        </fieldset>
-    </div>
-    <div class="form-footer buttons-container">
-        <div class="buttons">
-            <span class="cv-sd-status js-status cv-sd-status-left"></span>
-            <input type="button" class="aui-button js-goto-email-requesttype aui-button-primary" value="{getText('sd.common.words.next')}" />
-            <input type="button" class="aui-button aui-button-link cancel" value="{getText('sd.common.words.cancel')}" />
-        </div>
-    </div>
-{/template}
-
-/**
- * Incoming email request type selection
- * @param incomingEmail - An Empty incoming email model when adding new email account, or the incoming email being updated.
- * @param requestTypes - List of all valid request types.
- * @param invalidRequestTypes - List of all valid request types.
- * @param hasAnyRequestTypes
- */
-{template .emailAccountRequestType}
-    <div class="sd-email-panel-body">
-        <h3>{getText('sd.admin.incoming.email.setup.add.email.dialog.request.type.selection.title')}</h3>
-        <p>{getText('sd.admin.incoming.email.setup.add.email.dialog.request.type.selection.desc')}</p>
-        <div class="sd-email-rt-split-bar"></div>
-
-        {if $hasAnyRequestTypes }
-            <div class="sd-request-type-search">
-                <span class="aui-icon aui-icon-small aui-iconfont-search js-copy-clipboard sd-search-icon"></span>
-                <input type="text" class="js-request-type-search-field sd-request-type-search-field"
-                    placeholder="{getText('sd.admin.incoming.email.setup.add.email.dialog.search.placeholder')}">
+    {if $user.canAdministerJIRA and not $announcement.portalId}
+        <h3>{getText('sd.common.words.customize')}</h3>
+    {else}
+        <h3>{getText('sd.customerview.branding.announcement.customize.title')}</h3>
+    {/if}
+    {call aui.form.form}
+        {param action: '' /}
+        {param id: 'js-help-center-branding-submit' /}
+        {param extraClasses: 'cv-help-center-branding-form' /}
+        {param isTopLabels: true /}
+        {param isLongLabels: true/}
+        {param content}
+            {if $user.canAdministerJIRA and not $announcement.portalId}
+                {call aui.form.fieldset}
+                    {param legendContent: '' /}
+                    {param content}
+                    <div class="cv-front-page-title-container js-front-page-title-container"></div>
+                    {/param}
+                {/call}
+                {call aui.form.fieldset}
+                    {param legendContent: '' /}
+                    {param content}
+                    <div class="js-header-option-container cv-header-option-container"></div>
+                    {/param}
+                {/call}
+                {call aui.form.fieldset}
+                    {param isGroup: 'true' /}
+                    {param legendContent: getText('sd.customerview.helpcenterbranding.headerbar.color.header') /}
+                    {param content}
+                    <div class="js-header-bar-color-container cv-header-color-container"></div>
+                    {/param}
+                {/call}
+            {elseif $announcement.canEditAnnouncement}
+                {call aui.form.fieldset}
+                    {param legendContent: '' /}
+                    {param content}
+                        <div class="js-header-option-container cv-header-option-container"></div>
+                    {/param}
+                {/call}
+            {/if}
+            <div class="cv-help-center-branding-buttons">
+                {call ServiceDesk.Templates.Shared.Form.submitButtons}
+                    {param submitButtonLabel: getText('sd.customerview.helpcenterbranding.save') /}
+                    {param submitExtraClasses: 'js-help-center-branding-submit-button' /}
+                    {param cancelExtraClasses: 'js-help-center-branding-cancel-button' /}
+                    {param cancelText: getText('sd.common.words.cancel') /}
+                {/call}
             </div>
-        {/if}
-
-        <div class="sd-request-type-result">
-            {if length($requestTypes) > 0 }
-                <h4 class="js-email-rt-heading">{getText('sd.admin.incoming.email.setup.add.email.dialog.request.type.suitable.for.email.title')}</h4>
-                <div class="sd-email-rt-selector js-email-rt-selector" tabindex="0">
-                    {foreach $rt in $requestTypes}
-                        /* The selected request type is either : target request type in edit mode, or the first request type in create mode */
-                        {let $isSelected: (($incomingEmail.id and $incomingEmail.requestTypeId == $rt.id) or (not $incomingEmail.id and isFirst($rt)) )  /}
-                        <div class="sd-email-rt-option js-email-rt-option {if isFirst($rt)}selected{/if} " data-rt-id="{$rt.id}">
-                            {call ServiceDesk.Templates.Components.RequestTypeIcons.icon}
-                                {param iconId: $rt.icon /}
-                                {param class: 'sd-email-rt-icon' /}
-                            {/call}
-                            <span class="sd-email-rt-name">{$rt.name}</span>
-                        </div>
-                    {/foreach}
-                </div>
-            {/if}
-            {if length($invalidRequestTypes) > 0 }
-                <h4 class="js-email-rt-heading-invalid">{getText('sd.admin.incoming.email.setup.add.email.dialog.request.type.not.suitable.for.email.title')}</h4>
-                <div class="sd-email-rt-selector js-email-rt-selector-disabled">
-                    {foreach $rt in $invalidRequestTypes}
-                        /* The selected request type is either : target request type in edit mode, or the first request type in create mode */
-                        <div class="sd-email-rt-option js-email-rt-option disabled" data-rt-id="{$rt.id}">
-                            <span class="js-email-rt-option-tooltip" title="{getText('sd.admin.incoming.email.invalid.request.type.desc')}">
-                                {call ServiceDesk.Templates.Components.RequestTypeIcons.icon}
-                                    {param iconId: $rt.icon /}
-                                    {param class: 'sd-email-rt-icon' /}
-                                {/call}
-                                <span class="sd-email-rt-name">{$rt.name}</span>
-                            </span>
-                        </div>
-                    {/foreach}
-                </div>
-            {/if}
-            {if not $hasAnyRequestTypes }
-                <div class="aui-message aui-message-warning">
-                    <p>{getText('sd.admin.incoming.email.setup.add.email.dialog.no.request.types')}</p>
-                </div>
-            {/if}
-        </div>
-    </div>
-    <div class="form-footer buttons-container">
-        <div class="buttons">
-            <span class="js-status"></span>
-            <input type="button" class="aui-button js-goto-email-details" value="{getText('sd.common.words.back')}" />
-            <input type="button" class="aui-button js-save-email-account aui-button-primary" value="{getText('sd.common.words.done')}" />
-            <input type="button" class="aui-button aui-button-link cancel" value="{getText('sd.common.words.cancel')}" />
-        </div>
-    </div>
-{/template}
-
-/**
- * wrap text in <p> and escape for free
- * @param text
- */
-{template .simpleMessage}
-    <p>{$text}</p>
-{/template}
-
-/**
- * @param error
- */
-{template .errorMessageWithLink}
-    {let $linkStart}
-        {call ServiceDesk.Templates.Shared.Utils.helpLinkStart}
-            {param helpLinkKey: 'email.settings.troubleshooting' /}
-            {param analyticsKey: 'page.view.email.settings.troubleshooting' /}
-            {param newTab: true /}
-         {/call}
-    {/let}
-    <p>
-        {$error} {getText('sd.email.verification.server.troublshooting.docs', $linkStart, '</a>')|noAutoescape}
-    </p>
-{/template}
-
-/**
- * Inbox must be empty error with learn more link
- */
-{template .emptyInboxError}
-<p>
-    {getText('sd.email.invalid.email.setting.inbox.not.empty.content')}{sp}
-    {call ServiceDesk.Templates.Shared.Utils.helpLink}
-        {param helpLinkKey: 'email.setup' /}
-        {param analyticsKey: 'page.view.email.setting.inbox.not.empty' /}
-        {param linkText: getText('sd.common.words.learn.more') /}
+        {/param}
     {/call}
-</p>
+{/template}
+
+/**
+ * Help center branding header options
+ * @param canAdministerJIRA
+ * @param? currentHelpCenterName the current name of the help center, defaults to 'Help Center'
+ * @param? currentAnnouncementHeader the current announcement header, defaults to blank
+ * @param? currentAnnouncementMessage the current announcement message, defaults to blank
+ * @param isHelpCenter
+ */
+{template .headerOptions}
+    // We can't use aui .radioField soy here because we need to put markup between the radio buttons
+    {if $canAdministerJIRA and $isHelpCenter}
+        <div class="field-group">
+            <label for="help-center-header-option-text-only-text">{getText('sd.customerview.helpcenterbranding.portalcontentareaoptions.headeroptions.display.text.only.label')}</label>
+            <input id="help-center-header-option-text-only-text" class="text full-width-field" type="text" name="sharedPortalName"
+                value="{$currentHelpCenterName}"
+                data-aui-validation-field=""
+                data-aui-form-notification-position="bottom"
+                data-aui-validation-when="input"
+                data-aui-validation-trimmaxlength="30"
+                data-aui-validation-trimminlength="1">
+            <div class="description">({getText('sd.customerview.helpcenterbranding.portalcontentareaoptions.headeroptions.display.text.only.desc')})</div>
+        </div>
+    {/if}
+    <div class="field-group">
+        <label for="help-center-header-option-announcement-header">{getText('sd.customerview.helpcenterbranding.portalcontentareaoptions.headeroptions.announcement.header.label')}</label>
+        <input id="help-center-header-option-announcement-header" class="text full-width-field" type="text" name="announcementHeader"
+            value="{$currentAnnouncementHeader}"
+            placeholder="{getText('sd.customerview.helpcenterbranding.portalcontentareaoptions.headeroptions.announcement.placeholder')}">
+    </div>
+    <legend><span>{getText('sd.customerview.helpcenterbranding.portalcontentareaoptions.headeroptions.announcement.message.label')}</span></legend>
+    <div class="field-group">
+        <label for="help-center-header-option-announcement-message">{getText('sd.customerview.helpcenterbranding.portalcontentareaoptions.headeroptions.announcement.message.label')}</label>
+        <textarea class="textarea full-width-field" name="announcementMessage" id="help-center-header-option-announcement-message">
+            {$currentAnnouncementMessage}
+        </textarea>
+        <div class="announement-description">
+            {getText('sd.admin.standard.linkshelp.text.intro')}{sp}<span class="wiki-example">{getText('sd.admin.standard.linkshelp.text.example.helpcenter')}</span>
+        </div>
+    </div>
+    {if $canAdministerJIRA and $isHelpCenter}
+        <div class="checkbox cv-help-center-header-option-logo-container" id="help-center-header-option-logo-container">
+            <input id="help-center-header-option-logo" class="checkbox" type="checkbox" name="help-center-header-options">
+            <label for="help-center-header-option-logo">{getText('sd.customerview.helpcenterbranding.portalcontentareaoptions.headeroptions.upload.logo.label')}</label>
+            <div id="help-center-header-option-logo-uploader" class="js-help-center-header-option-logo cv-help-center-header-option-logo">
+                {call aui.buttons.button}
+                    {param extraAttributes: ['type': 'button'] /}
+                    {param extraClasses: 'js-choose-logo' /}
+                    {param text}
+                        {getText('sd.admin.details.logo.change')}
+                    {/param}
+                {/call}{sp}
+                <span id="cv-logo-upload-status" class="cv-sd-status"></span>
+                <input type="hidden" name="logoDataURI" class="js-logo-data-uri" >
+            </div>
+        </div>
+        <div id="help-center-header-option-generate-color-container" class="cv-hc-branding-generate-color-container">
+            <button id="help-center-header-option-generate-color" type="button" class="aui-button aui-button-link">{getText('sd.customerview.helpcenterbranding.logo.generate.color')}</button>
+            <span id="cv-generate-color-status" class="cv-sd-status"></span>
+        </div>
+    {/if}
+{/template}
+
+/**
+ * Help center page title editing view in sidepanel.
+ * @param helpCenterTitle
+ */
+{template .frontPageTitle}
+    {call aui.form.fieldGroup}
+        {param content}
+            {call aui.form.label}
+                {param content: getText('sd.customerview.helpcenterbranding.frontpagetitle.title') /}
+                {param forField: 'cv-front-page-title' /}
+                {param isRequired: false /}
+            {/call}
+            {call aui.form.input}
+                {param type: 'text' /}
+                {param id: 'cv-front-page-title' /}
+                {param name: 'helpCenterTitle' /}
+                {param extraAttributes: [
+                    'data-aui-form-notification-position': 'bottom',
+                    'data-aui-validation-field': '',
+                    'data-aui-validation-when': 'input',
+                    'data-aui-validation-trimminlength': 1,
+                    'data-aui-validation-trimmaxlength': 100
+                ] /}
+                {param value: $helpCenterTitle /}
+                {param extraClasses: ['cv-front-page-title-input', 'js-front-page-title-input', 'full-width-field'] /}
+            {/call}
+        {/param}
+    {/call}
+{/template}
+
+/**
+* Help Center Branding Header Bar Color Picker Area
+* @param? headerBGColor
+* @param? headerLinkColor
+* @param? headerLinkHoverColor
+* @param? headerLinkHoverBGColor
+*/
+{template .headerBarColor}
+    <div class="cv-help-center-color-picker">
+        <sd-color-picker id="help-center-header-bg-color-picker" class="help-center-header-color-picker" name="headerBGColor" value="{$headerBGColor}"></sd-color-picker>
+        <label for="help-center-header-bg-color-picker">{getText('sd.customerview.helpcenterbranding.headercolor.headerbg')}</label>
+    </div>
+
+    <div class="cv-help-center-color-picker">
+        <sd-color-picker id="help-center-header-link-color-picker" class="help-center-header-color-picker" name="headerLinkColor" value="{$headerLinkColor}"></sd-color-picker>
+        <label for="help-center-header-link-color-picker">{getText('sd.customerview.helpcenterbranding.headercolor.headerlink')}</label>
+    </div>
+
+    <div class="cv-help-center-color-picker">
+        <sd-color-picker id="help-center-link-hover-bg-color-picker" class="help-center-header-color-picker" name="headerLinkHoverBGColor" value="{$headerLinkHoverBGColor}"></sd-color-picker>
+        <label for="help-center-link-hover-bg-color-picker">{getText('sd.customerview.helpcenterbranding.headercolor.headerlinkhoverbg')}</label>
+    </div>
+
+    <div class="cv-help-center-color-picker">
+        <sd-color-picker id="help-center-link-hover-color-picker" class="help-center-header-color-picker" name="headerLinkHoverColor" value="{$headerLinkHoverColor}"></sd-color-picker>
+        <label for="help-center-link-hover-color-picker">{getText('sd.customerview.helpcenterbranding.headercolor.headerlinkhover')}</label>
+    </div>
+
+{/template}
+
+/**
+* Renders all preview themes style for help center branding
+* adding additional theme style for other color picker here.
+* @param headerBGColor
+* @param headerLinkColor
+* @param headerLinkHoverColor
+* @param headerLinkHoverBGColor
+*/
+{template .helpCenterBrandingPreviewTheme}
+/*    <style id="help-center-branding-preview">
+        .help-center-custom-theme .aui-header {lb}
+            background-color: {$headerBGColor};
+            border-bottom-color: {$headerLinkColor};
+        {rb}
+        {\n}
+        .help-center-custom-theme .aui-header .header-feedback-link,
+        .help-center-custom-theme .aui-header a {lb}
+            color: {$headerLinkColor}
+        {rb}
+        {\n}
+
+        .help-center-custom-theme .aui-dropdown2.aui-style-default .active,
+        .help-center-custom-theme .aui-header .aui-dropdown2-trigger.active,
+        .help-center-custom-theme .aui-header a:focus .header-feedback-link,
+        .help-center-custom-theme .aui-header a:active .header-feedback-link,
+        .help-center-custom-theme .aui-header a:hover .header-feedback-link,
+        .help-center-custom-theme .aui-header a:focus,
+        .help-center-custom-theme .aui-header a:active,
+        .help-center-custom-theme .aui-header a:hover,
+        .help-center-custom-theme .aui-dropdown2.aui-style-default.aui-dropdown2-in-header .aui-dropdown2-section a:hover{lb}
+            color: {$headerLinkHoverColor};
+            background-color: {$headerLinkHoverBGColor};
+        {rb}
+        {\n}
+
+        .help-center-custom-theme .aui-header .aui-dropdown2-trigger:after {lb}
+            border-top-color: {$headerLinkColor};
+        {rb}
+        {\n}
+
+        .help-center-custom-theme .aui-header .aui-dropdown2-trigger:hover:after,
+        .help-center-custom-theme .aui-header .aui-dropdown2-trigger.active::after {lb}
+            border-top-color: {$headerLinkHoverColor};
+        {rb}
+        {\n}
+
+        .help-center-custom-theme .aui-header .aui-badge.sd-cv-badge,
+        .help-center-custom-theme .aui-badge {lb}
+            background-color: {$headerLinkColor};
+            color: {$headerBGColor};
+        {rb}
+
+        .help-center-custom-theme .aui-header a:hover .aui-badge.sd-cv-badge {lb}
+            color: {$headerLinkColor};
+            background-color: {$headerBGColor};
+
+        {rb}
+    <style>
+*/
 {/template}
