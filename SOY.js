@@ -226,7 +226,7 @@ function peg$parse(input, options) {
       peg$c10 = function(comments, name, attributes, body) {
           const params = comments.reduce((acc, commentLines) => acc.concat(
               commentLines
-                .filter(line => line.type == "TemplateParam")
+                .filter(line => !!line && line.type == "TemplateParam")
                 .map(param => (
                   {
                     type: "Property",
@@ -241,10 +241,42 @@ function peg$parse(input, options) {
 
           body = body.filter(e => !!e);
 
+          if (body.length == 1 && body[0].type == "JSXElement") {
+            body = body[0];
+          } else {
+            const variableDecls = body.filter(e => e.type == "VariableDeclaration");
+            const elements = body.filter(e => e.type != "VariableDeclaration");
+            let returnValue;
+
+            if (elements.length < 1) {
+              returnValue = {
+                type: "Literal",
+                value: null
+              };
+            } else if (elements.length > 1) {
+              returnValue = {
+                type: "SequenceExpression",
+                expressions: elements
+              };
+            } else {
+              returnValue = elements[0];
+            }
+
+            const returnStatement = {
+              type: "ReturnStatement",
+              argument: returnValue
+            };
+
+            body = {
+              type: "BlockStatement",
+              body: variableDecls.concat(returnStatement)
+            };
+          }
+
           return {
             params,
             name,
-            body: body.length > 1 ? { type: "SequenceExpression", expressions: body, expression: true } : body[0]
+            body
           };
         },
       peg$c11 = function(name) {
@@ -313,16 +345,16 @@ function peg$parse(input, options) {
       peg$c54 = function(expression) { return expression; },
       peg$c55 = "{sp}",
       peg$c56 = peg$literalExpectation("{sp}", false),
-      peg$c57 = function() { return { type: "Literal", value: " " }; },
+      peg$c57 = function() { return { type: "JSXText", value: " " }; },
       peg$c58 = "{\\n}",
       peg$c59 = peg$literalExpectation("{\\n}", false),
-      peg$c60 = function() { return { type: "Literal", value: "\n" }; },
+      peg$c60 = function() { return { type: "JSXText", value: "\n" }; },
       peg$c61 = "{\\t}",
       peg$c62 = peg$literalExpectation("{\\t}", false),
-      peg$c63 = function() { return {  type: "Literal", value: "  "  }; },
+      peg$c63 = function() { return { type: "JSXText", value: "  " }; },
       peg$c64 = "{\\r}",
       peg$c65 = peg$literalExpectation("{\\r}", false),
-      peg$c66 = function() { return {  type: "Literal", value: "\r"  }; },
+      peg$c66 = function() { return { type: "JSXText", value: "\r" }; },
       peg$c67 = "|",
       peg$c68 = peg$literalExpectation("|", false),
       peg$c69 = function(name) {
@@ -348,8 +380,8 @@ function peg$parse(input, options) {
       peg$c75 = "\"",
       peg$c76 = peg$literalExpectation("\"", false),
       peg$c77 = function(content) {
-          const expressions = content.filter(v => v.type == "JSXExpressionContainer").map(v => v.expression).concat(content.filter(v => v.type == "CallExpression" || v.type == "IfStatement" || v.type == "ConditionalExpression"));
-          const quasis = (expressions.length > 0 ? ["", ""] : []).concat(content).filter(v => v.type != "JSXExpressionContainer" && v.type != "CallExpression" && v.type != "IfStatement" && v.type != "ConditionalExpression").map(v => ({ type: "TemplateElement", value: { raw: v } }));
+          const expressions = content.filter(v => !!v && v.type == "JSXExpressionContainer").map(v => v.expression).concat(content.filter(v => !!v && v.type == "CallExpression" || v.type == "IfStatement" || v.type == "ConditionalExpression"));
+          const quasis = (expressions.length > 0 ? ["", ""] : []).concat(content).filter(v => !!v && v.type != "JSXExpressionContainer" && v.type != "CallExpression" && v.type != "IfStatement" && v.type != "ConditionalExpression").map(v => ({ type: "TemplateElement", value: { raw: v } }));
 
           return {
             type: "TemplateLiteral",
@@ -360,8 +392,8 @@ function peg$parse(input, options) {
       peg$c78 = "'",
       peg$c79 = peg$literalExpectation("'", false),
       peg$c80 = function(content) {
-          const expressions = content.filter(v => v.type == "JSXExpressionContainer").map(v => v.expression);
-          const quasis = (expressions.length > 0 ? ["", ""] : []).concat(content).filter(v => v.type != "JSXExpressionContainer").map(v => ({ type: "TemplateElement", value: { raw: v } }));
+          const expressions = content.filter(v => !!v && v.type == "JSXExpressionContainer").map(v => v.expression);
+          const quasis = (expressions.length > 0 ? ["", ""] : []).concat(content).filter(v => !!v && v.type != "JSXExpressionContainer").map(v => ({ type: "TemplateElement", value: { raw: v } }));
 
           return {
             type: "TemplateLiteral",
@@ -511,15 +543,15 @@ function peg$parse(input, options) {
             return {
               type: "BinaryExpression",
               operator,
-              left,
-              right
+              left: left.type ? left : { type: "Literal", value: left },
+              right: right.type ? right : { type: "Literal", value: right }
             };
           },
       peg$c141 = function(operator, argument) {
             return {
               type: "UnaryExpression",
               operator,
-              argument,
+              argument: argument.type ? argument : { type: "Literal", value: argument },
               prefix: true
             };
           },
@@ -553,8 +585,8 @@ function peg$parse(input, options) {
       peg$c169 = "=",
       peg$c170 = peg$literalExpectation("=", false),
       peg$c171 = function(name, value) {
-          const expressions = name.filter(v => v.type == "JSXExpressionContainer").map(v => v.expression);
-          const quasis = (expressions.length > 0 ? ["", ""] : []).concat(name).filter(v => v.type != "JSXExpressionContainer").map(v => ({ type: "TemplateElement", value: { raw: v } }));
+          const expressions = name.filter(v => !!v && v.type == "JSXExpressionContainer").map(v => v.expression);
+          const quasis = (expressions.length > 0 ? ["", ""] : []).concat(name).filter(v => !!v && v.type != "JSXExpressionContainer").map(v => ({ type: "TemplateElement", value: { raw: v } }));
 
           return {
             type: "GeneratedAttribute",
@@ -567,8 +599,8 @@ function peg$parse(input, options) {
           };
         },
       peg$c172 = function(name) {
-          const expressions = name.filter(v => v.type == "JSXExpressionContainer").map(v => v.expression);
-          const quasis = (expressions.length > 0 ? ["", ""] : []).concat(name).filter(v => v.type != "JSXExpressionContainer").map(v => ({ type: "TemplateElement", value: { raw: v } }));
+          const expressions = name.filter(v => !!v && v.type == "JSXExpressionContainer").map(v => v.expression);
+          const quasis = (expressions.length > 0 ? ["", ""] : []).concat(name).filter(v => !!v && v.type != "JSXExpressionContainer").map(v => ({ type: "TemplateElement", value: { raw: v } }));
 
           return {
             type: "GeneratedAttribute",
@@ -673,15 +705,32 @@ function peg$parse(input, options) {
       peg$c193 = "/}",
       peg$c194 = peg$literalExpectation("/}", false),
       peg$c195 = function(name, value) {
+          if (!value.type && value.length && value.length > 0) {
+            value = value.filter(e => !!e);
+
+            if (value.length == 1) {
+              value = value[0];
+            } else {
+              value = {
+                type: "SequenceExpression",
+                expressions: value.filter(e => !!e)
+              };
+            }
+          }
+
+          if (!name.type) {
+            name = {
+              type: "Identifier",
+              name
+            };
+          }
+
           return {
             type: "VariableDeclaration",
             declarations: [
               {
                 type: "VariableDeclarator",
-                id: {
-                  type: "Identifier",
-                  name
-                },
+                id: name,
                 init: value
               }
             ],
@@ -697,11 +746,8 @@ function peg$parse(input, options) {
             } else {
               return {
                 type: "CallExpression",
-                callee: {
-                  type: "Identifier",
-                  name: filters[0].name,
-                },
-                arguments: [].concat(filters[0].arguments).concat(recursiveApplyFilters(filters.slice(1), expression))
+                callee: filters[0].name,
+                arguments: [].concat(filters[0].arguments).concat(recursiveApplyFilters(filters.slice(1), expression)).filter(a => !!a)
               };
             }
           };
@@ -798,11 +844,8 @@ function peg$parse(input, options) {
             } else {
               return {
                 type: "CallExpression",
-                callee: {
-                  type: "Identifier",
-                  name: filters[0].name,
-                },
-                arguments: [].concat(filters[0].arguments).concat(recursiveApplyFilters(filters.slice(1), expression))
+                callee: filters[0].name,
+                arguments: [].concat(filters[0].arguments).concat(recursiveApplyFilters(filters.slice(1), expression)).filter(a => !!a)
               };
             }
           };
@@ -813,7 +856,7 @@ function peg$parse(input, options) {
           return {
             type: "CallExpression",
             callee,
-            arguments: args.map(a => a.type ? a : { type: "Literal", value: a })
+            arguments: (args || []).filter(a => !!a).map(a => a.type ? a : { type: "Literal", value: a })
           };
         },
       peg$c226 = "{call",
@@ -915,7 +958,7 @@ function peg$parse(input, options) {
             type: "JSXElement",
             openingElement: element.openingElement,
             closingElement: element.closingElement || null,
-            children: element.children || [],
+            children: (element.children || []).filter(e => !!e).map(e => e.type != "JSXExpressionContainer" && e.type != "JSXElement" && e.type != "JSXText" ? { type: "JSXExpressionContainer", expression: e } : e),
           };
         },
       peg$c250 = "<!",
@@ -931,7 +974,7 @@ function peg$parse(input, options) {
           attributes = attributes || [];
 
           if (attributes.some(a => a.type == "GeneratedAttribute")) {
-            console.warn("GeneratedSingleElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+            console.warn("GeneratedSingleElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => !!a && a.type == "GeneratedAttribute"), null, 4), "\n\n");
           }
 
           attributes = attributes
@@ -995,7 +1038,7 @@ function peg$parse(input, options) {
           attributes = attributes || [];
 
           if (attributes.some(a => a.type == "GeneratedAttribute")) {
-            console.warn("GeneratedPairElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+            console.warn("GeneratedPairElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => !!a && a.type == "GeneratedAttribute"), null, 4), "\n\n");
           }
 
           attributes = attributes.map(attr => ({
@@ -1052,7 +1095,7 @@ function peg$parse(input, options) {
           attributes = attributes || [];
 
           if (attributes.some(a => a.type == "GeneratedAttribute")) {
-            console.warn("GeneratedUnclosedElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+            console.warn("GeneratedUnclosedElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => !!a && a.type == "GeneratedAttribute"), null, 4), "\n\n");
           }
 
           attributes = attributes.map(attr => ({
@@ -1109,10 +1152,11 @@ function peg$parse(input, options) {
           attributes = attributes || [];
 
           if (attributes.some(a => a.type == "GeneratedAttribute")) {
-            console.warn("SingleElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+            console.warn("SingleElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => !!a && a.type == "GeneratedAttribute"), null, 4), "\n\n");
           }
 
           attributes = attributes
+            .filter(attr => attr && attr.name)
             .filter(attr => (attr.name.type == "TemplateLiteral" && attr.name.quasis.length == 1) || (attr.name.type == "JSXIdentifier"))
             .map(attr => ({
               type: "JSXAttribute",
@@ -1143,7 +1187,7 @@ function peg$parse(input, options) {
       peg$c265 = function(startTag, children, endTag) { return startTag.name.type == endTag.name.type && startTag.name.name == endTag.name.name },
       peg$c266 = function(startTag, children, endTag) {
           if (startTag.attributes.some(a => a.type == "GeneratedAttribute")) {
-            console.warn("PairElement :: generated attributes found:\n\n", JSON.stringify(startTag.attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+            console.warn("PairElement :: generated attributes found:\n\n", JSON.stringify(startTag.attributes.filter(a => !!a && a.type == "GeneratedAttribute"), null, 4), "\n\n");
           }
 
           return {
@@ -1157,12 +1201,12 @@ function peg$parse(input, options) {
               type: "JSXClosingElement",
               name: endTag.name,
             },
-            children: children || [],
+            children: (children || []).filter(e => !!e).map(e => e.type != "JSXExpressionContainer" && e.type != "JSXElement" && e.type != "JSXText" ? { type: "JSXExpressionContainer", expression: e } : e),
           };
         },
       peg$c267 = function(startTag) {
           if (startTag.attributes.some(a => a.type == "GeneratedAttribute")) {
-            console.warn("NonClosedElement :: generated attributes found:\n\n", JSON.stringify(startTag.attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+            console.warn("NonClosedElement :: generated attributes found:\n\n", JSON.stringify(startTag.attributes.filter(a => !!a && a.type == "GeneratedAttribute"), null, 4), "\n\n");
           }
 
           return {
@@ -1174,6 +1218,7 @@ function peg$parse(input, options) {
         },
       peg$c268 = function(name, attributes) {
           attributes = (attributes || [])
+            .filter(attr => attr && attr.name)
             .filter(attr => (attr.name.type == "TemplateLiteral" && attr.name.expressions.length == 0) || (attr.name.type == "JSXIdentifier"))
             .map(attr => ({
               type: "JSXAttribute",

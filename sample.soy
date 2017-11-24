@@ -1,26 +1,250 @@
-{namespace ServiceDesk.Templates.Agent.People.Customers.Pagination.InviteCustomerDialog}
+{namespace ServiceDesk.Templates.SlaView}
 
 /**
-* Renders contents of Customer Invite inline dialog
-* @param showInviteForm boolean to show/hide the form, depending on if there are errors
-* @param errorContent
-*/
-{template .content}
-    <div class="sd-invite-customer-wrapper-dialog">
-        <div class="js-error-wrapper"></div>
-        {if $showInviteForm}
-            {call aui.form.form}
-                {param action: '#' /}
-                {param isTopLabels: true /}
-                {param extraClasses: 'js-invite-customer sd-invite-customer' /}
-                {param content}
-                    {call .dialogContent}
-                        {param errorContentHtml: $errorContent.html /}
-                        {param successCount: $errorContent.successCount /}
-                        {param failedCount: $errorContent.failedCount /}
-                    {/call}
-                {/param}
+ * @param goalView
+ * @param isAgent
+ * @param issueKey
+ */
+{template .navView}
+    {if $goalView and $isAgent}
+        <div class="sla-tag-example-wrapper">
+        {if isFeatureFlagEnabled('sd.sla.improved.rendering') and (not $goalView.remainingTimeHumanReadable or not $goalView.goalTimeHumanReadable)}
+            {call .getIssueLink}
+                {param issueKey: $issueKey /}
             {/call}
+            {sp}<span class="aui-icon aui-icon-small aui-iconfont-error sla-rendering-error"></span>
+        {else}
+            {if isFeatureFlagEnabled('sd.sla.improved.rendering')}
+                <div class="sla-tag {call .getStatusClass data='all' /} {call .getEmergencyClass data='all' /} js-tooltip"
+                data-html="true" title="{call .issueSlaTooltipText data='all' /}">
+                    <div style="mso-number-format: \@;">{$goalView.remainingTimeHumanReadable}</div>
+                    {call .getStatusIcon data="all" /}
+                </div>
+            {else}
+                <div class="sla-tag {call .getStatusClass data='all' /} {call .getEmergencyClass data='all' /}">
+                    <div style="mso-number-format: \@;">{$goalView.remainingTime}</div>
+                    {call .getStatusIcon data="all" /}
+                </div>
+            {/if}
         {/if}
-    </div>
+        </div>
+    {elseif not $isAgent}
+        <span class="sla-agent-restricted">{getText('sd.sla.nav.no.permission')}</span>
+    {/if}
+{/template}
+
+/**
+ * @param goalViews
+ * @param hasPreviousCycles
+ * @param canAdministerProject
+ * @param projectKey
+ */
+{template .issuePanelContentContainer}
+    {if length($goalViews) > 0}
+        <div class="sla-view-issue-container">
+            {call .issuePanelContent}
+                {param goalViews: $goalViews /}
+                {param hasPreviousCycles: $hasPreviousCycles /}
+                {param canAdministerProject: $canAdministerProject /}
+                {param projectKey: $projectKey /}
+            {/call}
+        </div>
+    {/if}
+{/template}
+
+/**
+ * @param goalViews
+ * @param hasPreviousCycles
+ * @param canAdministerProject
+ * @param projectKey
+ */
+{template .issuePanelContent}
+    {if length($goalViews) > 0}
+        {foreach $goalView in $goalViews}
+            {call .issuePanelSlaView}
+                {param goalView: $goalView /}
+                {param hasPreviousCycles: $hasPreviousCycles /}
+                {param canAdministerProject: $canAdministerProject /}
+                {param projectKey: $projectKey /}
+            {/call}
+        {/foreach}
+    {else}
+        <p>{getText('sd.sla.issue.webpanel.sla.removed')}</p>
+    {/if}
+{/template}
+
+
+/**
+ * @param goalView
+ * @param hasPreviousCycles
+ * @param canAdministerProject
+ * @param projectKey
+ */
+{template .issuePanelSlaView}
+<div class="sla-view-issue">
+    {if isFeatureFlagEnabled('sd.sla.improved.rendering') and (not $goalView.remainingTimeHumanReadable or not $goalView.goalTimeHumanReadable)}
+        {getText('sd.sla.rendering.error.description')}
+        {sp}<span class="aui-icon aui-icon-small aui-iconfont-error sla-rendering-error sla-issue-view-error"></span>
+        {call .getSLAConfigurationLink}
+            {param canAdministerProject: $canAdministerProject /}
+            {param projectKey: $projectKey /}
+            {param metricId: $goalView.metricId /}
+            {param metricName: $goalView.metricName /}
+        {/call}
+    {else}
+        <div class="sla-tag-container">
+            <div class="sla-tag {call .getStatusClass data='all' /} {call .getEmergencyClass data='all' /} js-tooltip"
+                data-html="true" title="{call .issueSlaTooltipText data='all' /}">
+                {if isFeatureFlagEnabled('sd.sla.improved.rendering')}
+                    <span class="sla-tag-duration">{$goalView.remainingTimeHumanReadable}</span>
+                {else}
+                    <span class="sla-tag-duration">{$goalView.remainingTime}</span>
+                {/if}
+                {call .getStatusIcon data="all" /}
+            </div>
+        </div>
+        <div class="sla-view-info">
+            <div class="sla-view-name">{$goalView.metricName}</div>
+            <div>
+                {if isFeatureFlagEnabled('sd.sla.improved.rendering')}
+                    {getText('sd.sla.issue.webpanel.longgoal.display', $goalView.goalTimeHumanReadable)}
+                {else}
+                    {getText('sd.sla.issue.webpanel.longgoal.display', $goalView.goalTimeLong)}
+                {/if}
+            <!-- calendars -->
+            <span class="sla-calendar-icon js-tooltip aui-icon aui-icon-small aui-iconfont-calendar" title="{$goalView.calendarName}"></span>
+            </div>
+        </div>
+        {if $hasPreviousCycles}
+            <div class="sla-view-previous-cycles">
+                {foreach $cycle in $goalView.completeGoals}
+                    <div class="sla-cycle{if $cycle.failed} sla-cycle-unsuccessful{else} sla-cycle-successful{/if}{if index($cycle) > 4} sla-hidden-cycle{/if} js-tooltip"
+                        data-html="true" data-gravity="ne" title="{call .issueSlaCompleteCycleTooltipText}{param cycle: $cycle /}{/call}">
+                        {if $cycle.failed}
+                            <span class="aui-icon aui-icon-small aui-iconfont-close-dialog sla-cycle-icon"></span>
+                        {else}
+                            <span class="aui-icon aui-icon-small aui-iconfont-success sla-cycle-icon"></span>
+                        {/if}
+                    </div>
+                {/foreach}
+                {if length($goalView.completeGoals) > 5 }
+                    <a class="sla-cycle-show-button" href="#">{getText('sd.sla.issue.webpanel.display.more')}</a>
+                {/if}
+            </div>
+        {/if}
+    {/if}
+</div>
+{/template}
+
+/**
+ * @param goalView
+ */
+{template .issueSlaTooltipText}
+    {if $goalView.closed}
+        {if isFeatureFlagEnabled('sd.sla.improved.rendering')}
+            <div>{getText('sd.sla.issue.customfield.longstatus.sla.goal', $goalView.goalTimeLong)}</div>
+            <div>{getText('sd.sla.issue.customfield.longstatus.actual', $goalView.durationTimeLong)}</div>
+        {else}
+            <div>{$goalView.startTime}{sp}-{sp}{$goalView.stopTime}</div>
+            <div>{getText('sd.sla.issue.customfield.longstatus.display', $goalView.remainingTimeLong, $goalView.goalTimeLong)}</div>
+        {/if}
+    {else}
+        {if isFeatureFlagEnabled('sd.sla.improved.rendering')}
+            <div>{getText('sd.sla.issue.customfield.longstatus.ongoing.due', $goalView.breachTime)}</div>
+        {/if}
+        <div>{getText('sd.sla.issue.customfield.longstatus.ongoing.matches', escapeMarkup($goalView.currentJqlMatch))}</div>
+        <div>{getText('sd.sla.issue.customfield.longstatus.ongoing.until', $goalView.nextConditionMatch)}</div>
+    {/if}
+{/template}
+
+/**
+ * @param cycle
+ */
+{template .issueSlaCompleteCycleTooltipText}
+    {if isFeatureFlagEnabled('sd.sla.improved.rendering')}
+        <div>{getText('sd.sla.issue.customfield.longstatus.sla.goal', $cycle.goalTimeLong)}</div>
+        <div>{getText('sd.sla.issue.customfield.longstatus.actual', $cycle.durationTimeLong)}</div>
+    {else}
+        <div>{$cycle.startTime}{sp}-{sp}{$cycle.stopTime}</div>
+        <div>{getText('sd.sla.issue.customfield.longstatus.display', $cycle.remainingTimeLong, $cycle.goalTimeLong)}</div>
+    {/if}
+{/template}
+
+/**
+ * Returns the CSS class that match SLA status.
+ * @param goalView
+ */
+{template .getStatusClass}
+    {if ($goalView.paused)}
+        sla-tag-pause
+    {elseif $goalView.closed}
+        {if $goalView.failed}
+            sla-tag-unsuccessful
+        {else}
+            sla-tag-successful
+        {/if}
+    {else}
+        {if $goalView.active}
+            sla-tag-ongoing
+        {else}
+            sla-tag-pause
+        {/if}
+    {/if}
+{/template}
+
+/**
+ * Return status icon
+ * @param goalView
+ */
+{template .getStatusIcon}
+    {if ($goalView.paused)}
+        <span class="aui-icon aui-icon-small aui-iconfont-pause sla-status-icon"></span>
+    {elseif $goalView.closed}
+        {if $goalView.failed}
+            <span class="aui-icon aui-icon-small aui-iconfont-close-dialog sla-status-icon"></span>
+        {else}
+            <span class="aui-icon aui-icon-small aui-iconfont-success sla-status-icon"></span>
+        {/if}
+    {else}
+        {if $goalView.active}
+            <span class="aui-icon aui-icon-small aui-iconfont-time sla-status-icon"></span>
+        {else}
+            <span class="aui-icon aui-icon-small aui-iconfont-pause sla-status-icon"></span>
+        {/if}
+    {/if}
+{/template}
+
+/**
+ * Returns the CSS class that match SLA emergency level.
+ * @param goalView
+ */
+{template .getEmergencyClass}
+    {if $goalView.closed != true}{if $goalView.emergencyLevel == 'breached'} sla-tag-breached{elseif $goalView.emergencyLevel == 'urgent'} sla-tag-urgent{elseif $goalView.emergencyLevel == 'important'} sla-tag-important{else}{/if}{/if}
+{/template}
+
+/**
+ * @param canAdministerProject
+ * @param projectKey
+ * @param metricId
+ * @param metricName
+ */
+{template .getSLAConfigurationLink}
+    {if $metricName}
+        {if $canAdministerProject and $projectKey and $metricId}
+            <a href="{contextPath()}/servicedesk/admin/{$projectKey}/sla/custom/{$metricId}">{getText('sd.sla.rendering.error.link.title', $metricName)}</a>
+        {else}
+            {getText('sd.sla.rendering.error.link.title', $metricName)}
+        {/if}
+    {/if}
+{/template}
+
+/**
+ * @param issueKey
+ */
+{template .getIssueLink}
+    {if $issueKey}
+        <a href="{contextPath()}/browse/{$issueKey}">{getText('sd.sla.rendering.error.description')}</a>
+    {else}
+        {getText('sd.sla.rendering.error.description')}
+    {/if}
 {/template}

@@ -83,7 +83,7 @@ TemplateDef
   = comments:SoyTemplateDefComment* WS* "{template " name:TemplateName WS* attributes:Attributes? "}" WS+ body:TemplateBodyElement* "{/template}" WS* {
     const params = comments.reduce((acc, commentLines) => acc.concat(
         commentLines
-          .filter(line => line.type == "TemplateParam")
+          .filter(line => !!line && line.type == "TemplateParam")
           .map(param => (
             {
               type: "Property",
@@ -98,10 +98,42 @@ TemplateDef
 
     body = body.filter(e => !!e);
 
+    if (body.length == 1 && body[0].type == "JSXElement") {
+      body = body[0];
+    } else {
+      const variableDecls = body.filter(e => e.type == "VariableDeclaration");
+      const elements = body.filter(e => e.type != "VariableDeclaration");
+      let returnValue;
+
+      if (elements.length < 1) {
+        returnValue = {
+          type: "Literal",
+          value: null
+        };
+      } else if (elements.length > 1) {
+        returnValue = {
+          type: "SequenceExpression",
+          expressions: elements
+        };
+      } else {
+        returnValue = elements[0];
+      }
+
+      const returnStatement = {
+        type: "ReturnStatement",
+        argument: returnValue
+      };
+
+      body = {
+        type: "BlockStatement",
+        body: variableDecls.concat(returnStatement)
+      };
+    }
+
     return {
       params,
       name,
-      body: body.length > 1 ? { type: "SequenceExpression", expressions: body, expression: true } : body[0]
+      body
     };
   };
 
@@ -223,16 +255,16 @@ SoySpecialCharacter
   / SoySpecialCharacterNewline;
 
 SoySpecialCharacterSpace
-  = "{sp}" { return { type: "Literal", value: " " }; };
+  = "{sp}" { return { type: "JSXText", value: " " }; };
 
 SoySpecialCharacterNewline
-  = "{\\n}" { return { type: "Literal", value: "\n" }; };
+  = "{\\n}" { return { type: "JSXText", value: "\n" }; };
 
 SoySpecialCharacterIndentation
-  = "{\\t}" { return {  type: "Literal", value: "  "  }; };
+  = "{\\t}" { return { type: "JSXText", value: "  " }; };
 
 SoySpecialCharacterCaretReturn
-  = "{\\r}" { return {  type: "Literal", value: "\r"  }; };
+  = "{\\r}" { return { type: "JSXText", value: "\r" }; };
 
 SoyFilters
   = SoyFilter+;
@@ -279,8 +311,8 @@ SoyCapableString
 
 DoubleQuotedSoyCapableString
   = '"' content:(SoyStringInterpolateableExpr / EscapeableDoubleQuoteText)* '"' {
-    const expressions = content.filter(v => v.type == "JSXExpressionContainer").map(v => v.expression).concat(content.filter(v => v.type == "CallExpression" || v.type == "IfStatement" || v.type == "ConditionalExpression"));
-    const quasis = (expressions.length > 0 ? ["", ""] : []).concat(content).filter(v => v.type != "JSXExpressionContainer" && v.type != "CallExpression" && v.type != "IfStatement" && v.type != "ConditionalExpression").map(v => ({ type: "TemplateElement", value: { raw: v } }));
+    const expressions = content.filter(v => !!v && v.type == "JSXExpressionContainer").map(v => v.expression).concat(content.filter(v => !!v && v.type == "CallExpression" || v.type == "IfStatement" || v.type == "ConditionalExpression"));
+    const quasis = (expressions.length > 0 ? ["", ""] : []).concat(content).filter(v => !!v && v.type != "JSXExpressionContainer" && v.type != "CallExpression" && v.type != "IfStatement" && v.type != "ConditionalExpression").map(v => ({ type: "TemplateElement", value: { raw: v } }));
 
     return {
       type: "TemplateLiteral",
@@ -291,8 +323,8 @@ DoubleQuotedSoyCapableString
 
 SingleQuotedSoyCapableString
   = "'" content:(SoyStringInterpolateableExpr / EscapeableSingleQuoteText)* "'" {
-    const expressions = content.filter(v => v.type == "JSXExpressionContainer").map(v => v.expression);
-    const quasis = (expressions.length > 0 ? ["", ""] : []).concat(content).filter(v => v.type != "JSXExpressionContainer").map(v => ({ type: "TemplateElement", value: { raw: v } }));
+    const expressions = content.filter(v => !!v && v.type == "JSXExpressionContainer").map(v => v.expression);
+    const quasis = (expressions.length > 0 ? ["", ""] : []).concat(content).filter(v => !!v && v.type != "JSXExpressionContainer").map(v => ({ type: "TemplateElement", value: { raw: v } }));
 
     return {
       type: "TemplateLiteral",
@@ -499,8 +531,8 @@ SoyBinaryExpression
       return {
         type: "BinaryExpression",
         operator,
-        left,
-        right
+        left: left.type ? left : { type: "Literal", value: left },
+        right: right.type ? right : { type: "Literal", value: right }
       };
     }
   / SoyPrimaryExpression;
@@ -510,7 +542,7 @@ SoyUnaryExpression
       return {
         type: "UnaryExpression",
         operator,
-        argument,
+        argument: argument.type ? argument : { type: "Literal", value: argument },
         prefix: true
       };
     }
@@ -560,8 +592,8 @@ SoyAttributeExpr
 
 SoyAttributeGeneratorValueAttribute
   = name:SoyGeneratedAttributeNamePart+ "=" value:SoyCapableString {
-    const expressions = name.filter(v => v.type == "JSXExpressionContainer").map(v => v.expression);
-    const quasis = (expressions.length > 0 ? ["", ""] : []).concat(name).filter(v => v.type != "JSXExpressionContainer").map(v => ({ type: "TemplateElement", value: { raw: v } }));
+    const expressions = name.filter(v => !!v && v.type == "JSXExpressionContainer").map(v => v.expression);
+    const quasis = (expressions.length > 0 ? ["", ""] : []).concat(name).filter(v => !!v && v.type != "JSXExpressionContainer").map(v => ({ type: "TemplateElement", value: { raw: v } }));
 
     return {
       type: "GeneratedAttribute",
@@ -576,8 +608,8 @@ SoyAttributeGeneratorValueAttribute
 
 SoyAttributeGeneratorBooleanAttribute
   = name:SoyGeneratedAttributeNamePart+ {
-    const expressions = name.filter(v => v.type == "JSXExpressionContainer").map(v => v.expression);
-    const quasis = (expressions.length > 0 ? ["", ""] : []).concat(name).filter(v => v.type != "JSXExpressionContainer").map(v => ({ type: "TemplateElement", value: { raw: v } }));
+    const expressions = name.filter(v => !!v && v.type == "JSXExpressionContainer").map(v => v.expression);
+    const quasis = (expressions.length > 0 ? ["", ""] : []).concat(name).filter(v => !!v && v.type != "JSXExpressionContainer").map(v => ({ type: "TemplateElement", value: { raw: v } }));
 
     return {
       type: "GeneratedAttribute",
@@ -719,15 +751,32 @@ SoyLetOperator
 
 SoyInlineLetOperator
   = "{" WS* "let" WS+ name:VariableReference WS* ":" WS* value:SoyValueExpr WS* "/}" {
+    if (!value.type && value.length && value.length > 0) {
+      value = value.filter(e => !!e);
+
+      if (value.length == 1) {
+        value = value[0];
+      } else {
+        value = {
+          type: "SequenceExpression",
+          expressions: value.filter(e => !!e)
+        };
+      }
+    }
+
+    if (!name.type) {
+      name = {
+        type: "Identifier",
+        name
+      };
+    }
+
     return {
       type: "VariableDeclaration",
       declarations: [
         {
           type: "VariableDeclarator",
-          id: {
-            type: "Identifier",
-            name
-          },
+          id: name,
           init: value
         }
       ],
@@ -737,15 +786,32 @@ SoyInlineLetOperator
 
 SoyMultilineLetOperator
   = "{" WS* "let" WS+ name:VariableReference WS* "}" WS* value:TemplateBodyElement* WS* "{/let}" {
+    if (!value.type && value.length && value.length > 0) {
+      value = value.filter(e => !!e);
+
+      if (value.length == 1) {
+        value = value[0];
+      } else {
+        value = {
+          type: "SequenceExpression",
+          expressions: value.filter(e => !!e)
+        };
+      }
+    }
+
+    if (!name.type) {
+      name = {
+        type: "Identifier",
+        name
+      };
+    }
+
     return {
       type: "VariableDeclaration",
       declarations: [
         {
           type: "VariableDeclarator",
-          id: {
-            type: "Identifier",
-            name
-          },
+          id: name,
           init: value
         }
       ],
@@ -761,11 +827,8 @@ SoyVariableInterpolation
       } else {
         return {
           type: "CallExpression",
-          callee: {
-            type: "Identifier",
-            name: filters[0].name,
-          },
-          arguments: [].concat(filters[0].arguments).concat(recursiveApplyFilters(filters.slice(1), expression))
+          callee: filters[0].name,
+          arguments: [].concat(filters[0].arguments).concat(recursiveApplyFilters(filters.slice(1), expression)).filter(a => !!a)
         };
       }
     };
@@ -878,11 +941,8 @@ SoyFunctionCall
       } else {
         return {
           type: "CallExpression",
-          callee: {
-            type: "Identifier",
-            name: filters[0].name,
-          },
-          arguments: [].concat(filters[0].arguments).concat(recursiveApplyFilters(filters.slice(1), expression))
+          callee: filters[0].name,
+          arguments: [].concat(filters[0].arguments).concat(recursiveApplyFilters(filters.slice(1), expression)).filter(a => !!a)
         };
       }
     };
@@ -895,7 +955,7 @@ FunctionCall
     return {
       type: "CallExpression",
       callee,
-      arguments: args.map(a => a.type ? a : { type: "Literal", value: a })
+      arguments: (args || []).filter(a => !!a).map(a => a.type ? a : { type: "Literal", value: a })
     };
   };
 
@@ -1087,7 +1147,7 @@ HTMLElement
       type: "JSXElement",
       openingElement: element.openingElement,
       closingElement: element.closingElement || null,
-      children: element.children || [],
+      children: (element.children || []).filter(e => !!e).map(e => e.type != "JSXExpressionContainer" && e.type != "JSXElement" && e.type != "JSXText" ? { type: "JSXExpressionContainer", expression: e } : e),
     };
   };
 
@@ -1113,7 +1173,7 @@ GeneratedSingleElement
     attributes = attributes || [];
 
     if (attributes.some(a => a.type == "GeneratedAttribute")) {
-      console.warn("GeneratedSingleElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+      console.warn("GeneratedSingleElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => !!a && a.type == "GeneratedAttribute"), null, 4), "\n\n");
     }
 
     attributes = attributes
@@ -1178,7 +1238,7 @@ GeneratedPairElement
     attributes = attributes || [];
 
     if (attributes.some(a => a.type == "GeneratedAttribute")) {
-      console.warn("GeneratedPairElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+      console.warn("GeneratedPairElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => !!a && a.type == "GeneratedAttribute"), null, 4), "\n\n");
     }
 
     attributes = attributes.map(attr => ({
@@ -1237,7 +1297,7 @@ GeneratedUnclosedElement
     attributes = attributes || [];
 
     if (attributes.some(a => a.type == "GeneratedAttribute")) {
-      console.warn("GeneratedUnclosedElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+      console.warn("GeneratedUnclosedElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => !!a && a.type == "GeneratedAttribute"), null, 4), "\n\n");
     }
 
     attributes = attributes.map(attr => ({
@@ -1296,10 +1356,11 @@ SingleElement
     attributes = attributes || [];
 
     if (attributes.some(a => a.type == "GeneratedAttribute")) {
-      console.warn("SingleElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+      console.warn("SingleElement :: generated attributes found:\n\n", JSON.stringify(attributes.filter(a => !!a && a.type == "GeneratedAttribute"), null, 4), "\n\n");
     }
 
     attributes = attributes
+      .filter(attr => attr && attr.name)
       .filter(attr => (attr.name.type == "TemplateLiteral" && attr.name.quasis.length == 1) || (attr.name.type == "JSXIdentifier"))
       .map(attr => ({
         type: "JSXAttribute",
@@ -1332,7 +1393,7 @@ SingleElement
 PairElement
   = startTag:StartTag children:ElementContent? endTag:EndTag & { return startTag.name.type == endTag.name.type && startTag.name.name == endTag.name.name } {
     if (startTag.attributes.some(a => a.type == "GeneratedAttribute")) {
-      console.warn("PairElement :: generated attributes found:\n\n", JSON.stringify(startTag.attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+      console.warn("PairElement :: generated attributes found:\n\n", JSON.stringify(startTag.attributes.filter(a => !!a && a.type == "GeneratedAttribute"), null, 4), "\n\n");
     }
 
     return {
@@ -1346,14 +1407,14 @@ PairElement
         type: "JSXClosingElement",
         name: endTag.name,
       },
-      children: children || [],
+      children: (children || []).filter(e => !!e).map(e => e.type != "JSXExpressionContainer" && e.type != "JSXElement" && e.type != "JSXText" ? { type: "JSXExpressionContainer", expression: e } : e),
     };
   };
 
 NonClosedElement
   = startTag:StartTag {
     if (startTag.attributes.some(a => a.type == "GeneratedAttribute")) {
-      console.warn("NonClosedElement :: generated attributes found:\n\n", JSON.stringify(startTag.attributes.filter(a => a.type == "GeneratedAttribute" && a.name.expressions.length > 0), null, 4), "\n\n");
+      console.warn("NonClosedElement :: generated attributes found:\n\n", JSON.stringify(startTag.attributes.filter(a => !!a && a.type == "GeneratedAttribute"), null, 4), "\n\n");
     }
 
     return {
@@ -1367,6 +1428,7 @@ NonClosedElement
 StartTag
   = "<" name:TagName WS* attributes:Attributes? WS* ">" {
     attributes = (attributes || [])
+      .filter(attr => attr && attr.name)
       .filter(attr => (attr.name.type == "TemplateLiteral" && attr.name.expressions.length == 0) || (attr.name.type == "JSXIdentifier"))
       .map(attr => ({
         type: "JSXAttribute",
