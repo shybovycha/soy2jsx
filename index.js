@@ -15,34 +15,24 @@ function parseFile(filename) {
             }
 
             try {
+                const dirname = path.dirname(filename);
+                const baseFileName = path.basename(filename);
+                const astFilename = path.join(dirname, baseFileName + '.ast');
+                const jsxFilename = path.join(dirname, baseFileName + '.jsx');
+
                 const ast = parser.parse(sample);
 
                 if (ast) {
-                    if (!!process.env.DEBUG) {
-                        const dirname = path.dirname(filename);
-                        const baseFileName = path.basename(filename);
+                    fs.writeFileSync(astFilename, JSON.stringify(ast, null, 4));
 
-                        console.log(util.inspect(ast, { depth: null, showHidden: false }));
+                    const jsx = recast.print(ast).code;
 
-                        const astFilename = path.join(dirname, baseFileName + '.ast');
+                    fs.writeFileSync(jsxFilename, jsx);
 
-                        fs.writeFileSync(astFilename, JSON.stringify(ast, null, 4));
-
-                        const jsx = recast.print(ast).code;
-                        console.log('');
-                        console.log(jsx);
-
-                        const jsxFilename = path.join(dirname, baseFileName + '.jsx');
-
-                        fs.writeFileSync(jsxFilename, jsx);
-
-                        try {
-                            recast.parse(jsx);
-
-                            console.log(`${jsxFilename} is a valid JSX`);
-                        } catch (e) {
-                            console.error('Error parsing output JSX:', e);
-                        }
+                    try {
+                        recast.parse(jsx);
+                    } catch (e) {
+                        throw `Error parsing output JSX: ${JSON.stringify(e)}`;
                     }
 
                     return resolve(ast);
