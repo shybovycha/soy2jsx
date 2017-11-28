@@ -15,7 +15,7 @@
 <div id="sd-report-content">
     {if $isEditing}
         <div class="sdr-editing">
-            <div class="sdr-edit-form-container js-edit-report-form">{moo()|filter1:moo:foo|filter2}</div>
+            <div class="sdr-edit-form-container js-edit-report-form">{moo()|filter1}</div>
         </div>
     {else}
         {call ServiceDesk.Templates.InternalApi.Panel.panel}

@@ -969,7 +969,7 @@ HTMLElement
   = element:(SingleElement / PairElement / NonClosedElement) {
     return {
       type: "HtmlElement",
-      tagName: element.name,
+      tagName: element.tagName,
       attributes: element.attributes || [],
       children: element.children || []
     };
