@@ -1,4 +1,5 @@
 const parser = require('./SOY.js');
+const generator = require('./generator.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -14,34 +15,47 @@ function parseFile(filename) {
                 return reject(err);
             }
 
+            const dirname = path.dirname(filename);
+            const baseFileName = path.basename(filename);
+            const soyAstFilename = path.join(dirname, baseFileName + '.soy.ast');
+            const jsxAstFilename = path.join(dirname, baseFileName + '.jsx.ast');
+            const jsxFilename = path.join(dirname, baseFileName + '.jsx');
+
+            let soyAst, jsxAst;
+
             try {
-                const dirname = path.dirname(filename);
-                const baseFileName = path.basename(filename);
-                const astFilename = path.join(dirname, baseFileName + '.ast');
-                const jsxFilename = path.join(dirname, baseFileName + '.jsx');
+                soyAst = parser.parse(sample);
 
-                const ast = parser.parse(sample);
-
-                if (ast) {
-                    fs.writeFileSync(astFilename, JSON.stringify(ast, null, 4));
-
-                    const jsx = recast.print(ast).code;
-
-                    fs.writeFileSync(jsxFilename, jsx);
-
-                    try {
-                        recast.parse(jsx);
-                    } catch (e) {
-                        throw `Error parsing output JSX: ${JSON.stringify(e)}`;
-                    }
-
-                    return resolve(ast);
-                } else {
-                    throw `Parsing ${filename} failed. Data does not exist: ` + JSON.stringify(ast);
-                }
+                fs.writeFileSync(soyAstFilename, JSON.stringify(soyAst, null, 4));
             } catch (e) {
                 console.error(`ERROR: Could not parse file ${filename}.`, e);
-                return reject(err);
+                return reject(e);
+            }
+
+            try {
+                jsxAst = generator.generate(soyAst);
+
+                fs.writeFileSync(jsxAstFilename, JSON.stringify(jsxAst, null, 4));
+            } catch (e) {
+                console.error(`ERROR: Could not generate JSX AST.`, e);
+                return reject(e);
+            }
+
+            try {
+                const jsx = recast.print(jsxAst).code;
+
+                fs.writeFileSync(jsxFilename, jsx);
+
+                try {
+                    recast.parse(jsx);
+                } catch (e) {
+                    throw `Error parsing output JSX: ${JSON.stringify(e)}`;
+                }
+
+                return resolve(jsx);
+            } catch (e) {
+                console.error(`ERROR: Could not generate JSX.`, e);
+                return reject(e);
             }
         });
     });

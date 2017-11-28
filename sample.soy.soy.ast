@@ -1,0 +1,283 @@
+{
+    "type": "SoyFile",
+    "namespaces": [
+        {
+            "type": "Namespace",
+            "name": {
+                "type": "MemberExpression",
+                "object": {
+                    "type": "Identifier",
+                    "name": "ServiceDesk"
+                },
+                "properties": [
+                    {
+                        "type": "Identifier",
+                        "name": "Templates",
+                        "computed": false
+                    },
+                    {
+                        "type": "Identifier",
+                        "name": "Agent",
+                        "computed": false
+                    },
+                    {
+                        "type": "Identifier",
+                        "name": "Reports",
+                        "computed": false
+                    }
+                ]
+            },
+            "templates": [
+                {
+                    "type": "Template",
+                    "comments": [
+                        {
+                            "type": "Comment",
+                            "lines": [
+                                {
+                                    "type": "CommentText",
+                                    "content": "* This is the main template for th`e reports view. It draws in the containers for each section then calls the respective soy templates for each bit."
+                                },
+                                {
+                                    "type": "CommentText",
+                                    "content": " * This ought to be called from the server only."
+                                },
+                                {
+                                    "type": "TemplateParam",
+                                    "name": {
+                                        "type": "Identifier",
+                                        "name": "projectKey"
+                                    }
+                                },
+                                {
+                                    "type": "TemplateParam",
+                                    "name": {
+                                        "type": "Identifier",
+                                        "name": "projectName"
+                                    }
+                                },
+                                {
+                                    "type": "TemplateParam",
+                                    "name": {
+                                        "type": "Identifier",
+                                        "name": "selectedReport"
+                                    }
+                                },
+                                {
+                                    "type": "TemplateParam",
+                                    "name": {
+                                        "type": "Identifier",
+                                        "name": "selectedTimescale"
+                                    }
+                                },
+                                {
+                                    "type": "TemplateParam",
+                                    "name": {
+                                        "type": "Identifier",
+                                        "name": "canEditReports"
+                                    }
+                                },
+                                {
+                                    "type": "TemplateParam",
+                                    "name": {
+                                        "type": "Identifier",
+                                        "name": "isEditing"
+                                    }
+                                },
+                                {
+                                    "type": "TemplateParam",
+                                    "name": {
+                                        "type": "Identifier",
+                                        "name": "showHelpBubble"
+                                    }
+                                },
+                                null
+                            ]
+                        },
+                        null
+                    ],
+                    "name": {
+                        "type": "MemberExpression",
+                        "object": null,
+                        "properties": [
+                            {
+                                "type": "Identifier",
+                                "name": "reportMainView",
+                                "computed": false
+                            }
+                        ]
+                    },
+                    "attributes": null,
+                    "body": [
+                        {
+                            "type": "HtmlElement",
+                            "tagName": {
+                                "type": "Identifier",
+                                "name": "div"
+                            },
+                            "attributes": [
+                                {
+                                    "type": "GeneratedAttribute",
+                                    "name": [
+                                        "id"
+                                    ],
+                                    "value": {
+                                        "type": "SoyCapableString",
+                                        "body": [
+                                            "sd-report-content"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "children": [
+                                {
+                                    "type": "IfStatement",
+                                    "test": {
+                                        "type": "Identifier",
+                                        "name": "isEditing"
+                                    },
+                                    "consequent": [
+                                        {
+                                            "type": "HtmlElement",
+                                            "tagName": {
+                                                "type": "Identifier",
+                                                "name": "div"
+                                            },
+                                            "attributes": [
+                                                {
+                                                    "type": "GeneratedAttribute",
+                                                    "name": [
+                                                        "class"
+                                                    ],
+                                                    "value": {
+                                                        "type": "SoyCapableString",
+                                                        "body": [
+                                                            "sdr-editing"
+                                                        ]
+                                                    }
+                                                }
+                                            ],
+                                            "children": [
+                                                {
+                                                    "type": "HtmlElement",
+                                                    "tagName": {
+                                                        "type": "Identifier",
+                                                        "name": "div"
+                                                    },
+                                                    "attributes": [
+                                                        {
+                                                            "type": "GeneratedAttribute",
+                                                            "name": [
+                                                                "class"
+                                                            ],
+                                                            "value": {
+                                                                "type": "SoyCapableString",
+                                                                "body": [
+                                                                    "sdr-edit-form-container js-edit-report-form"
+                                                                ]
+                                                            }
+                                                        }
+                                                    ],
+                                                    "children": [
+                                                        {
+                                                            "type": "InterpolatedExpression",
+                                                            "expression": {
+                                                                "type": "CallExpression",
+                                                                "callee": {
+                                                                    "type": "Identifier",
+                                                                    "name": "moo"
+                                                                },
+                                                                "arguments": null,
+                                                                "filters": [
+                                                                    {
+                                                                        "type": "Filter",
+                                                                        "name": {
+                                                                            "type": "Identifier",
+                                                                            "name": "filter1"
+                                                                        },
+                                                                        "params": []
+                                                                    }
+                                                                ]
+                                                            }
+                                                        },
+                                                        null
+                                                    ]
+                                                },
+                                                null
+                                            ]
+                                        },
+                                        null
+                                    ],
+                                    "alternate": [
+                                        {
+                                            "type": "ConditionalBranch",
+                                            "test": null,
+                                            "body": [
+                                                {
+                                                    "type": "TemplateCall",
+                                                    "template": {
+                                                        "type": "MemberExpression",
+                                                        "object": {
+                                                            "type": "Identifier",
+                                                            "name": "ServiceDesk"
+                                                        },
+                                                        "properties": [
+                                                            {
+                                                                "type": "Identifier",
+                                                                "name": "Templates",
+                                                                "computed": false
+                                                            },
+                                                            {
+                                                                "type": "Identifier",
+                                                                "name": "InternalApi",
+                                                                "computed": false
+                                                            },
+                                                            {
+                                                                "type": "Identifier",
+                                                                "name": "Panel",
+                                                                "computed": false
+                                                            },
+                                                            {
+                                                                "type": "Identifier",
+                                                                "name": "panel",
+                                                                "computed": false
+                                                            }
+                                                        ]
+                                                    },
+                                                    "attributes": {
+                                                        "type": "Attribute",
+                                                        "name": {
+                                                            "type": "Identifier",
+                                                            "name": "title"
+                                                        },
+                                                        "value": {
+                                                            "type": "MemberExpression",
+                                                            "object": {
+                                                                "type": "Identifier",
+                                                                "name": "selectedReport"
+                                                            },
+                                                            "properties": [
+                                                                {
+                                                                    "type": "Identifier",
+                                                                    "name": "name",
+                                                                    "computed": false
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                null
+                                            ]
+                                        }
+                                    ]
+                                },
+                                null
+                            ]
+                        },
+                        null
+                    ]
+                }
+            ]
+        }
+    ]
+}

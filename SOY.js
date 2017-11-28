@@ -745,7 +745,7 @@ function peg$parse(input, options) {
       peg$c240 = function(element) {
           return {
             type: "HtmlElement",
-            tagName: element.name,
+            tagName: element.tagName,
             attributes: element.attributes || [],
             children: element.children || []
           };
