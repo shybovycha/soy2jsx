@@ -1,0 +1,278 @@
+SoyFile
+
+{
+  type: "SoyFile",
+  namespaces
+}
+
+
+Namespace
+
+{
+  type: "Namespace",
+  name,
+  templates
+}
+
+Template
+
+{
+  type: "Template",
+  comments,
+  name,
+  attributes,
+  body
+}
+
+MemberExpression
+
+{
+  type: "MemberExpression",
+  object: null,
+  property
+}
+
+Literal
+
+{
+      type: "Literal",
+      value: chars.join('')
+    }
+
+Comment
+
+{
+      type: "Comment",
+      lines
+    }
+
+CommentText
+
+{
+      type: "CommentText",
+      content: chars.map(e => e[1]).join('')
+    }
+
+TemplateParam
+
+{
+      type: "TemplateParam",
+      name
+    }
+
+Identifier
+
+{
+      type: "Identifier",
+      name: head + tail.join('')
+    }
+
+Filter
+
+{
+      type: "Filter",
+      name,
+      arguments: []
+    }
+
+SoyCapableString
+
+{
+      type: "SoyCapableString",
+      content
+    }
+
+RawText
+
+{
+      type: "RawText",
+      value
+    }
+
+SwitchOperator
+
+{
+      type: "SwitchOperator",
+      expression,
+      clauses
+    }
+
+CaseExpression
+
+{
+      type: "CaseExpression"
+      test,
+      output
+    }
+
+ForeachOperator
+
+{
+      type: "ForeachOperator",
+      range,
+      iterator,
+      body
+    }
+
+LogicalExpression
+
+{
+      type: "LogicalExpression",
+      operator: "||",
+      left: {
+        type: "ForeachOperator",
+        range,
+        iterator,
+        body
+      },
+      right: defaultBody
+    }
+
+CallExpression
+
+{
+      type: "CallExpression",
+      callee: {
+        type: "Identifier",
+        name: "range"
+      },
+      arguments: [
+        {
+          type: "Literal",
+          value: 0
+        },
+        endIndex,
+        {
+          type: "Literal",
+          value: 1
+        }
+      ]
+    }
+
+ObjectExpression
+
+{
+      type: "ObjectExpression",
+      properties
+    }
+
+Property
+
+{
+      type: "Property",
+      key,
+      value,
+      computed: !!key.type
+    }
+
+BinaryExpression
+
+{
+        type: "BinaryExpression",
+        operator,
+        left,
+        right
+      }
+
+UnaryExpression
+
+{
+        type: "UnaryExpression",
+        operator,
+        argument,
+        prefix: true
+      }
+
+GeneratedAttribute
+
+{
+      type: "GeneratedAttribute",
+      name,
+      value
+    }
+
+IfStatement
+
+{
+      type: "IfStatement",
+      test: mainClause.test,
+      consequent: mainClause.body,
+      alternate: alternate || []
+    }
+
+ConditionalExpression
+
+{
+      type: "ConditionalExpression",
+      test,
+      consequent,
+      alternate
+    }
+
+VariableDeclaration
+
+{
+      type: "VariableDeclaration",
+      name,
+      value
+    }
+
+InterpolatedExpression
+
+{
+      type: "InterpolatedExpression",
+      expression: {
+        type: "VariableInterpolation",
+        variable: reference,
+        filters
+      }
+    }
+
+VariableInterpolation
+
+{
+        type: "VariableInterpolation",
+        variable: reference,
+        filters
+    }
+
+TemplateCall
+
+{
+      type: "TemplateCall",
+      template: name,
+      attributes: [].concat(inlineParams || []).concat(bodyParams || [])
+    }
+
+Attribute
+
+{
+      type: "Attribute",
+      name,
+      value: null
+    }
+
+HtmlElement
+
+{
+      type: "HtmlElement",
+      tagName: element.name,
+      attributes: element.attributes || [],
+      children: element.children || []
+    }
+
+Doctype
+
+{
+      type: "Doctype",
+      attributes
+    }
+
+GeneratedElement
+
+{
+      type: "GeneratedElement",
+      tagName: name,
+      attributes,
+      children: []
+    }
