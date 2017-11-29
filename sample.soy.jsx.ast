@@ -165,121 +165,62 @@
                                 "type": "Identifier",
                                 "name": "div"
                             },
-                            "selfClosing": false,
+                            "selfClosing": true,
                             "attributes": [
                                 {
                                     "type": "JSXAttribute",
                                     "name": "id",
                                     "value": {
-                                        "type": "Literal",
-                                        "value": "sd-report-content"
+                                        "type": "JSXExpressionContainer",
+                                        "expression": {
+                                            "type": "TemplateLiteral",
+                                            "quasis": [
+                                                {
+                                                    "type": "TemplateElement",
+                                                    "value": {
+                                                        "raw": "sd-report-content "
+                                                    }
+                                                },
+                                                {
+                                                    "type": "TemplateElement",
+                                                    "value": {
+                                                        "raw": ""
+                                                    }
+                                                },
+                                                {
+                                                    "type": "TemplateElement",
+                                                    "value": {
+                                                        "raw": " "
+                                                    }
+                                                },
+                                                {
+                                                    "type": "TemplateElement",
+                                                    "value": {
+                                                        "raw": ""
+                                                    }
+                                                }
+                                            ],
+                                            "expressions": [
+                                                {
+                                                    "type": "Identifier",
+                                                    "name": "var1"
+                                                },
+                                                {
+                                                    "type": "CallExpression",
+                                                    "callee": {
+                                                        "type": "Identifier",
+                                                        "name": "moo"
+                                                    },
+                                                    "arguments": []
+                                                }
+                                            ]
+                                        }
                                     }
                                 }
                             ]
                         },
-                        "closingElement": {
-                            "type": "JSXClosingElement",
-                            "name": {
-                                "type": "Identifier",
-                                "name": "div"
-                            }
-                        },
-                        "children": [
-                            {
-                                "type": "JSXExpressionContainer",
-                                "expression": {
-                                    "type": "ConditionalExpression",
-                                    "test": {
-                                        "type": "Identifier",
-                                        "name": "isEditing"
-                                    },
-                                    "consequent": {
-                                        "type": "JSXElement",
-                                        "openingElement": {
-                                            "type": "JSXOpeningElement",
-                                            "name": {
-                                                "type": "Identifier",
-                                                "name": "div"
-                                            },
-                                            "selfClosing": false,
-                                            "attributes": [
-                                                {
-                                                    "type": "JSXAttribute",
-                                                    "name": "class",
-                                                    "value": {
-                                                        "type": "Literal",
-                                                        "value": "sdr-editing"
-                                                    }
-                                                }
-                                            ]
-                                        },
-                                        "closingElement": {
-                                            "type": "JSXClosingElement",
-                                            "name": {
-                                                "type": "Identifier",
-                                                "name": "div"
-                                            }
-                                        },
-                                        "children": [
-                                            {
-                                                "type": "JSXElement",
-                                                "openingElement": {
-                                                    "type": "JSXOpeningElement",
-                                                    "name": {
-                                                        "type": "Identifier",
-                                                        "name": "div"
-                                                    },
-                                                    "selfClosing": false,
-                                                    "attributes": [
-                                                        {
-                                                            "type": "JSXAttribute",
-                                                            "name": "class",
-                                                            "value": {
-                                                                "type": "Literal",
-                                                                "value": "sdr-edit-form-container js-edit-report-form"
-                                                            }
-                                                        }
-                                                    ]
-                                                },
-                                                "closingElement": {
-                                                    "type": "JSXClosingElement",
-                                                    "name": {
-                                                        "type": "Identifier",
-                                                        "name": "div"
-                                                    }
-                                                },
-                                                "children": [
-                                                    {
-                                                        "type": "JSXExpressionContainer",
-                                                        "expression": {
-                                                            "type": "CallExpression",
-                                                            "callee": {
-                                                                "type": "Identifier",
-                                                                "name": "filter1"
-                                                            },
-                                                            "arguments": [
-                                                                {
-                                                                    "type": "CallExpression",
-                                                                    "callee": {
-                                                                        "type": "Identifier",
-                                                                        "name": "moo"
-                                                                    },
-                                                                    "arguments": []
-                                                                }
-                                                            ]
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    },
-                                    "alternate": {
-                                        "type": "Literal",
-                                        "value": null
-                                    }
-                                }
-                            }
-                        ]
+                        "closingElement": null,
+                        "children": []
                     }
                 }
             }

@@ -12,15 +12,5 @@
  * @param showHelpBubble whether to show the help bubble
  */
 {template .reportMainView}
-<div id="sd-report-content">
-    {if $isEditing}
-        <div class="sdr-editing">
-            <div class="sdr-edit-form-container js-edit-report-form">{moo()|filter1}</div>
-        </div>
-    {else}
-        {call ServiceDesk.Templates.InternalApi.Panel.panel}
-            {param title: $selectedReport.name /}
-        {/call}
-    {/if}
-</div>
+<div id="sd-report-content {$var1} {moo()}"></div>
 {/template}

@@ -124,155 +124,36 @@
                                     "value": {
                                         "type": "SoyCapableString",
                                         "body": [
-                                            "sd-report-content"
+                                            "sd-report-content ",
+                                            {
+                                                "type": "InterpolatedExpression",
+                                                "expression": {
+                                                    "type": "VariableInterpolation",
+                                                    "variable": {
+                                                        "type": "Identifier",
+                                                        "name": "var1"
+                                                    },
+                                                    "filters": null
+                                                }
+                                            },
+                                            " ",
+                                            {
+                                                "type": "InterpolatedExpression",
+                                                "expression": {
+                                                    "type": "CallExpression",
+                                                    "callee": {
+                                                        "type": "Identifier",
+                                                        "name": "moo"
+                                                    },
+                                                    "arguments": null,
+                                                    "filters": null
+                                                }
+                                            }
                                         ]
                                     }
                                 }
                             ],
-                            "children": [
-                                {
-                                    "type": "IfStatement",
-                                    "test": {
-                                        "type": "Identifier",
-                                        "name": "isEditing"
-                                    },
-                                    "consequent": [
-                                        {
-                                            "type": "HtmlElement",
-                                            "tagName": {
-                                                "type": "Identifier",
-                                                "name": "div"
-                                            },
-                                            "attributes": [
-                                                {
-                                                    "type": "GeneratedAttribute",
-                                                    "name": [
-                                                        "class"
-                                                    ],
-                                                    "value": {
-                                                        "type": "SoyCapableString",
-                                                        "body": [
-                                                            "sdr-editing"
-                                                        ]
-                                                    }
-                                                }
-                                            ],
-                                            "children": [
-                                                {
-                                                    "type": "HtmlElement",
-                                                    "tagName": {
-                                                        "type": "Identifier",
-                                                        "name": "div"
-                                                    },
-                                                    "attributes": [
-                                                        {
-                                                            "type": "GeneratedAttribute",
-                                                            "name": [
-                                                                "class"
-                                                            ],
-                                                            "value": {
-                                                                "type": "SoyCapableString",
-                                                                "body": [
-                                                                    "sdr-edit-form-container js-edit-report-form"
-                                                                ]
-                                                            }
-                                                        }
-                                                    ],
-                                                    "children": [
-                                                        {
-                                                            "type": "InterpolatedExpression",
-                                                            "expression": {
-                                                                "type": "CallExpression",
-                                                                "callee": {
-                                                                    "type": "Identifier",
-                                                                    "name": "moo"
-                                                                },
-                                                                "arguments": null,
-                                                                "filters": [
-                                                                    {
-                                                                        "type": "Filter",
-                                                                        "name": {
-                                                                            "type": "Identifier",
-                                                                            "name": "filter1"
-                                                                        },
-                                                                        "params": []
-                                                                    }
-                                                                ]
-                                                            }
-                                                        },
-                                                        null
-                                                    ]
-                                                },
-                                                null
-                                            ]
-                                        },
-                                        null
-                                    ],
-                                    "alternate": [
-                                        {
-                                            "type": "ConditionalBranch",
-                                            "test": null,
-                                            "body": [
-                                                {
-                                                    "type": "TemplateCall",
-                                                    "template": {
-                                                        "type": "MemberExpression",
-                                                        "object": {
-                                                            "type": "Identifier",
-                                                            "name": "ServiceDesk"
-                                                        },
-                                                        "properties": [
-                                                            {
-                                                                "type": "Identifier",
-                                                                "name": "Templates",
-                                                                "computed": false
-                                                            },
-                                                            {
-                                                                "type": "Identifier",
-                                                                "name": "InternalApi",
-                                                                "computed": false
-                                                            },
-                                                            {
-                                                                "type": "Identifier",
-                                                                "name": "Panel",
-                                                                "computed": false
-                                                            },
-                                                            {
-                                                                "type": "Identifier",
-                                                                "name": "panel",
-                                                                "computed": false
-                                                            }
-                                                        ]
-                                                    },
-                                                    "attributes": {
-                                                        "type": "Attribute",
-                                                        "name": {
-                                                            "type": "Identifier",
-                                                            "name": "title"
-                                                        },
-                                                        "value": {
-                                                            "type": "MemberExpression",
-                                                            "object": {
-                                                                "type": "Identifier",
-                                                                "name": "selectedReport"
-                                                            },
-                                                            "properties": [
-                                                                {
-                                                                    "type": "Identifier",
-                                                                    "name": "name",
-                                                                    "computed": false
-                                                                }
-                                                            ]
-                                                        }
-                                                    }
-                                                },
-                                                null
-                                            ]
-                                        }
-                                    ]
-                                },
-                                null
-                            ]
+                            "children": []
                         },
                         null
                     ]

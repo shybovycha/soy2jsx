@@ -8,4 +8,4 @@ ServiceDesk.Templates.Agent.Reports.reportMainView = (
         isEditing,
         showHelpBubble
     }
-) => <div id="sd-report-content">{(isEditing ? <div class="sdr-editing"><div class="sdr-edit-form-container js-edit-report-form">{filter1(moo())}</div></div> : null)}</div>;
+) => <div id={`sd-report-content ${var1}${moo()} `} />;
