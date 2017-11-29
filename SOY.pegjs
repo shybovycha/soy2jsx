@@ -242,10 +242,10 @@ SingleQuotedSoyCapableString
   };
 
 EscapeableDoubleQuoteText
-  = chars:[^"]+ { return chars.join(''); };
+  = chars:[^{"]+ { return chars.join(''); };
 
 EscapeableSingleQuoteText
-  = chars:[^']+ { return chars.join(''); };
+  = chars:[^{']+ { return chars.join(''); };
 
 SoyLiteralOperator
   = "{literal}" value:(!"{/literal}" .)* "{/literal}" {
@@ -813,7 +813,7 @@ MixedTemplateCall
     return {
       type: "TemplateCall",
       template: name,
-      attributes: [].concat(inlineParams || []).concat(bodyParams || [])
+      params: [].concat(inlineParams || []).concat(bodyParams || [])
     };
   };
 
@@ -822,7 +822,7 @@ InPlaceTemplateCall
     return {
       type: "TemplateCall",
       template: name,
-      attributes: params || []
+      params: params || []
     };
   };
 
@@ -843,7 +843,7 @@ TemplateCallInlineParam
 TemplateCallInlineBooleanParam
   = name:Identifier {
     return {
-      type: "Attribute",
+      type: "TemplateCallParam",
       name,
       value: null
     };
@@ -852,7 +852,7 @@ TemplateCallInlineBooleanParam
 TemplateCallInlineValueParam
   = name:Identifier WS* "=" WS* value:SoyValueExpr {
     return {
-      type: "Attribute",
+      type: "TemplateCallParam",
       name,
       value
     };
@@ -863,7 +863,7 @@ MultilineTemplateCall
     return {
       type: "TemplateCall",
       template: name,
-      attributes: params || []
+      params: params || []
     };
   };
 
@@ -884,7 +884,7 @@ MultilineTemplateCallParam
 MultilineTemplateCallBooleanParam
   = "{param" WS+ name:Identifier WS* "/}" {
     return {
-      type: "Attribute",
+      type: "TemplateCallParam",
       name,
       value: null
     };
@@ -897,7 +897,7 @@ MultilineTemplateCallValueParam
 MultilineTemplateCallMultilineParam
   = "{param" WS+ name:Identifier WS* "}" WS* value:TemplateBodyElement* WS* "{/param}" {
     return {
-      type: "Attribute",
+      type: "TemplateCallParam",
       name,
       value: {
         type: "InterpolatedExpression",
@@ -909,7 +909,7 @@ MultilineTemplateCallMultilineParam
 MultilineTemplateCallInlineParam
   = "{param" WS+ name:Identifier WS* ":" WS* value:SoyValueExpr WS* "/}" {
     return {
-      type: "Attribute",
+      type: "TemplateCallParam",
       name,
       value
     };
