@@ -624,7 +624,7 @@ SoyIfOperator
       type: "IfStatement",
       test: mainClause.test,
       consequent: mainClause.body,
-      alternate: [].concat(otherClauses || []).concat(otherwiseClause ? [ otherwiseClause ] : [ { body: null } ])
+      alternate: [].concat(otherClauses || []).concat(otherwiseClause ? [ otherwiseClause ] : [])
     };
   };
 
@@ -941,10 +941,20 @@ AttributeNameChar
   = [a-zA-Z\-0-9_.];
 
 SingleQuotedString
-  = "'" chars:[^']* "'" { return chars.join(''); };
+  = "'" chars:[^']* "'" {
+    return {
+      type: "Literal",
+      value: chars.join('')
+    };
+  };
 
 DoubleQuotedString
-  = '"' chars:[^"]* '"' { return chars.join(''); };
+  = '"' chars:[^"]* '"' {
+    return {
+      type: "Literal",
+      value: chars.join('')
+    };
+  };
 
 ElementContent
   = MultipleElementContentChildren

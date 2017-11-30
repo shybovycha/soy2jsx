@@ -24,6 +24,11 @@
                         "type": "Identifier",
                         "name": "Reports",
                         "computed": false
+                    },
+                    {
+                        "type": "Identifier",
+                        "name": "Kb",
+                        "computed": false
                     }
                 ]
             },
@@ -36,32 +41,7 @@
                             "lines": [
                                 {
                                     "type": "CommentText",
-                                    "content": "* This is the main template for th`e reports view. It draws in the containers for each section then calls the respective soy templates for each bit."
-                                },
-                                {
-                                    "type": "CommentText",
-                                    "content": " * This ought to be called from the server only."
-                                },
-                                {
-                                    "type": "TemplateParam",
-                                    "name": {
-                                        "type": "Identifier",
-                                        "name": "projectKey"
-                                    }
-                                },
-                                {
-                                    "type": "TemplateParam",
-                                    "name": {
-                                        "type": "Identifier",
-                                        "name": "projectName"
-                                    }
-                                },
-                                {
-                                    "type": "TemplateParam",
-                                    "name": {
-                                        "type": "Identifier",
-                                        "name": "selectedReport"
-                                    }
+                                    "content": "* Renders options for report display, such as timescales"
                                 },
                                 {
                                     "type": "TemplateParam",
@@ -74,21 +54,7 @@
                                     "type": "TemplateParam",
                                     "name": {
                                         "type": "Identifier",
-                                        "name": "canEditReports"
-                                    }
-                                },
-                                {
-                                    "type": "TemplateParam",
-                                    "name": {
-                                        "type": "Identifier",
-                                        "name": "isEditing"
-                                    }
-                                },
-                                {
-                                    "type": "TemplateParam",
-                                    "name": {
-                                        "type": "Identifier",
-                                        "name": "showHelpBubble"
+                                        "name": "timescales"
                                     }
                                 },
                                 null
@@ -102,7 +68,7 @@
                         "properties": [
                             {
                                 "type": "Identifier",
-                                "name": "reportMainView",
+                                "name": "reportOptions",
                                 "computed": false
                             }
                         ]
@@ -113,42 +79,232 @@
                             "type": "HtmlElement",
                             "tagName": {
                                 "type": "Identifier",
+                                "name": "form"
+                            },
+                            "attributes": [
+                                {
+                                    "type": "GeneratedAttribute",
+                                    "name": [
+                                        "class"
+                                    ],
+                                    "value": {
+                                        "type": "SoyCapableString",
+                                        "body": [
+                                            "aui sd-report-timescales"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "IfStatement",
+                                    "test": {
+                                        "type": "BinaryExpression",
+                                        "operator": ">",
+                                        "left": {
+                                            "type": "Identifier",
+                                            "name": "moo"
+                                        },
+                                        "right": {
+                                            "type": "Literal",
+                                            "value": 2
+                                        }
+                                    },
+                                    "consequent": [
+                                        {
+                                            "type": "GeneratedAttribute",
+                                            "name": [
+                                                "foo"
+                                            ],
+                                            "value": {
+                                                "type": "SoyCapableString",
+                                                "body": [
+                                                    {
+                                                        "type": "Literal",
+                                                        "value": 12
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "alternate": []
+                                }
+                            ],
+                            "children": [
+                                {
+                                    "type": "HtmlElement",
+                                    "tagName": {
+                                        "type": "Identifier",
+                                        "name": "select"
+                                    },
+                                    "attributes": [
+                                        {
+                                            "type": "GeneratedAttribute",
+                                            "name": [
+                                                "class"
+                                            ],
+                                            "value": {
+                                                "type": "SoyCapableString",
+                                                "body": [
+                                                    "hidden js-timescales"
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "GeneratedAttribute",
+                                            "name": [
+                                                "id"
+                                            ],
+                                            "value": {
+                                                "type": "SoyCapableString",
+                                                "body": [
+                                                    "report-timescales"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "children": [
+                                        {
+                                            "type": "ForeachOperator",
+                                            "range": {
+                                                "type": "Identifier",
+                                                "name": "timescales"
+                                            },
+                                            "iterator": {
+                                                "type": "Identifier",
+                                                "name": "timescale"
+                                            },
+                                            "body": [
+                                                {
+                                                    "type": "HtmlElement",
+                                                    "tagName": {
+                                                        "type": "Identifier",
+                                                        "name": "option"
+                                                    },
+                                                    "attributes": [
+                                                        {
+                                                            "type": "GeneratedAttribute",
+                                                            "name": [
+                                                                "value"
+                                                            ],
+                                                            "value": {
+                                                                "type": "SoyCapableString",
+                                                                "body": [
+                                                                    {
+                                                                        "type": "InterpolatedExpression",
+                                                                        "expression": {
+                                                                            "type": "VariableInterpolation",
+                                                                            "variable": {
+                                                                                "type": "MemberExpression",
+                                                                                "object": {
+                                                                                    "type": "Identifier",
+                                                                                    "name": "timescale"
+                                                                                },
+                                                                                "properties": [
+                                                                                    {
+                                                                                        "type": "Identifier",
+                                                                                        "name": "id",
+                                                                                        "computed": false
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            "filters": null
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        },
+                                                        {
+                                                            "type": "IfStatement",
+                                                            "test": {
+                                                                "type": "BinaryExpression",
+                                                                "operator": "==",
+                                                                "left": {
+                                                                    "type": "MemberExpression",
+                                                                    "object": {
+                                                                        "type": "Identifier",
+                                                                        "name": "selectedTimescale"
+                                                                    },
+                                                                    "properties": [
+                                                                        {
+                                                                            "type": "Identifier",
+                                                                            "name": "id",
+                                                                            "computed": false
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "right": {
+                                                                    "type": "MemberExpression",
+                                                                    "object": {
+                                                                        "type": "Identifier",
+                                                                        "name": "timescale"
+                                                                    },
+                                                                    "properties": [
+                                                                        {
+                                                                            "type": "Identifier",
+                                                                            "name": "id",
+                                                                            "computed": false
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "consequent": [
+                                                                {
+                                                                    "type": "GeneratedAttribute",
+                                                                    "name": [
+                                                                        "selected"
+                                                                    ],
+                                                                    "value": {
+                                                                        "type": "Literal",
+                                                                        "value": true
+                                                                    }
+                                                                }
+                                                            ],
+                                                            "alternate": []
+                                                        }
+                                                    ],
+                                                    "children": [
+                                                        {
+                                                            "type": "MemberExpression",
+                                                            "object": {
+                                                                "type": "Identifier",
+                                                                "name": "timescale"
+                                                            },
+                                                            "properties": [
+                                                                {
+                                                                    "type": "Identifier",
+                                                                    "name": "name",
+                                                                    "computed": false
+                                                                }
+                                                            ]
+                                                        },
+                                                        null
+                                                    ]
+                                                },
+                                                null
+                                            ]
+                                        },
+                                        null
+                                    ]
+                                },
+                                null
+                            ]
+                        },
+                        null,
+                        {
+                            "type": "HtmlElement",
+                            "tagName": {
+                                "type": "Identifier",
                                 "name": "div"
                             },
                             "attributes": [
                                 {
                                     "type": "GeneratedAttribute",
                                     "name": [
-                                        "id"
+                                        "class"
                                     ],
                                     "value": {
                                         "type": "SoyCapableString",
                                         "body": [
-                                            "sd-report-content ",
-                                            {
-                                                "type": "InterpolatedExpression",
-                                                "expression": {
-                                                    "type": "VariableInterpolation",
-                                                    "variable": {
-                                                        "type": "Identifier",
-                                                        "name": "var1"
-                                                    },
-                                                    "filters": null
-                                                }
-                                            },
-                                            " ",
-                                            {
-                                                "type": "InterpolatedExpression",
-                                                "expression": {
-                                                    "type": "CallExpression",
-                                                    "callee": {
-                                                        "type": "Identifier",
-                                                        "name": "moo"
-                                                    },
-                                                    "arguments": null,
-                                                    "filters": null
-                                                }
-                                            }
+                                            "sd-custom-date-range-container"
                                         ]
                                     }
                                 }

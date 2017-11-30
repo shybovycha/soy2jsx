@@ -1,16 +1,19 @@
-{namespace ServiceDesk.Templates.Agent.Reports}
+{namespace ServiceDesk.Templates.Agent.Reports.Kb}
 
 /**
- * This is the main template for th`e reports view. It draws in the containers for each section then calls the respective soy templates for each bit.
- * This ought to be called from the server only.
- * @param projectKey can the user edit reports?
- * @param projectName the name of the project to which the report relates
- * @param selectedReport can the user edit reports?
- * @param selectedTimescale list of timescales usable by reports
- * @param canEditReports can the user edit reports?
- * @param isEditing if currently editing or creating new report
- * @param showHelpBubble whether to show the help bubble
+ * Renders options for report display, such as timescales
+ * @param selectedTimescale selectedTimescale
+ * @param timescales list of timescales usable by reports
  */
-{template .reportMainView}
-<div id="sd-report-content {$var1} {moo()}"></div>
+{template .reportOptions}
+    <form class="aui sd-report-timescales" {if $moo > 2}foo="12"{/if}>
+        <select class="hidden js-timescales" id="report-timescales">
+            {foreach $timescale in $timescales}
+                <option value="{$timescale.id}" {if $selectedTimescale.id == $timescale.id}selected{/if}>
+                    {$timescale.name}
+                </option>
+            {/foreach}
+         </select>
+     </form>
+     <div class="sd-custom-date-range-container"></div>
 {/template}
