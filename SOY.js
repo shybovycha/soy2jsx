@@ -564,7 +564,7 @@ function peg$parse(input, options) {
             type: "IfStatement",
             test: mainClause.test,
             consequent: mainClause.body,
-            alternate: [].concat(otherClauses || []).concat(otherwiseClause ? [ otherwiseClause ] : [ { body: null } ])
+            alternate: [].concat(otherClauses || []).concat(otherwiseClause ? [ otherwiseClause ] : [])
           };
         },
       peg$c180 = "{/if}",
@@ -8001,7 +8001,7 @@ function peg$parse(input, options) {
         }
         if (s3 !== peg$FAILED) {
           peg$savedPos = s0;
-          s1 = peg$c78(s2);
+          s1 = peg$c14(s2);
           s0 = s1;
         } else {
           peg$currPos = s0;
@@ -8059,7 +8059,7 @@ function peg$parse(input, options) {
         }
         if (s3 !== peg$FAILED) {
           peg$savedPos = s0;
-          s1 = peg$c78(s2);
+          s1 = peg$c14(s2);
           s0 = s1;
         } else {
           peg$currPos = s0;
