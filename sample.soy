@@ -1,38 +1,74 @@
-{namespace ServiceDesk.Project.Notifications.OutgoingEmail.Templates}
+{namespace ServiceDesk.Templates.Components.Participants}
 
 /**
- * Renders the rows of the email rules table
- * @param outgoingEmailRules
- * @param defaultRuleUrlPrefix the URL of the default rule edit page, excluding the rule ID
- * @param defaultRuleUrlSuffix
- */
-{template .renderOutgoingEmailRules}
-    {foreach $rule in $outgoingEmailRules}
-        <tr>
-            <td class="col-name {if $rule.enabled == false}outgoing-rule-disabled{/if}">
-                <p class="col-text-content">
-                    {$rule.ruleName}
-                    {if $rule.enabled == false}
-                        <span class="aui-lozenge aui-lozenge-subtle">{getText('sd.admin.outgoing.email.rules.table.disabled')}</span>
-                    {/if}
-                </p>
-            </td>
-            <td class="col-name {if $rule.enabled == false}outgoing-rule-disabled{/if}">
-                <p class="col-text-content">
-                    {$rule.ruleDescription}
-                </p>
-            </td>
-            <td class="col-actions">
-                <a href="{$defaultRuleUrlPrefix}/{$rule.id}{$defaultRuleUrlSuffix}" class="js-outgoing-email-rule-edit-link" analytics-suffix="{if $rule.analyticsSuffix}{$rule.analyticsSuffix}{else}custom{/if}">
-                    {getText('sd.common.words.edit')}
-                </a>
-            </td>
-        </tr>
-    {ifempty}
-       <tr>
-         <td colspan="3" class="rules-not-found">
-           {getText('sd.admin.outgoing.email.rules.not.found')}
-         </td>
-       </tr>
+* Renders request participants list, with a see more / see less option at bottom.
+* @param displayedUsers - The list of participants to display
+* @param totalUsers - The total number of participants
+* @param expanded - Flag determining if all participants are shown or just the first $maxDisplayedUsers
+* @param hasToggle - Flag determining if the list can be toggled to show all or just first 5 users
+*/
+{template .main}
+{if length($displayedUsers)}
+    {call .participantList}
+        {param users: $displayedUsers /}
+    {/call}
+    {if $hasToggle}
+        {if $expanded}
+            {call aui.buttons.button}
+                {param extraClasses: 'js-contract' /}
+                {param type: 'link' /}
+                {param text: getText('sd.request.participants.contract') /}
+            {/call}
+        {else}
+            {call aui.buttons.button}
+                {param extraClasses: 'js-expand' /}
+                {param type: 'link' /}
+                {param text: getText('sd.request.participants.expand', $totalUsers) /}
+            {/call}
+        {/if}
+    {/if}
+{/if}
+{/template}
+
+/**
+* Renders a view only list of participants. This is what is displayed in the people section.
+* @param users - The list of participants to display
+*/
+{template .participantList}
+<ul class="sd-participant-list">
+    {foreach $user in $users}
+        <li class="sd-participant" data-key="{$user.key}">
+            {call ServiceDesk.Templates.Shared.Utils.userHover}
+                {param displayName: $user.displayName /}
+                {param name: $user.name /}
+                {param avatarUrl: $user.avatarUrls['24x24'] /}
+                {param avatarSize: 'small' /}
+            {/call}
+        </li>
     {/foreach}
+</ul>
+{/template}
+
+/**
+* Renders a selected participant in the participants field
+* @param icon - User avatar
+* @param label - Users display name
+* @param value - username
+*/
+{template .participantsLozenge}
+<li class="sd-participant-lozenge" title="{$label}">
+    {call ServiceDesk.Templates.Shared.Utils.user}
+        {param displayName: $label /}
+        {param name: $value /}
+        {param avatarUrl: $icon /}
+        {param avatarSize: 'small' /}
+    {/call}
+    <button type="button" class="js-remove aui-icon aui-icon-small aui-iconfont-delete" tabindex="-1"></button>
+</li>
+{/template}
+
+/**
+*/
+{template .resultsExceedLimit}
+<div class="sd-limit-exceeded">{getText('sd.request.participants.matches.exceeded')}</div>
 {/template}

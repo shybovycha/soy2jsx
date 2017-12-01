@@ -91,6 +91,7 @@ const ContextType = {
     GENERATED_ATTRIBUTE: 'GENERATED_ATTRIBUTE',
     GENERATED_ATTRIBUTE_NAME: 'GENERATED_ATTRIBUTE_NAME',
     GENERATED_ATTRIBUTE_VALUE: 'GENERATED_ATTRIBUTE_VALUE',
+    MEMBER_EXPRESSION_CHILD: 'MEMBER_EXPRESSION_CHILD',
 };
 
 const findVisitor = (nodeType) => visitors[nodeType];
@@ -105,6 +106,9 @@ class Visitor {
     preprocessChild(node, childrenContextType, parentContext) {
         if (!node)
             return null;
+
+        if (node.__visitor)
+            return node;
 
         const visitor = findVisitor(node.type);
         const nodeContext = parentContext.createContext(childrenContextType);
@@ -280,10 +284,12 @@ class TemplateVisitor extends Visitor {
                     child.consequent = wrapWithReturn(child.consequent);
                 }
 
-                if (child.alternate.body) {
-                    child.alternate.body = wrapWithReturn(child.alternate.body);
-                } else {
-                    child.alternate = wrapWithReturn(child.alternate);
+                if (child.alternate) {
+                    if (child.alternate.body) {
+                        child.alternate.body = wrapWithReturn(child.alternate.body);
+                    } else {
+                        child.alternate = wrapWithReturn(child.alternate);
+                    }
                 }
 
                 return child;
@@ -351,25 +357,26 @@ class TemplateVisitor extends Visitor {
 }
 
 class MemberExpressionVisitor extends Visitor {
-    static recursiveAssign(properties) {
-        if (properties && properties.length < 2) {
-            return properties[0];
-        } else {
-            return {
-                type: "MemberExpression",
-                property: properties[0],
-                object: MemberExpressionVisitor.recursiveAssign(properties.slice(1)),
-                computed: properties[0].type !== "Identifier"
-            };
-        }
-    };
-
     preprocess(node, localCtx, parentCtx) {
-        const props = [node.object].concat(node.properties).filter(e => !!e);
+        const recursiveAssign = function (properties) {
+            if (properties && properties.length < 2) {
+                return properties[0];
+            } else {
+                return {
+                    type: "MemberExpression",
+                    property: properties[0],
+                    object: recursiveAssign(properties.slice(1))
+                };
+            }
+        };
+
+        let props = [node.object].concat(node.properties).filter(e => !!e);
+        
+        props = this.preprocessChildren(props, ContextType.MEMBER_EXPRESSION_CHILD, localCtx);
 
         props.reverse();
 
-        const memberExpr = MemberExpressionVisitor.recursiveAssign(props);
+        const memberExpr = recursiveAssign(props);
 
         localCtx.object = memberExpr.object;
         localCtx.property = memberExpr.property;
@@ -384,11 +391,14 @@ class MemberExpressionVisitor extends Visitor {
                 return contextToMemberExpression(ctx.object || ctx.property);
             }
 
+            const object = that.generateChild(contextToMemberExpression(ctx.object), localCtx);
+            const property = that.generateChild(ctx.property, localCtx);
+
             return {
                 type: "MemberExpression",
-                object: that.generateChild(contextToMemberExpression(ctx.object), localCtx),
-                property: that.generateChild(ctx.property, localCtx),
-                computed: ctx.property.type !== "Identifier"
+                object,
+                property,
+                computed: property.type !== "Identifier"
             }
         };
 
@@ -404,7 +414,11 @@ class MemberExpressionVisitor extends Visitor {
 
 class LiteralVisitor extends Visitor {
     preprocess(node, localCtx, parentCtx) {
-        localCtx.value = node.value;
+        if (node.value.type && node.value.type === "Literal") {
+            localCtx.value = node.value.value;
+        } else {
+            localCtx.value = node.value;
+        }
     }
 
     generate(localCtx) {
@@ -693,6 +707,7 @@ class ForeachOperatorVisitor extends Visitor {
         } else {
             const needsWrapper = [
                 ContextType.HTML_ELEMENT_CHILD,
+                ContextType.TEMPLATE_ELEMENT,
             ];
 
             return this.wrapIfNeeded(needsWrapper, foreachExpr, parentCtx);
@@ -889,7 +904,8 @@ class GeneratedAttributeVisitor extends Visitor {
 
 class ConditionalExpressionVisitor extends Visitor {
     preprocess(node, localCtx, parentCtx) {
-        // localCtx.type = ContextType.CONDITIONAL_EXPRESSION_BODY;
+        localCtx.type = ContextType.CONDITIONAL_EXPRESSION_BODY;
+
         let {test, consequent, alternate} = node;
 
         consequent = Array.isArray(consequent) ? consequent : [consequent];
@@ -1116,7 +1132,6 @@ class TemplateCallVisitor extends Visitor {
             }
         };
 
-        // TODO: CallExpression vs JSXElement?
         const callExpr = {
             type: "JSXElement",
             openingElement: {
@@ -1144,7 +1159,7 @@ class TemplateCallVisitor extends Visitor {
         //     };
         // } else {
             const needsWrapper = [
-                ContextType.TEMPLATE_ELEMENT,
+                // ContextType.TEMPLATE_ELEMENT,
                 ContextType.HTML_ELEMENT_CHILD,
                 ContextType.HTML_ELEMENT_ATTRIBUTE_VALUE,
             ];

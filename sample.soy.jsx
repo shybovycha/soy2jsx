@@ -1,21 +1,60 @@
-ServiceDesk.Project.Notifications.OutgoingEmail.Templates = (
+ServiceDesk.Templates.Components.Participants = (
     {
-        outgoingEmailRules,
-        defaultRuleUrlSuffix
+        displayedUsers,
+        totalUsers,
+        expanded,
+        hasToggle
     }
 ) => {
-    if (outgoingEmailRules.length < "1") return outgoingEmailRules.map(rule => {
-        return (
-            <tr><td
-                    class={`col-name ${(rule.enabled == "false" ? "outgoing-rule-disabled" : null)}`}><p class="col-text-content">{rule.ruleName}{(rule.enabled == "false" ? <span class="aui-lozenge aui-lozenge-subtle">{getText("sd.admin.outgoing.email.rules.table.disabled")}</span> : null)}</p></td><td
-                    class={`col-name ${(rule.enabled == "false" ? "outgoing-rule-disabled" : null)}`}><p class="col-text-content">{rule.ruleDescription}</p></td><td class="col-actions"><a
-                        href={`${defaultRuleUrlPrefix}/${rule.id}${defaultRuleUrlSuffix}`}
-                        class="js-outgoing-email-rule-edit-link"
-                        analytics-suffix={(rule.analyticsSuffix ? rule.analyticsSuffix : "custom")}>{getText("sd.common.words.edit")}</a></td></tr>
-        );
-    });
-    else
-        return <tr><td colspan="3" class="rules-not-found">{getText("sd.admin.outgoing.email.rules.not.found")}</td></tr>;
+    if (length(displayedUsers)) return <ServiceDesk.Templates.Components.Participants.participantList
+        {...{
+            users: displayedUsers
+        }} />, (hasToggle ? (expanded ? <aui.buttons.button
+        {...{
+            extraClasses: "js-contract",
+            type: "link",
+            text: getText("sd.request.participants.contract")
+        }} /> : <aui.buttons.button
+        {...{
+            extraClasses: "js-expand",
+            type: "link",
+            text: getText("sd.request.participants.expand", totalUsers)
+        }} />) : null);
 
     return null;
 };
+
+ServiceDesk.Templates.Components.Participants = (
+    {
+        users
+    }
+) => <ul class="sd-participant-list">{users.map(user => {
+        return (
+            <li class="sd-participant" data-key={user.key}><ServiceDesk.Templates.Shared.Utils.userHover
+                    {...{
+                        displayName: user.displayName,
+                        name: user.name,
+                        avatarUrl: user.avatarUrls["24x24"],
+                        avatarSize: "small"
+                    }} /></li>
+        );
+    })}</ul>;
+
+ServiceDesk.Templates.Components.Participants = (
+    {
+        icon,
+        label,
+        value
+    }
+) => <li class="sd-participant-lozenge" title={label}><ServiceDesk.Templates.Shared.Utils.user
+        {...{
+            displayName: label,
+            name: value,
+            avatarUrl: icon,
+            avatarSize: "small"
+        }} /><button
+        type="button"
+        class="js-remove aui-icon aui-icon-small aui-iconfont-delete"
+        tabindex="-1" /></li>;
+
+ServiceDesk.Templates.Components.Participants = ({}) => <div class="sd-limit-exceeded">{getText("sd.request.participants.matches.exceeded")}</div>;
