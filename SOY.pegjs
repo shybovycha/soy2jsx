@@ -106,7 +106,7 @@ SoyCommentText
   };
 
 SoyCommentParamDefinition
-  = WS* "*" WS* param:(SoyCommentRequiredParamDef / SoyCommentOptionalParamDef) WS* SoyCommentText? { return param; };
+  = WS* "*" WS* param:(SoyCommentRequiredParamDef / SoyCommentOptionalParamDef) [^\n]* { return param; };
 
 SoyCommentRequiredParamDef
   = "@param" WS+ name:Identifier {

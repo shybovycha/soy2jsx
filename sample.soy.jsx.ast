@@ -24,13 +24,13 @@
                         },
                         "property": {
                             "type": "Identifier",
-                            "name": "Components"
+                            "name": "HelpBubble"
                         },
                         "computed": false
                     },
                     "property": {
                         "type": "Identifier",
-                        "name": "Participants"
+                        "name": "bubble"
                     },
                     "computed": false
                 },
@@ -45,11 +45,11 @@
                                     "type": "Property",
                                     "key": {
                                         "type": "Identifier",
-                                        "name": "displayedUsers"
+                                        "name": "id"
                                     },
                                     "value": {
                                         "type": "Identifier",
-                                        "name": "displayedUsers"
+                                        "name": "id"
                                     },
                                     "kind": "init",
                                     "computed": false,
@@ -60,11 +60,11 @@
                                     "type": "Property",
                                     "key": {
                                         "type": "Identifier",
-                                        "name": "totalUsers"
+                                        "name": "bubbleContents"
                                     },
                                     "value": {
                                         "type": "Identifier",
-                                        "name": "totalUsers"
+                                        "name": "bubbleContents"
                                     },
                                     "kind": "init",
                                     "computed": false,
@@ -75,26 +75,11 @@
                                     "type": "Property",
                                     "key": {
                                         "type": "Identifier",
-                                        "name": "expanded"
+                                        "name": "alignment"
                                     },
                                     "value": {
                                         "type": "Identifier",
-                                        "name": "expanded"
-                                    },
-                                    "kind": "init",
-                                    "computed": false,
-                                    "method": false,
-                                    "shorthand": true
-                                },
-                                {
-                                    "type": "Property",
-                                    "key": {
-                                        "type": "Identifier",
-                                        "name": "hasToggle"
-                                    },
-                                    "value": {
-                                        "type": "Identifier",
-                                        "name": "hasToggle"
+                                        "name": "alignment"
                                     },
                                     "kind": "init",
                                     "computed": false,
@@ -105,732 +90,8 @@
                         }
                     ],
                     "body": {
-                        "type": "BlockStatement",
-                        "body": [
-                            {
-                                "type": "IfStatement",
-                                "test": {
-                                    "type": "CallExpression",
-                                    "callee": {
-                                        "type": "Identifier",
-                                        "name": "length"
-                                    },
-                                    "arguments": [
-                                        {
-                                            "type": "Identifier",
-                                            "name": "displayedUsers"
-                                        }
-                                    ]
-                                },
-                                "consequent": {
-                                    "type": "ReturnStatement",
-                                    "argument": {
-                                        "type": "SequenceExpression",
-                                        "expressions": [
-                                            {
-                                                "type": "JSXElement",
-                                                "openingElement": {
-                                                    "type": "JSXOpeningElement",
-                                                    "name": {
-                                                        "type": "JSXMemberExpression",
-                                                        "object": {
-                                                            "type": "JSXMemberExpression",
-                                                            "object": {
-                                                                "type": "JSXMemberExpression",
-                                                                "object": {
-                                                                    "type": "JSXMemberExpression",
-                                                                    "object": {
-                                                                        "type": "Identifier",
-                                                                        "name": "ServiceDesk"
-                                                                    },
-                                                                    "property": {
-                                                                        "type": "Identifier",
-                                                                        "name": "Templates"
-                                                                    }
-                                                                },
-                                                                "property": {
-                                                                    "type": "Identifier",
-                                                                    "name": "Components"
-                                                                }
-                                                            },
-                                                            "property": {
-                                                                "type": "Identifier",
-                                                                "name": "Participants"
-                                                            }
-                                                        },
-                                                        "property": {
-                                                            "type": "Identifier",
-                                                            "name": "participantList"
-                                                        }
-                                                    },
-                                                    "attributes": [
-                                                        {
-                                                            "type": "JSXSpreadAttribute",
-                                                            "argument": {
-                                                                "type": "ObjectExpression",
-                                                                "properties": [
-                                                                    {
-                                                                        "type": "Property",
-                                                                        "key": {
-                                                                            "type": "Identifier",
-                                                                            "name": "users"
-                                                                        },
-                                                                        "value": {
-                                                                            "type": "Identifier",
-                                                                            "name": "displayedUsers"
-                                                                        },
-                                                                        "kind": "init"
-                                                                    }
-                                                                ]
-                                                            }
-                                                        }
-                                                    ],
-                                                    "selfClosing": true
-                                                },
-                                                "closingElement": null,
-                                                "children": []
-                                            },
-                                            {
-                                                "type": "ConditionalExpression",
-                                                "test": {
-                                                    "type": "Identifier",
-                                                    "name": "hasToggle"
-                                                },
-                                                "consequent": {
-                                                    "type": "ConditionalExpression",
-                                                    "test": {
-                                                        "type": "Identifier",
-                                                        "name": "expanded"
-                                                    },
-                                                    "consequent": {
-                                                        "type": "JSXElement",
-                                                        "openingElement": {
-                                                            "type": "JSXOpeningElement",
-                                                            "name": {
-                                                                "type": "JSXMemberExpression",
-                                                                "object": {
-                                                                    "type": "JSXMemberExpression",
-                                                                    "object": {
-                                                                        "type": "Identifier",
-                                                                        "name": "aui"
-                                                                    },
-                                                                    "property": {
-                                                                        "type": "Identifier",
-                                                                        "name": "buttons"
-                                                                    }
-                                                                },
-                                                                "property": {
-                                                                    "type": "Identifier",
-                                                                    "name": "button"
-                                                                }
-                                                            },
-                                                            "attributes": [
-                                                                {
-                                                                    "type": "JSXSpreadAttribute",
-                                                                    "argument": {
-                                                                        "type": "ObjectExpression",
-                                                                        "properties": [
-                                                                            {
-                                                                                "type": "Property",
-                                                                                "key": {
-                                                                                    "type": "Identifier",
-                                                                                    "name": "extraClasses"
-                                                                                },
-                                                                                "value": {
-                                                                                    "type": "Literal",
-                                                                                    "value": "js-contract"
-                                                                                },
-                                                                                "kind": "init"
-                                                                            },
-                                                                            {
-                                                                                "type": "Property",
-                                                                                "key": {
-                                                                                    "type": "Identifier",
-                                                                                    "name": "type"
-                                                                                },
-                                                                                "value": {
-                                                                                    "type": "Literal",
-                                                                                    "value": "link"
-                                                                                },
-                                                                                "kind": "init"
-                                                                            },
-                                                                            {
-                                                                                "type": "Property",
-                                                                                "key": {
-                                                                                    "type": "Identifier",
-                                                                                    "name": "text"
-                                                                                },
-                                                                                "value": {
-                                                                                    "type": "CallExpression",
-                                                                                    "callee": {
-                                                                                        "type": "Identifier",
-                                                                                        "name": "getText"
-                                                                                    },
-                                                                                    "arguments": [
-                                                                                        {
-                                                                                            "type": "Literal",
-                                                                                            "value": "sd.request.participants.contract"
-                                                                                        }
-                                                                                    ]
-                                                                                },
-                                                                                "kind": "init"
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ],
-                                                            "selfClosing": true
-                                                        },
-                                                        "closingElement": null,
-                                                        "children": []
-                                                    },
-                                                    "alternate": {
-                                                        "type": "JSXElement",
-                                                        "openingElement": {
-                                                            "type": "JSXOpeningElement",
-                                                            "name": {
-                                                                "type": "JSXMemberExpression",
-                                                                "object": {
-                                                                    "type": "JSXMemberExpression",
-                                                                    "object": {
-                                                                        "type": "Identifier",
-                                                                        "name": "aui"
-                                                                    },
-                                                                    "property": {
-                                                                        "type": "Identifier",
-                                                                        "name": "buttons"
-                                                                    }
-                                                                },
-                                                                "property": {
-                                                                    "type": "Identifier",
-                                                                    "name": "button"
-                                                                }
-                                                            },
-                                                            "attributes": [
-                                                                {
-                                                                    "type": "JSXSpreadAttribute",
-                                                                    "argument": {
-                                                                        "type": "ObjectExpression",
-                                                                        "properties": [
-                                                                            {
-                                                                                "type": "Property",
-                                                                                "key": {
-                                                                                    "type": "Identifier",
-                                                                                    "name": "extraClasses"
-                                                                                },
-                                                                                "value": {
-                                                                                    "type": "Literal",
-                                                                                    "value": "js-expand"
-                                                                                },
-                                                                                "kind": "init"
-                                                                            },
-                                                                            {
-                                                                                "type": "Property",
-                                                                                "key": {
-                                                                                    "type": "Identifier",
-                                                                                    "name": "type"
-                                                                                },
-                                                                                "value": {
-                                                                                    "type": "Literal",
-                                                                                    "value": "link"
-                                                                                },
-                                                                                "kind": "init"
-                                                                            },
-                                                                            {
-                                                                                "type": "Property",
-                                                                                "key": {
-                                                                                    "type": "Identifier",
-                                                                                    "name": "text"
-                                                                                },
-                                                                                "value": {
-                                                                                    "type": "CallExpression",
-                                                                                    "callee": {
-                                                                                        "type": "Identifier",
-                                                                                        "name": "getText"
-                                                                                    },
-                                                                                    "arguments": [
-                                                                                        {
-                                                                                            "type": "Literal",
-                                                                                            "value": "sd.request.participants.expand"
-                                                                                        },
-                                                                                        {
-                                                                                            "type": "Identifier",
-                                                                                            "name": "totalUsers"
-                                                                                        }
-                                                                                    ]
-                                                                                },
-                                                                                "kind": "init"
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ],
-                                                            "selfClosing": true
-                                                        },
-                                                        "closingElement": null,
-                                                        "children": []
-                                                    }
-                                                },
-                                                "alternate": {
-                                                    "type": "Literal",
-                                                    "value": null
-                                                }
-                                            }
-                                        ]
-                                    }
-                                },
-                                "alternate": null
-                            },
-                            {
-                                "type": "ReturnStatement",
-                                "argument": {
-                                    "type": "Literal",
-                                    "value": null
-                                }
-                            }
-                        ]
-                    }
-                }
-            }
-        },
-        {
-            "type": "ExpressionStatement",
-            "expression": {
-                "type": "AssignmentExpression",
-                "operator": "=",
-                "left": {
-                    "type": "MemberExpression",
-                    "object": {
-                        "type": "MemberExpression",
-                        "object": {
-                            "type": "MemberExpression",
-                            "object": {
-                                "type": "Identifier",
-                                "name": "ServiceDesk"
-                            },
-                            "property": {
-                                "type": "Identifier",
-                                "name": "Templates"
-                            },
-                            "computed": false
-                        },
-                        "property": {
-                            "type": "Identifier",
-                            "name": "Components"
-                        },
-                        "computed": false
-                    },
-                    "property": {
-                        "type": "Identifier",
-                        "name": "Participants"
-                    },
-                    "computed": false
-                },
-                "right": {
-                    "type": "ArrowFunctionExpression",
-                    "id": null,
-                    "params": [
-                        {
-                            "type": "ObjectPattern",
-                            "properties": [
-                                {
-                                    "type": "Property",
-                                    "key": {
-                                        "type": "Identifier",
-                                        "name": "users"
-                                    },
-                                    "value": {
-                                        "type": "Identifier",
-                                        "name": "users"
-                                    },
-                                    "kind": "init",
-                                    "computed": false,
-                                    "method": false,
-                                    "shorthand": true
-                                }
-                            ]
-                        }
-                    ],
-                    "body": {
-                        "type": "JSXElement",
-                        "openingElement": {
-                            "type": "JSXOpeningElement",
-                            "name": {
-                                "type": "Identifier",
-                                "name": "ul"
-                            },
-                            "selfClosing": false,
-                            "attributes": [
-                                {
-                                    "type": "JSXAttribute",
-                                    "name": "class",
-                                    "value": {
-                                        "type": "Literal",
-                                        "value": "sd-participant-list"
-                                    }
-                                }
-                            ]
-                        },
-                        "closingElement": {
-                            "type": "JSXClosingElement",
-                            "name": {
-                                "type": "Identifier",
-                                "name": "ul"
-                            }
-                        },
-                        "children": [
-                            {
-                                "type": "JSXExpressionContainer",
-                                "expression": {
-                                    "type": "CallExpression",
-                                    "callee": {
-                                        "type": "MemberExpression",
-                                        "object": {
-                                            "type": "Identifier",
-                                            "name": "users"
-                                        },
-                                        "property": {
-                                            "type": "Identifier",
-                                            "name": "map"
-                                        }
-                                    },
-                                    "arguments": [
-                                        {
-                                            "type": "ArrowFunctionExpression",
-                                            "id": null,
-                                            "params": [
-                                                {
-                                                    "type": "Identifier",
-                                                    "name": "user"
-                                                }
-                                            ],
-                                            "body": {
-                                                "type": "BlockStatement",
-                                                "body": [
-                                                    {
-                                                        "type": "ReturnStatement",
-                                                        "argument": {
-                                                            "type": "JSXElement",
-                                                            "openingElement": {
-                                                                "type": "JSXOpeningElement",
-                                                                "name": {
-                                                                    "type": "Identifier",
-                                                                    "name": "li"
-                                                                },
-                                                                "selfClosing": false,
-                                                                "attributes": [
-                                                                    {
-                                                                        "type": "JSXAttribute",
-                                                                        "name": "class",
-                                                                        "value": {
-                                                                            "type": "Literal",
-                                                                            "value": "sd-participant"
-                                                                        }
-                                                                    },
-                                                                    {
-                                                                        "type": "JSXAttribute",
-                                                                        "name": "data-key",
-                                                                        "value": {
-                                                                            "type": "JSXExpressionContainer",
-                                                                            "expression": {
-                                                                                "type": "MemberExpression",
-                                                                                "object": {
-                                                                                    "type": "Identifier",
-                                                                                    "name": "user"
-                                                                                },
-                                                                                "property": {
-                                                                                    "type": "Identifier",
-                                                                                    "name": "key"
-                                                                                },
-                                                                                "computed": false
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                ]
-                                                            },
-                                                            "closingElement": {
-                                                                "type": "JSXClosingElement",
-                                                                "name": {
-                                                                    "type": "Identifier",
-                                                                    "name": "li"
-                                                                }
-                                                            },
-                                                            "children": [
-                                                                {
-                                                                    "type": "JSXElement",
-                                                                    "openingElement": {
-                                                                        "type": "JSXOpeningElement",
-                                                                        "name": {
-                                                                            "type": "JSXMemberExpression",
-                                                                            "object": {
-                                                                                "type": "JSXMemberExpression",
-                                                                                "object": {
-                                                                                    "type": "JSXMemberExpression",
-                                                                                    "object": {
-                                                                                        "type": "JSXMemberExpression",
-                                                                                        "object": {
-                                                                                            "type": "Identifier",
-                                                                                            "name": "ServiceDesk"
-                                                                                        },
-                                                                                        "property": {
-                                                                                            "type": "Identifier",
-                                                                                            "name": "Templates"
-                                                                                        }
-                                                                                    },
-                                                                                    "property": {
-                                                                                        "type": "Identifier",
-                                                                                        "name": "Shared"
-                                                                                    }
-                                                                                },
-                                                                                "property": {
-                                                                                    "type": "Identifier",
-                                                                                    "name": "Utils"
-                                                                                }
-                                                                            },
-                                                                            "property": {
-                                                                                "type": "Identifier",
-                                                                                "name": "userHover"
-                                                                            }
-                                                                        },
-                                                                        "attributes": [
-                                                                            {
-                                                                                "type": "JSXSpreadAttribute",
-                                                                                "argument": {
-                                                                                    "type": "ObjectExpression",
-                                                                                    "properties": [
-                                                                                        {
-                                                                                            "type": "Property",
-                                                                                            "key": {
-                                                                                                "type": "Identifier",
-                                                                                                "name": "displayName"
-                                                                                            },
-                                                                                            "value": {
-                                                                                                "type": "MemberExpression",
-                                                                                                "object": {
-                                                                                                    "type": "Identifier",
-                                                                                                    "name": "user"
-                                                                                                },
-                                                                                                "property": {
-                                                                                                    "type": "Identifier",
-                                                                                                    "name": "displayName"
-                                                                                                },
-                                                                                                "computed": false
-                                                                                            },
-                                                                                            "kind": "init"
-                                                                                        },
-                                                                                        {
-                                                                                            "type": "Property",
-                                                                                            "key": {
-                                                                                                "type": "Identifier",
-                                                                                                "name": "name"
-                                                                                            },
-                                                                                            "value": {
-                                                                                                "type": "MemberExpression",
-                                                                                                "object": {
-                                                                                                    "type": "Identifier",
-                                                                                                    "name": "user"
-                                                                                                },
-                                                                                                "property": {
-                                                                                                    "type": "Identifier",
-                                                                                                    "name": "name"
-                                                                                                },
-                                                                                                "computed": false
-                                                                                            },
-                                                                                            "kind": "init"
-                                                                                        },
-                                                                                        {
-                                                                                            "type": "Property",
-                                                                                            "key": {
-                                                                                                "type": "Identifier",
-                                                                                                "name": "avatarUrl"
-                                                                                            },
-                                                                                            "value": {
-                                                                                                "type": "MemberExpression",
-                                                                                                "object": {
-                                                                                                    "type": "MemberExpression",
-                                                                                                    "object": {
-                                                                                                        "type": "Identifier",
-                                                                                                        "name": "user"
-                                                                                                    },
-                                                                                                    "property": {
-                                                                                                        "type": "Identifier",
-                                                                                                        "name": "avatarUrls"
-                                                                                                    },
-                                                                                                    "computed": false
-                                                                                                },
-                                                                                                "property": {
-                                                                                                    "type": "Literal",
-                                                                                                    "value": "24x24"
-                                                                                                },
-                                                                                                "computed": true
-                                                                                            },
-                                                                                            "kind": "init"
-                                                                                        },
-                                                                                        {
-                                                                                            "type": "Property",
-                                                                                            "key": {
-                                                                                                "type": "Identifier",
-                                                                                                "name": "avatarSize"
-                                                                                            },
-                                                                                            "value": {
-                                                                                                "type": "Literal",
-                                                                                                "value": "small"
-                                                                                            },
-                                                                                            "kind": "init"
-                                                                                        }
-                                                                                    ]
-                                                                                }
-                                                                            }
-                                                                        ],
-                                                                        "selfClosing": true
-                                                                    },
-                                                                    "closingElement": null,
-                                                                    "children": []
-                                                                }
-                                                            ]
-                                                        }
-                                                    }
-                                                ]
-                                            },
-                                            "generator": false,
-                                            "expression": false,
-                                            "async": false
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    }
-                }
-            }
-        },
-        {
-            "type": "ExpressionStatement",
-            "expression": {
-                "type": "AssignmentExpression",
-                "operator": "=",
-                "left": {
-                    "type": "MemberExpression",
-                    "object": {
-                        "type": "MemberExpression",
-                        "object": {
-                            "type": "MemberExpression",
-                            "object": {
-                                "type": "Identifier",
-                                "name": "ServiceDesk"
-                            },
-                            "property": {
-                                "type": "Identifier",
-                                "name": "Templates"
-                            },
-                            "computed": false
-                        },
-                        "property": {
-                            "type": "Identifier",
-                            "name": "Components"
-                        },
-                        "computed": false
-                    },
-                    "property": {
-                        "type": "Identifier",
-                        "name": "Participants"
-                    },
-                    "computed": false
-                },
-                "right": {
-                    "type": "ArrowFunctionExpression",
-                    "id": null,
-                    "params": [
-                        {
-                            "type": "ObjectPattern",
-                            "properties": [
-                                {
-                                    "type": "Property",
-                                    "key": {
-                                        "type": "Identifier",
-                                        "name": "icon"
-                                    },
-                                    "value": {
-                                        "type": "Identifier",
-                                        "name": "icon"
-                                    },
-                                    "kind": "init",
-                                    "computed": false,
-                                    "method": false,
-                                    "shorthand": true
-                                },
-                                {
-                                    "type": "Property",
-                                    "key": {
-                                        "type": "Identifier",
-                                        "name": "label"
-                                    },
-                                    "value": {
-                                        "type": "Identifier",
-                                        "name": "label"
-                                    },
-                                    "kind": "init",
-                                    "computed": false,
-                                    "method": false,
-                                    "shorthand": true
-                                },
-                                {
-                                    "type": "Property",
-                                    "key": {
-                                        "type": "Identifier",
-                                        "name": "value"
-                                    },
-                                    "value": {
-                                        "type": "Identifier",
-                                        "name": "value"
-                                    },
-                                    "kind": "init",
-                                    "computed": false,
-                                    "method": false,
-                                    "shorthand": true
-                                }
-                            ]
-                        }
-                    ],
-                    "body": {
-                        "type": "JSXElement",
-                        "openingElement": {
-                            "type": "JSXOpeningElement",
-                            "name": {
-                                "type": "Identifier",
-                                "name": "li"
-                            },
-                            "selfClosing": false,
-                            "attributes": [
-                                {
-                                    "type": "JSXAttribute",
-                                    "name": "class",
-                                    "value": {
-                                        "type": "Literal",
-                                        "value": "sd-participant-lozenge"
-                                    }
-                                },
-                                {
-                                    "type": "JSXAttribute",
-                                    "name": "title",
-                                    "value": {
-                                        "type": "JSXExpressionContainer",
-                                        "expression": {
-                                            "type": "Identifier",
-                                            "name": "label"
-                                        }
-                                    }
-                                }
-                            ]
-                        },
-                        "closingElement": {
-                            "type": "JSXClosingElement",
-                            "name": {
-                                "type": "Identifier",
-                                "name": "li"
-                            }
-                        },
-                        "children": [
+                        "type": "SequenceExpression",
+                        "expressions": [
                             {
                                 "type": "JSXElement",
                                 "openingElement": {
@@ -840,31 +101,17 @@
                                         "object": {
                                             "type": "JSXMemberExpression",
                                             "object": {
-                                                "type": "JSXMemberExpression",
-                                                "object": {
-                                                    "type": "JSXMemberExpression",
-                                                    "object": {
-                                                        "type": "Identifier",
-                                                        "name": "ServiceDesk"
-                                                    },
-                                                    "property": {
-                                                        "type": "Identifier",
-                                                        "name": "Templates"
-                                                    }
-                                                },
-                                                "property": {
-                                                    "type": "Identifier",
-                                                    "name": "Shared"
-                                                }
+                                                "type": "Identifier",
+                                                "name": "aui"
                                             },
                                             "property": {
                                                 "type": "Identifier",
-                                                "name": "Utils"
+                                                "name": "icons"
                                             }
                                         },
                                         "property": {
                                             "type": "Identifier",
-                                            "name": "user"
+                                            "name": "icon"
                                         }
                                     },
                                     "attributes": [
@@ -877,11 +124,11 @@
                                                         "type": "Property",
                                                         "key": {
                                                             "type": "Identifier",
-                                                            "name": "displayName"
+                                                            "name": "useIconFont"
                                                         },
                                                         "value": {
-                                                            "type": "Identifier",
-                                                            "name": "label"
+                                                            "type": "Literal",
+                                                            "value": "true"
                                                         },
                                                         "kind": "init"
                                                     },
@@ -889,35 +136,75 @@
                                                         "type": "Property",
                                                         "key": {
                                                             "type": "Identifier",
-                                                            "name": "name"
-                                                        },
-                                                        "value": {
-                                                            "type": "Identifier",
-                                                            "name": "value"
-                                                        },
-                                                        "kind": "init"
-                                                    },
-                                                    {
-                                                        "type": "Property",
-                                                        "key": {
-                                                            "type": "Identifier",
-                                                            "name": "avatarUrl"
-                                                        },
-                                                        "value": {
-                                                            "type": "Identifier",
-                                                            "name": "icon"
-                                                        },
-                                                        "kind": "init"
-                                                    },
-                                                    {
-                                                        "type": "Property",
-                                                        "key": {
-                                                            "type": "Identifier",
-                                                            "name": "avatarSize"
+                                                            "name": "size"
                                                         },
                                                         "value": {
                                                             "type": "Literal",
                                                             "value": "small"
+                                                        },
+                                                        "kind": "init"
+                                                    },
+                                                    {
+                                                        "type": "Property",
+                                                        "key": {
+                                                            "type": "Identifier",
+                                                            "name": "icon"
+                                                        },
+                                                        "value": {
+                                                            "type": "Literal",
+                                                            "value": "info"
+                                                        },
+                                                        "kind": "init"
+                                                    },
+                                                    {
+                                                        "type": "Property",
+                                                        "key": {
+                                                            "type": "Identifier",
+                                                            "name": "extraAttributes"
+                                                        },
+                                                        "value": {
+                                                            "type": "ObjectExpression",
+                                                            "properties": [
+                                                                {
+                                                                    "type": "Property",
+                                                                    "key": {
+                                                                        "type": "Literal",
+                                                                        "value": "data-aui-trigger"
+                                                                    },
+                                                                    "value": {
+                                                                        "type": "Literal",
+                                                                        "value": ""
+                                                                    },
+                                                                    "kind": "init",
+                                                                    "computed": false
+                                                                },
+                                                                {
+                                                                    "type": "Property",
+                                                                    "key": {
+                                                                        "type": "Literal",
+                                                                        "value": "aria-controls"
+                                                                    },
+                                                                    "value": {
+                                                                        "type": "Identifier",
+                                                                        "name": "id"
+                                                                    },
+                                                                    "kind": "init",
+                                                                    "computed": false
+                                                                },
+                                                                {
+                                                                    "type": "Property",
+                                                                    "key": {
+                                                                        "type": "Literal",
+                                                                        "value": "tabindex"
+                                                                    },
+                                                                    "value": {
+                                                                        "type": "Literal",
+                                                                        "value": "0"
+                                                                    },
+                                                                    "kind": "init",
+                                                                    "computed": false
+                                                                }
+                                                            ]
                                                         },
                                                         "kind": "init"
                                                     }
@@ -936,38 +223,105 @@
                                     "type": "JSXOpeningElement",
                                     "name": {
                                         "type": "Identifier",
-                                        "name": "button"
+                                        "name": "aui-inline-dialog"
                                     },
-                                    "selfClosing": true,
+                                    "selfClosing": false,
                                     "attributes": [
                                         {
                                             "type": "JSXAttribute",
-                                            "name": "type",
+                                            "name": "id",
                                             "value": {
-                                                "type": "Literal",
-                                                "value": "button"
+                                                "type": "JSXExpressionContainer",
+                                                "expression": {
+                                                    "type": "Identifier",
+                                                    "name": "id"
+                                                }
                                             }
                                         },
                                         {
                                             "type": "JSXAttribute",
                                             "name": "class",
                                             "value": {
-                                                "type": "Literal",
-                                                "value": "js-remove aui-icon aui-icon-small aui-iconfont-delete"
+                                                "type": "JSXExpressionContainer",
+                                                "expression": {
+                                                    "type": "TemplateLiteral",
+                                                    "quasis": [
+                                                        {
+                                                            "type": "TemplateElement",
+                                                            "value": {
+                                                                "raw": "sd-help-bubble sd-help-bubble-dialog2-"
+                                                            }
+                                                        },
+                                                        {
+                                                            "type": "TemplateElement",
+                                                            "value": {
+                                                                "raw": ""
+                                                            }
+                                                        }
+                                                    ],
+                                                    "expressions": [
+                                                        {
+                                                            "type": "Identifier",
+                                                            "name": "alignment"
+                                                        }
+                                                    ]
+                                                }
                                             }
                                         },
                                         {
                                             "type": "JSXAttribute",
-                                            "name": "tabindex",
+                                            "name": "alignment",
                                             "value": {
-                                                "type": "Literal",
-                                                "value": "-1"
+                                                "type": "JSXExpressionContainer",
+                                                "expression": {
+                                                    "type": "TemplateLiteral",
+                                                    "quasis": [
+                                                        {
+                                                            "type": "TemplateElement",
+                                                            "value": {
+                                                                "raw": "bottom "
+                                                            }
+                                                        },
+                                                        {
+                                                            "type": "TemplateElement",
+                                                            "value": {
+                                                                "raw": ""
+                                                            }
+                                                        }
+                                                    ],
+                                                    "expressions": [
+                                                        {
+                                                            "type": "Identifier",
+                                                            "name": "alignment"
+                                                        }
+                                                    ]
+                                                }
                                             }
                                         }
                                     ]
                                 },
-                                "closingElement": null,
-                                "children": []
+                                "closingElement": {
+                                    "type": "JSXClosingElement",
+                                    "name": {
+                                        "type": "Identifier",
+                                        "name": "aui-inline-dialog"
+                                    }
+                                },
+                                "children": [
+                                    {
+                                        "type": "CallExpression",
+                                        "callee": {
+                                            "type": "Identifier",
+                                            "name": "noAutoescape"
+                                        },
+                                        "arguments": [
+                                            {
+                                                "type": "Identifier",
+                                                "name": "bubbleContents"
+                                            }
+                                        ]
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -997,13 +351,13 @@
                         },
                         "property": {
                             "type": "Identifier",
-                            "name": "Components"
+                            "name": "HelpBubble"
                         },
                         "computed": false
                     },
                     "property": {
                         "type": "Identifier",
-                        "name": "Participants"
+                        "name": "container"
                     },
                     "computed": false
                 },
@@ -1013,7 +367,23 @@
                     "params": [
                         {
                             "type": "ObjectPattern",
-                            "properties": []
+                            "properties": [
+                                {
+                                    "type": "Property",
+                                    "key": {
+                                        "type": "Identifier",
+                                        "name": "after"
+                                    },
+                                    "value": {
+                                        "type": "Identifier",
+                                        "name": "after"
+                                    },
+                                    "kind": "init",
+                                    "computed": false,
+                                    "method": false,
+                                    "shorthand": true
+                                }
+                            ]
                         }
                     ],
                     "body": {
@@ -1024,43 +394,53 @@
                                 "type": "Identifier",
                                 "name": "div"
                             },
-                            "selfClosing": false,
+                            "selfClosing": true,
                             "attributes": [
                                 {
                                     "type": "JSXAttribute",
                                     "name": "class",
                                     "value": {
-                                        "type": "Literal",
-                                        "value": "sd-limit-exceeded"
+                                        "type": "JSXExpressionContainer",
+                                        "expression": {
+                                            "type": "TemplateLiteral",
+                                            "quasis": [
+                                                {
+                                                    "type": "TemplateElement",
+                                                    "value": {
+                                                        "raw": "sd-help-bubble-container"
+                                                    }
+                                                },
+                                                {
+                                                    "type": "TemplateElement",
+                                                    "value": {
+                                                        "raw": ""
+                                                    }
+                                                }
+                                            ],
+                                            "expressions": [
+                                                {
+                                                    "type": "ConditionalExpression",
+                                                    "test": {
+                                                        "type": "Identifier",
+                                                        "name": "after"
+                                                    },
+                                                    "consequent": {
+                                                        "type": "Literal",
+                                                        "value": "-after"
+                                                    },
+                                                    "alternate": {
+                                                        "type": "Literal",
+                                                        "value": null
+                                                    }
+                                                }
+                                            ]
+                                        }
                                     }
                                 }
                             ]
                         },
-                        "closingElement": {
-                            "type": "JSXClosingElement",
-                            "name": {
-                                "type": "Identifier",
-                                "name": "div"
-                            }
-                        },
-                        "children": [
-                            {
-                                "type": "JSXExpressionContainer",
-                                "expression": {
-                                    "type": "CallExpression",
-                                    "callee": {
-                                        "type": "Identifier",
-                                        "name": "getText"
-                                    },
-                                    "arguments": [
-                                        {
-                                            "type": "Literal",
-                                            "value": "sd.request.participants.matches.exceeded"
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
+                        "closingElement": null,
+                        "children": []
                     }
                 }
             }

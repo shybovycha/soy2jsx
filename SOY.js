@@ -1919,24 +1919,27 @@ function peg$parse(input, options) {
           }
           if (s4 !== peg$FAILED) {
             s5 = [];
-            s6 = peg$parseWS();
+            if (peg$c24.test(input.charAt(peg$currPos))) {
+              s6 = input.charAt(peg$currPos);
+              peg$currPos++;
+            } else {
+              s6 = peg$FAILED;
+              if (peg$silentFails === 0) { peg$fail(peg$c25); }
+            }
             while (s6 !== peg$FAILED) {
               s5.push(s6);
-              s6 = peg$parseWS();
+              if (peg$c24.test(input.charAt(peg$currPos))) {
+                s6 = input.charAt(peg$currPos);
+                peg$currPos++;
+              } else {
+                s6 = peg$FAILED;
+                if (peg$silentFails === 0) { peg$fail(peg$c25); }
+              }
             }
             if (s5 !== peg$FAILED) {
-              s6 = peg$parseSoyCommentText();
-              if (s6 === peg$FAILED) {
-                s6 = null;
-              }
-              if (s6 !== peg$FAILED) {
-                peg$savedPos = s0;
-                s1 = peg$c38(s4);
-                s0 = s1;
-              } else {
-                peg$currPos = s0;
-                s0 = peg$FAILED;
-              }
+              peg$savedPos = s0;
+              s1 = peg$c38(s4);
+              s0 = s1;
             } else {
               peg$currPos = s0;
               s0 = peg$FAILED;

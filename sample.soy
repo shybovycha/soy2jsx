@@ -1,74 +1,33 @@
-{namespace ServiceDesk.Templates.Components.Participants}
+{namespace ServiceDesk.Templates.HelpBubble}
 
 /**
-* Renders request participants list, with a see more / see less option at bottom.
-* @param displayedUsers - The list of participants to display
-* @param totalUsers - The total number of participants
-* @param expanded - Flag determining if all participants are shown or just the first $maxDisplayedUsers
-* @param hasToggle - Flag determining if the list can be toggled to show all or just first 5 users
-*/
-{template .main}
-{if length($displayedUsers)}
-    {call .participantList}
-        {param users: $displayedUsers /}
+ * Creates an info help bubble using aui-inline-dialog2. Used by info-help-bubble.js - use that rather than calling this
+ * template directly, as it handles cleanup.
+ * @param id The id you would like to use for the info bubble
+ * @param bubbleContents The contents you would like to have inside the info bubble
+ * @param alignment How the dialog is positioned relative to the trigger
+ */
+{template .bubble}
+    {sp}
+    {call aui.icons.icon}
+        {param useIconFont: true /}
+        {param size: 'small' /}
+        {param icon: 'info' /}
+        {param extraAttributes: [
+            'data-aui-trigger': '',
+            'aria-controls': $id,
+            'tabindex': 0
+        ] /}
     {/call}
-    {if $hasToggle}
-        {if $expanded}
-            {call aui.buttons.button}
-                {param extraClasses: 'js-contract' /}
-                {param type: 'link' /}
-                {param text: getText('sd.request.participants.contract') /}
-            {/call}
-        {else}
-            {call aui.buttons.button}
-                {param extraClasses: 'js-expand' /}
-                {param type: 'link' /}
-                {param text: getText('sd.request.participants.expand', $totalUsers) /}
-            {/call}
-        {/if}
-    {/if}
-{/if}
+    <aui-inline-dialog id="{$id}" class="sd-help-bubble sd-help-bubble-dialog2-{$alignment}" alignment="bottom {$alignment}">
+        {$bubbleContents |noAutoescape}
+    </aui-inline-dialog>
 {/template}
 
 /**
-* Renders a view only list of participants. This is what is displayed in the people section.
-* @param users - The list of participants to display
-*/
-{template .participantList}
-<ul class="sd-participant-list">
-    {foreach $user in $users}
-        <li class="sd-participant" data-key="{$user.key}">
-            {call ServiceDesk.Templates.Shared.Utils.userHover}
-                {param displayName: $user.displayName /}
-                {param name: $user.name /}
-                {param avatarUrl: $user.avatarUrls['24x24'] /}
-                {param avatarSize: 'small' /}
-            {/call}
-        </li>
-    {/foreach}
-</ul>
-{/template}
-
-/**
-* Renders a selected participant in the participants field
-* @param icon - User avatar
-* @param label - Users display name
-* @param value - username
-*/
-{template .participantsLozenge}
-<li class="sd-participant-lozenge" title="{$label}">
-    {call ServiceDesk.Templates.Shared.Utils.user}
-        {param displayName: $label /}
-        {param name: $value /}
-        {param avatarUrl: $icon /}
-        {param avatarSize: 'small' /}
-    {/call}
-    <button type="button" class="js-remove aui-icon aui-icon-small aui-iconfont-delete" tabindex="-1"></button>
-</li>
-{/template}
-
-/**
-*/
-{template .resultsExceedLimit}
-<div class="sd-limit-exceeded">{getText('sd.request.participants.matches.exceeded')}</div>
+ * Creates a container to place an info help bubble inside. Use this to create a container to pass to info-help-bubble.js
+ * @param? after Is this to be positioned after the container
+ */
+{template .container}
+    <div class="sd-help-bubble-container{if $after}-after{/if}"></div>
 {/template}
