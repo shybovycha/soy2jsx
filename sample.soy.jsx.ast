@@ -20,28 +20,28 @@
                                 },
                                 "property": {
                                     "type": "Identifier",
-                                    "name": "Templates",
+                                    "name": "Project",
                                     "computed": false
                                 },
                                 "computed": false
                             },
                             "property": {
                                 "type": "Identifier",
-                                "name": "Agent",
+                                "name": "Notifications",
                                 "computed": false
                             },
                             "computed": false
                         },
                         "property": {
                             "type": "Identifier",
-                            "name": "Reports",
+                            "name": "OutgoingEmail",
                             "computed": false
                         },
                         "computed": false
                     },
                     "property": {
                         "type": "Identifier",
-                        "name": "Kb",
+                        "name": "Templates",
                         "computed": false
                     },
                     "computed": false
@@ -57,11 +57,11 @@
                                     "type": "Property",
                                     "key": {
                                         "type": "Identifier",
-                                        "name": "selectedTimescale"
+                                        "name": "outgoingEmailRules"
                                     },
                                     "value": {
                                         "type": "Identifier",
-                                        "name": "selectedTimescale"
+                                        "name": "outgoingEmailRules"
                                     },
                                     "kind": "init",
                                     "computed": false,
@@ -72,11 +72,11 @@
                                     "type": "Property",
                                     "key": {
                                         "type": "Identifier",
-                                        "name": "timescales"
+                                        "name": "defaultRuleUrlSuffix"
                                     },
                                     "value": {
                                         "type": "Identifier",
-                                        "name": "timescales"
+                                        "name": "defaultRuleUrlSuffix"
                                     },
                                     "kind": "init",
                                     "computed": false,
@@ -90,371 +90,676 @@
                         "type": "BlockStatement",
                         "body": [
                             {
-                                "type": "VariableDeclaration",
-                                "declarations": [
-                                    {
-                                        "type": "VariableDeclarator",
-                                        "id": {
-                                            "type": "Identifier",
-                                            "name": "__attributes1"
-                                        },
-                                        "init": {
-                                            "type": "ObjectExpression",
-                                            "properties": []
-                                        }
-                                    }
-                                ],
-                                "kind": "let"
-                            },
-                            {
-                                "type": "VariableDeclaration",
-                                "declarations": [
-                                    {
-                                        "type": "VariableDeclarator",
-                                        "id": {
-                                            "type": "Identifier",
-                                            "name": "__attributes2"
-                                        },
-                                        "init": {
-                                            "type": "ObjectExpression",
-                                            "properties": []
-                                        }
-                                    }
-                                ],
-                                "kind": "let"
-                            },
-                            {
-                                "type": "ExpressionStatement",
-                                "expression": {
-                                    "type": "AssignmentExpression",
-                                    "operator": "=",
-                                    "left": {
-                                        "type": "MemberExpression",
-                                        "object": {
-                                            "type": "Identifier",
-                                            "name": "__attributes1"
-                                        },
-                                        "property": {
-                                            "type": "Literal",
-                                            "value": "value"
-                                        },
-                                        "computed": true
-                                    },
-                                    "right": {
-                                        "type": "MemberExpression",
-                                        "object": {
-                                            "type": "Identifier",
-                                            "name": "timescale"
-                                        },
-                                        "property": {
-                                            "type": "Identifier",
-                                            "name": "id",
-                                            "computed": false
-                                        },
-                                        "computed": false
-                                    }
-                                }
-                            },
-                            {
                                 "type": "IfStatement",
                                 "test": {
                                     "type": "BinaryExpression",
-                                    "operator": "==",
+                                    "operator": "<",
                                     "left": {
                                         "type": "MemberExpression",
                                         "object": {
                                             "type": "Identifier",
-                                            "name": "selectedTimescale"
+                                            "name": "outgoingEmailRules"
                                         },
                                         "property": {
                                             "type": "Identifier",
-                                            "name": "id",
-                                            "computed": false
+                                            "name": "length"
                                         },
                                         "computed": false
                                     },
                                     "right": {
-                                        "type": "MemberExpression",
-                                        "object": {
-                                            "type": "Identifier",
-                                            "name": "timescale"
-                                        },
-                                        "property": {
-                                            "type": "Identifier",
-                                            "name": "id",
-                                            "computed": false
-                                        },
-                                        "computed": false
+                                        "type": "Literal",
+                                        "value": "1"
                                     }
                                 },
                                 "consequent": {
-                                    "type": "ExpressionStatement",
-                                    "expression": {
-                                        "type": "AssignmentExpression",
-                                        "operator": "=",
-                                        "left": {
+                                    "type": "ReturnStatement",
+                                    "argument": {
+                                        "type": "CallExpression",
+                                        "callee": {
                                             "type": "MemberExpression",
                                             "object": {
                                                 "type": "Identifier",
-                                                "name": "__attributes1"
+                                                "name": "outgoingEmailRules"
                                             },
                                             "property": {
-                                                "type": "Literal",
-                                                "value": "selected"
-                                            },
-                                            "computed": true
-                                        },
-                                        "right": {
-                                            "type": "Literal",
-                                            "value": true
-                                        }
-                                    }
-                                },
-                                "alternate": null
-                            },
-                            {
-                                "type": "ExpressionStatement",
-                                "expression": {
-                                    "type": "AssignmentExpression",
-                                    "operator": "=",
-                                    "left": {
-                                        "type": "MemberExpression",
-                                        "object": {
-                                            "type": "Identifier",
-                                            "name": "__attributes2"
-                                        },
-                                        "property": {
-                                            "type": "Literal",
-                                            "value": "class"
-                                        },
-                                        "computed": true
-                                    },
-                                    "right": {
-                                        "type": "Literal",
-                                        "value": "aui sd-report-timescales"
-                                    }
-                                }
-                            },
-                            {
-                                "type": "IfStatement",
-                                "test": {
-                                    "type": "BinaryExpression",
-                                    "operator": ">",
-                                    "left": {
-                                        "type": "Identifier",
-                                        "name": "moo"
-                                    },
-                                    "right": {
-                                        "type": "Literal",
-                                        "value": 2
-                                    }
-                                },
-                                "consequent": {
-                                    "type": "ExpressionStatement",
-                                    "expression": {
-                                        "type": "AssignmentExpression",
-                                        "operator": "=",
-                                        "left": {
-                                            "type": "MemberExpression",
-                                            "object": {
                                                 "type": "Identifier",
-                                                "name": "__attributes2"
-                                            },
-                                            "property": {
-                                                "type": "Literal",
-                                                "value": "foo"
-                                            },
-                                            "computed": true
+                                                "name": "map"
+                                            }
                                         },
-                                        "right": {
-                                            "type": "Literal",
-                                            "value": "12"
-                                        }
-                                    }
-                                },
-                                "alternate": null
-                            },
-                            {
-                                "type": "ReturnStatement",
-                                "argument": {
-                                    "type": "SequenceExpression",
-                                    "expressions": [
-                                        {
-                                            "type": "JSXElement",
-                                            "openingElement": {
-                                                "type": "JSXOpeningElement",
-                                                "name": {
-                                                    "type": "Identifier",
-                                                    "name": "form"
-                                                },
-                                                "selfClosing": false,
-                                                "attributes": [
+                                        "arguments": [
+                                            {
+                                                "type": "ArrowFunctionExpression",
+                                                "id": null,
+                                                "params": [
                                                     {
-                                                        "type": "JSXSpreadAttribute",
-                                                        "argument": {
-                                                            "type": "Identifier",
-                                                            "name": "__attributes2"
-                                                        }
+                                                        "type": "Identifier",
+                                                        "name": "rule"
                                                     }
-                                                ]
-                                            },
-                                            "closingElement": {
-                                                "type": "JSXClosingElement",
-                                                "name": {
-                                                    "type": "Identifier",
-                                                    "name": "form"
-                                                }
-                                            },
-                                            "children": [
-                                                {
-                                                    "type": "JSXElement",
-                                                    "openingElement": {
-                                                        "type": "JSXOpeningElement",
-                                                        "name": {
-                                                            "type": "Identifier",
-                                                            "name": "select"
-                                                        },
-                                                        "selfClosing": false,
-                                                        "attributes": [
-                                                            {
-                                                                "type": "JSXAttribute",
-                                                                "name": "class",
-                                                                "value": {
-                                                                    "type": "Literal",
-                                                                    "value": "hidden js-timescales"
-                                                                }
-                                                            },
-                                                            {
-                                                                "type": "JSXAttribute",
-                                                                "name": "id",
-                                                                "value": {
-                                                                    "type": "Literal",
-                                                                    "value": "report-timescales"
-                                                                }
-                                                            }
-                                                        ]
-                                                    },
-                                                    "closingElement": {
-                                                        "type": "JSXClosingElement",
-                                                        "name": {
-                                                            "type": "Identifier",
-                                                            "name": "select"
-                                                        }
-                                                    },
-                                                    "children": [
+                                                ],
+                                                "body": {
+                                                    "type": "BlockStatement",
+                                                    "body": [
                                                         {
-                                                            "type": "JSXExpressionContainer",
-                                                            "expression": {
-                                                                "type": "CallExpression",
-                                                                "callee": {
-                                                                    "type": "MemberExpression",
-                                                                    "object": {
+                                                            "type": "ReturnStatement",
+                                                            "argument": {
+                                                                "type": "JSXElement",
+                                                                "openingElement": {
+                                                                    "type": "JSXOpeningElement",
+                                                                    "name": {
                                                                         "type": "Identifier",
-                                                                        "name": "timescales"
+                                                                        "name": "tr"
                                                                     },
-                                                                    "property": {
+                                                                    "selfClosing": false,
+                                                                    "attributes": []
+                                                                },
+                                                                "closingElement": {
+                                                                    "type": "JSXClosingElement",
+                                                                    "name": {
                                                                         "type": "Identifier",
-                                                                        "name": "map"
+                                                                        "name": "tr"
                                                                     }
                                                                 },
-                                                                "arguments": [
+                                                                "children": [
                                                                     {
-                                                                        "type": "ArrowFunctionExpression",
-                                                                        "id": null,
-                                                                        "params": [
-                                                                            {
+                                                                        "type": "JSXElement",
+                                                                        "openingElement": {
+                                                                            "type": "JSXOpeningElement",
+                                                                            "name": {
                                                                                 "type": "Identifier",
-                                                                                "name": "timescale"
-                                                                            }
-                                                                        ],
-                                                                        "body": {
-                                                                            "type": "BlockStatement",
-                                                                            "body": [
+                                                                                "name": "td"
+                                                                            },
+                                                                            "selfClosing": false,
+                                                                            "attributes": [
                                                                                 {
-                                                                                    "type": "ReturnStatement",
-                                                                                    "argument": {
-                                                                                        "type": "JSXElement",
-                                                                                        "openingElement": {
-                                                                                            "type": "JSXOpeningElement",
-                                                                                            "name": {
-                                                                                                "type": "Identifier",
-                                                                                                "name": "option"
-                                                                                            },
-                                                                                            "selfClosing": false,
-                                                                                            "attributes": [
+                                                                                    "type": "JSXAttribute",
+                                                                                    "name": "class",
+                                                                                    "value": {
+                                                                                        "type": "JSXExpressionContainer",
+                                                                                        "expression": {
+                                                                                            "type": "TemplateLiteral",
+                                                                                            "quasis": [
                                                                                                 {
-                                                                                                    "type": "JSXSpreadAttribute",
-                                                                                                    "argument": {
-                                                                                                        "type": "Identifier",
-                                                                                                        "name": "__attributes1"
+                                                                                                    "type": "TemplateElement",
+                                                                                                    "value": {
+                                                                                                        "raw": "col-name "
+                                                                                                    }
+                                                                                                },
+                                                                                                {
+                                                                                                    "type": "TemplateElement",
+                                                                                                    "value": {
+                                                                                                        "raw": ""
+                                                                                                    }
+                                                                                                }
+                                                                                            ],
+                                                                                            "expressions": [
+                                                                                                {
+                                                                                                    "type": "ConditionalExpression",
+                                                                                                    "test": {
+                                                                                                        "type": "BinaryExpression",
+                                                                                                        "operator": "==",
+                                                                                                        "left": {
+                                                                                                            "type": "MemberExpression",
+                                                                                                            "object": {
+                                                                                                                "type": "Identifier",
+                                                                                                                "name": "rule"
+                                                                                                            },
+                                                                                                            "property": {
+                                                                                                                "type": "Identifier",
+                                                                                                                "name": "enabled",
+                                                                                                                "computed": false
+                                                                                                            },
+                                                                                                            "computed": false
+                                                                                                        },
+                                                                                                        "right": {
+                                                                                                            "type": "Literal",
+                                                                                                            "value": "false"
+                                                                                                        }
+                                                                                                    },
+                                                                                                    "consequent": {
+                                                                                                        "type": "Literal",
+                                                                                                        "value": "outgoing-rule-disabled"
+                                                                                                    },
+                                                                                                    "alternate": {
+                                                                                                        "type": "Literal",
+                                                                                                        "value": null
                                                                                                     }
                                                                                                 }
                                                                                             ]
-                                                                                        },
-                                                                                        "closingElement": {
-                                                                                            "type": "JSXClosingElement",
-                                                                                            "name": {
-                                                                                                "type": "Identifier",
-                                                                                                "name": "option"
-                                                                                            }
-                                                                                        },
-                                                                                        "children": [
-                                                                                            {
-                                                                                                "type": "JSXExpressionContainer",
-                                                                                                "expression": {
-                                                                                                    "type": "MemberExpression",
-                                                                                                    "object": {
-                                                                                                        "type": "Identifier",
-                                                                                                        "name": "timescale"
-                                                                                                    },
-                                                                                                    "property": {
-                                                                                                        "type": "Identifier",
-                                                                                                        "name": "name",
-                                                                                                        "computed": false
-                                                                                                    },
-                                                                                                    "computed": false
-                                                                                                }
-                                                                                            }
-                                                                                        ]
+                                                                                        }
                                                                                     }
                                                                                 }
                                                                             ]
                                                                         },
-                                                                        "generator": false,
-                                                                        "expression": false,
-                                                                        "async": false
+                                                                        "closingElement": {
+                                                                            "type": "JSXClosingElement",
+                                                                            "name": {
+                                                                                "type": "Identifier",
+                                                                                "name": "td"
+                                                                            }
+                                                                        },
+                                                                        "children": [
+                                                                            {
+                                                                                "type": "JSXElement",
+                                                                                "openingElement": {
+                                                                                    "type": "JSXOpeningElement",
+                                                                                    "name": {
+                                                                                        "type": "Identifier",
+                                                                                        "name": "p"
+                                                                                    },
+                                                                                    "selfClosing": false,
+                                                                                    "attributes": [
+                                                                                        {
+                                                                                            "type": "JSXAttribute",
+                                                                                            "name": "class",
+                                                                                            "value": {
+                                                                                                "type": "Literal",
+                                                                                                "value": "col-text-content"
+                                                                                            }
+                                                                                        }
+                                                                                    ]
+                                                                                },
+                                                                                "closingElement": {
+                                                                                    "type": "JSXClosingElement",
+                                                                                    "name": {
+                                                                                        "type": "Identifier",
+                                                                                        "name": "p"
+                                                                                    }
+                                                                                },
+                                                                                "children": [
+                                                                                    {
+                                                                                        "type": "JSXExpressionContainer",
+                                                                                        "expression": {
+                                                                                            "type": "MemberExpression",
+                                                                                            "object": {
+                                                                                                "type": "Identifier",
+                                                                                                "name": "rule"
+                                                                                            },
+                                                                                            "property": {
+                                                                                                "type": "Identifier",
+                                                                                                "name": "ruleName",
+                                                                                                "computed": false
+                                                                                            },
+                                                                                            "computed": false
+                                                                                        }
+                                                                                    },
+                                                                                    {
+                                                                                        "type": "JSXExpressionContainer",
+                                                                                        "expression": {
+                                                                                            "type": "ConditionalExpression",
+                                                                                            "test": {
+                                                                                                "type": "BinaryExpression",
+                                                                                                "operator": "==",
+                                                                                                "left": {
+                                                                                                    "type": "MemberExpression",
+                                                                                                    "object": {
+                                                                                                        "type": "Identifier",
+                                                                                                        "name": "rule"
+                                                                                                    },
+                                                                                                    "property": {
+                                                                                                        "type": "Identifier",
+                                                                                                        "name": "enabled",
+                                                                                                        "computed": false
+                                                                                                    },
+                                                                                                    "computed": false
+                                                                                                },
+                                                                                                "right": {
+                                                                                                    "type": "Literal",
+                                                                                                    "value": "false"
+                                                                                                }
+                                                                                            },
+                                                                                            "consequent": {
+                                                                                                "type": "JSXElement",
+                                                                                                "openingElement": {
+                                                                                                    "type": "JSXOpeningElement",
+                                                                                                    "name": {
+                                                                                                        "type": "Identifier",
+                                                                                                        "name": "span"
+                                                                                                    },
+                                                                                                    "selfClosing": false,
+                                                                                                    "attributes": [
+                                                                                                        {
+                                                                                                            "type": "JSXAttribute",
+                                                                                                            "name": "class",
+                                                                                                            "value": {
+                                                                                                                "type": "Literal",
+                                                                                                                "value": "aui-lozenge aui-lozenge-subtle"
+                                                                                                            }
+                                                                                                        }
+                                                                                                    ]
+                                                                                                },
+                                                                                                "closingElement": {
+                                                                                                    "type": "JSXClosingElement",
+                                                                                                    "name": {
+                                                                                                        "type": "Identifier",
+                                                                                                        "name": "span"
+                                                                                                    }
+                                                                                                },
+                                                                                                "children": [
+                                                                                                    {
+                                                                                                        "type": "JSXExpressionContainer",
+                                                                                                        "expression": {
+                                                                                                            "type": "CallExpression",
+                                                                                                            "callee": {
+                                                                                                                "type": "Identifier",
+                                                                                                                "name": "getText"
+                                                                                                            },
+                                                                                                            "arguments": [
+                                                                                                                {
+                                                                                                                    "type": "Literal",
+                                                                                                                    "value": "sd.admin.outgoing.email.rules.table.disabled"
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    }
+                                                                                                ]
+                                                                                            },
+                                                                                            "alternate": {
+                                                                                                "type": "Literal",
+                                                                                                "value": null
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    {
+                                                                        "type": "JSXElement",
+                                                                        "openingElement": {
+                                                                            "type": "JSXOpeningElement",
+                                                                            "name": {
+                                                                                "type": "Identifier",
+                                                                                "name": "td"
+                                                                            },
+                                                                            "selfClosing": false,
+                                                                            "attributes": [
+                                                                                {
+                                                                                    "type": "JSXAttribute",
+                                                                                    "name": "class",
+                                                                                    "value": {
+                                                                                        "type": "JSXExpressionContainer",
+                                                                                        "expression": {
+                                                                                            "type": "TemplateLiteral",
+                                                                                            "quasis": [
+                                                                                                {
+                                                                                                    "type": "TemplateElement",
+                                                                                                    "value": {
+                                                                                                        "raw": "col-name "
+                                                                                                    }
+                                                                                                },
+                                                                                                {
+                                                                                                    "type": "TemplateElement",
+                                                                                                    "value": {
+                                                                                                        "raw": ""
+                                                                                                    }
+                                                                                                }
+                                                                                            ],
+                                                                                            "expressions": [
+                                                                                                {
+                                                                                                    "type": "ConditionalExpression",
+                                                                                                    "test": {
+                                                                                                        "type": "BinaryExpression",
+                                                                                                        "operator": "==",
+                                                                                                        "left": {
+                                                                                                            "type": "MemberExpression",
+                                                                                                            "object": {
+                                                                                                                "type": "Identifier",
+                                                                                                                "name": "rule"
+                                                                                                            },
+                                                                                                            "property": {
+                                                                                                                "type": "Identifier",
+                                                                                                                "name": "enabled",
+                                                                                                                "computed": false
+                                                                                                            },
+                                                                                                            "computed": false
+                                                                                                        },
+                                                                                                        "right": {
+                                                                                                            "type": "Literal",
+                                                                                                            "value": "false"
+                                                                                                        }
+                                                                                                    },
+                                                                                                    "consequent": {
+                                                                                                        "type": "Literal",
+                                                                                                        "value": "outgoing-rule-disabled"
+                                                                                                    },
+                                                                                                    "alternate": {
+                                                                                                        "type": "Literal",
+                                                                                                        "value": null
+                                                                                                    }
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        "closingElement": {
+                                                                            "type": "JSXClosingElement",
+                                                                            "name": {
+                                                                                "type": "Identifier",
+                                                                                "name": "td"
+                                                                            }
+                                                                        },
+                                                                        "children": [
+                                                                            {
+                                                                                "type": "JSXElement",
+                                                                                "openingElement": {
+                                                                                    "type": "JSXOpeningElement",
+                                                                                    "name": {
+                                                                                        "type": "Identifier",
+                                                                                        "name": "p"
+                                                                                    },
+                                                                                    "selfClosing": false,
+                                                                                    "attributes": [
+                                                                                        {
+                                                                                            "type": "JSXAttribute",
+                                                                                            "name": "class",
+                                                                                            "value": {
+                                                                                                "type": "Literal",
+                                                                                                "value": "col-text-content"
+                                                                                            }
+                                                                                        }
+                                                                                    ]
+                                                                                },
+                                                                                "closingElement": {
+                                                                                    "type": "JSXClosingElement",
+                                                                                    "name": {
+                                                                                        "type": "Identifier",
+                                                                                        "name": "p"
+                                                                                    }
+                                                                                },
+                                                                                "children": [
+                                                                                    {
+                                                                                        "type": "JSXExpressionContainer",
+                                                                                        "expression": {
+                                                                                            "type": "MemberExpression",
+                                                                                            "object": {
+                                                                                                "type": "Identifier",
+                                                                                                "name": "rule"
+                                                                                            },
+                                                                                            "property": {
+                                                                                                "type": "Identifier",
+                                                                                                "name": "ruleDescription",
+                                                                                                "computed": false
+                                                                                            },
+                                                                                            "computed": false
+                                                                                        }
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    {
+                                                                        "type": "JSXElement",
+                                                                        "openingElement": {
+                                                                            "type": "JSXOpeningElement",
+                                                                            "name": {
+                                                                                "type": "Identifier",
+                                                                                "name": "td"
+                                                                            },
+                                                                            "selfClosing": false,
+                                                                            "attributes": [
+                                                                                {
+                                                                                    "type": "JSXAttribute",
+                                                                                    "name": "class",
+                                                                                    "value": {
+                                                                                        "type": "Literal",
+                                                                                        "value": "col-actions"
+                                                                                    }
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        "closingElement": {
+                                                                            "type": "JSXClosingElement",
+                                                                            "name": {
+                                                                                "type": "Identifier",
+                                                                                "name": "td"
+                                                                            }
+                                                                        },
+                                                                        "children": [
+                                                                            {
+                                                                                "type": "JSXElement",
+                                                                                "openingElement": {
+                                                                                    "type": "JSXOpeningElement",
+                                                                                    "name": {
+                                                                                        "type": "Identifier",
+                                                                                        "name": "a"
+                                                                                    },
+                                                                                    "selfClosing": false,
+                                                                                    "attributes": [
+                                                                                        {
+                                                                                            "type": "JSXAttribute",
+                                                                                            "name": "href",
+                                                                                            "value": {
+                                                                                                "type": "JSXExpressionContainer",
+                                                                                                "expression": {
+                                                                                                    "type": "TemplateLiteral",
+                                                                                                    "quasis": [
+                                                                                                        {
+                                                                                                            "type": "TemplateElement",
+                                                                                                            "value": {
+                                                                                                                "raw": ""
+                                                                                                            }
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "type": "TemplateElement",
+                                                                                                            "value": {
+                                                                                                                "raw": "/"
+                                                                                                            }
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "type": "TemplateElement",
+                                                                                                            "value": {
+                                                                                                                "raw": ""
+                                                                                                            }
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "type": "TemplateElement",
+                                                                                                            "value": {
+                                                                                                                "raw": ""
+                                                                                                            }
+                                                                                                        }
+                                                                                                    ],
+                                                                                                    "expressions": [
+                                                                                                        {
+                                                                                                            "type": "Identifier",
+                                                                                                            "name": "defaultRuleUrlPrefix"
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "type": "MemberExpression",
+                                                                                                            "object": {
+                                                                                                                "type": "Identifier",
+                                                                                                                "name": "rule"
+                                                                                                            },
+                                                                                                            "property": {
+                                                                                                                "type": "Identifier",
+                                                                                                                "name": "id",
+                                                                                                                "computed": false
+                                                                                                            },
+                                                                                                            "computed": false
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "type": "Identifier",
+                                                                                                            "name": "defaultRuleUrlSuffix"
+                                                                                                        }
+                                                                                                    ]
+                                                                                                }
+                                                                                            }
+                                                                                        },
+                                                                                        {
+                                                                                            "type": "JSXAttribute",
+                                                                                            "name": "class",
+                                                                                            "value": {
+                                                                                                "type": "Literal",
+                                                                                                "value": "js-outgoing-email-rule-edit-link"
+                                                                                            }
+                                                                                        },
+                                                                                        {
+                                                                                            "type": "JSXAttribute",
+                                                                                            "name": "analytics-suffix",
+                                                                                            "value": {
+                                                                                                "type": "JSXExpressionContainer",
+                                                                                                "expression": {
+                                                                                                    "type": "ConditionalExpression",
+                                                                                                    "test": {
+                                                                                                        "type": "MemberExpression",
+                                                                                                        "object": {
+                                                                                                            "type": "Identifier",
+                                                                                                            "name": "rule"
+                                                                                                        },
+                                                                                                        "property": {
+                                                                                                            "type": "Identifier",
+                                                                                                            "name": "analyticsSuffix",
+                                                                                                            "computed": false
+                                                                                                        },
+                                                                                                        "computed": false
+                                                                                                    },
+                                                                                                    "consequent": {
+                                                                                                        "type": "MemberExpression",
+                                                                                                        "object": {
+                                                                                                            "type": "Identifier",
+                                                                                                            "name": "rule"
+                                                                                                        },
+                                                                                                        "property": {
+                                                                                                            "type": "Identifier",
+                                                                                                            "name": "analyticsSuffix",
+                                                                                                            "computed": false
+                                                                                                        },
+                                                                                                        "computed": false
+                                                                                                    },
+                                                                                                    "alternate": {
+                                                                                                        "type": "Literal",
+                                                                                                        "value": "custom"
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    ]
+                                                                                },
+                                                                                "closingElement": {
+                                                                                    "type": "JSXClosingElement",
+                                                                                    "name": {
+                                                                                        "type": "Identifier",
+                                                                                        "name": "a"
+                                                                                    }
+                                                                                },
+                                                                                "children": [
+                                                                                    {
+                                                                                        "type": "JSXExpressionContainer",
+                                                                                        "expression": {
+                                                                                            "type": "CallExpression",
+                                                                                            "callee": {
+                                                                                                "type": "Identifier",
+                                                                                                "name": "getText"
+                                                                                            },
+                                                                                            "arguments": [
+                                                                                                {
+                                                                                                    "type": "Literal",
+                                                                                                    "value": "sd.common.words.edit"
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
                                                                     }
                                                                 ]
                                                             }
                                                         }
                                                     ]
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            "type": "JSXElement",
-                                            "openingElement": {
-                                                "type": "JSXOpeningElement",
-                                                "name": {
-                                                    "type": "Identifier",
-                                                    "name": "div"
                                                 },
-                                                "selfClosing": true,
-                                                "attributes": [
+                                                "generator": false,
+                                                "expression": false,
+                                                "async": false
+                                            }
+                                        ]
+                                    }
+                                },
+                                "alternate": {
+                                    "type": "ReturnStatement",
+                                    "argument": {
+                                        "type": "JSXElement",
+                                        "openingElement": {
+                                            "type": "JSXOpeningElement",
+                                            "name": {
+                                                "type": "Identifier",
+                                                "name": "tr"
+                                            },
+                                            "selfClosing": false,
+                                            "attributes": []
+                                        },
+                                        "closingElement": {
+                                            "type": "JSXClosingElement",
+                                            "name": {
+                                                "type": "Identifier",
+                                                "name": "tr"
+                                            }
+                                        },
+                                        "children": [
+                                            {
+                                                "type": "JSXElement",
+                                                "openingElement": {
+                                                    "type": "JSXOpeningElement",
+                                                    "name": {
+                                                        "type": "Identifier",
+                                                        "name": "td"
+                                                    },
+                                                    "selfClosing": false,
+                                                    "attributes": [
+                                                        {
+                                                            "type": "JSXAttribute",
+                                                            "name": "colspan",
+                                                            "value": {
+                                                                "type": "Literal",
+                                                                "value": "3"
+                                                            }
+                                                        },
+                                                        {
+                                                            "type": "JSXAttribute",
+                                                            "name": "class",
+                                                            "value": {
+                                                                "type": "Literal",
+                                                                "value": "rules-not-found"
+                                                            }
+                                                        }
+                                                    ]
+                                                },
+                                                "closingElement": {
+                                                    "type": "JSXClosingElement",
+                                                    "name": {
+                                                        "type": "Identifier",
+                                                        "name": "td"
+                                                    }
+                                                },
+                                                "children": [
                                                     {
-                                                        "type": "JSXAttribute",
-                                                        "name": "class",
-                                                        "value": {
-                                                            "type": "Literal",
-                                                            "value": "sd-custom-date-range-container"
+                                                        "type": "JSXExpressionContainer",
+                                                        "expression": {
+                                                            "type": "CallExpression",
+                                                            "callee": {
+                                                                "type": "Identifier",
+                                                                "name": "getText"
+                                                            },
+                                                            "arguments": [
+                                                                {
+                                                                    "type": "Literal",
+                                                                    "value": "sd.admin.outgoing.email.rules.not.found"
+                                                                }
+                                                            ]
                                                         }
                                                     }
                                                 ]
-                                            },
-                                            "closingElement": null,
-                                            "children": []
-                                        }
-                                    ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "type": "ReturnStatement",
+                                "argument": {
+                                    "type": "Literal",
+                                    "value": null
                                 }
                             }
                         ]
