@@ -64,6 +64,7 @@ const ContextType = {
     HTML_ELEMENT_ATTRIBUTE: 'HTML_ELEMENT_ATTRIBUTE',
     HTML_ELEMENT_CHILD: 'HTML_ELEMENT_CHILD',
     CALL_EXPRESSION_ARGUMENT: 'CALL_EXPRESSION_ARGUMENT',
+    CALL_EXPRESSION: 'CALL_EXPRESSION',
     FOREACH_BODY: 'FOREACH_BODY',
     FOREACH_RANGE: 'FOREACH_RANGE',
     CALL_EXPRESSION_CALLEE: 'CALL_EXPRESSION_CALLEE',
@@ -92,6 +93,7 @@ const ContextType = {
     GENERATED_ATTRIBUTE_NAME: 'GENERATED_ATTRIBUTE_NAME',
     GENERATED_ATTRIBUTE_VALUE: 'GENERATED_ATTRIBUTE_VALUE',
     MEMBER_EXPRESSION_CHILD: 'MEMBER_EXPRESSION_CHILD',
+    IF_STATEMENT_BODY: 'IF_STATEMENT_BODY',
 };
 
 const findVisitor = (nodeType) => visitors[nodeType];
@@ -180,6 +182,28 @@ class Visitor {
 
         return expr;
     }
+
+    createTemplateLiteralFromExpressions(args) {
+        let quasis = [];
+        let expressions = [];
+
+        args.forEach((arg) => {
+            if (arg.type) {
+                quasis.push("");
+                expressions.push(arg);
+            } else {
+                quasis.push(arg);
+            }
+        });
+
+        quasis = quasis.map(e => ({ type: "TemplateElement", value: { raw: e } }));
+
+        return {
+            type: "TemplateLiteral",
+            quasis,
+            expressions
+        };
+    }
 }
 
 class SoyFileVisitor extends Visitor {
@@ -213,7 +237,19 @@ class NamespaceVisitor extends Visitor {
 
 class TemplateVisitor extends Visitor {
     preprocess(node, localCtx, parentCtx) {
-        localCtx.namespace = parentCtx.name;
+        const mergeNames = (master, slave) => {
+            if (!slave.object) {
+                slave.object = master;
+                return;
+            }
+
+            mergeNames(master, slave.object);
+        };
+
+        // replaces localCtx.name with the full reference
+        localCtx.name = node.name;
+        mergeNames(parentCtx.name, localCtx.name);
+
         localCtx.name = this.preprocessChild(node.name, ContextType.TEMPLATE_NAME, localCtx);
         localCtx.addPropertyElements('body', this.preprocessChildren(node.body, ContextType.TEMPLATE_ELEMENT, localCtx));
         
@@ -225,18 +261,6 @@ class TemplateVisitor extends Visitor {
     }
 
     generate(localCtx, parentCtx) {
-        const mergeNames = (master, slave) => {
-            if (!slave.object) {
-                slave.object = master;
-                return;
-            }
-
-            mergeNames(master, slave.object);
-        };
-
-        // replaces localCtx.name with the full reference
-        mergeNames(localCtx.namespace, localCtx.name);
-
         const name = this.generateChild(localCtx.name, localCtx);
 
         const params = localCtx.params.map(param => ({
@@ -296,7 +320,7 @@ class TemplateVisitor extends Visitor {
             });
         }
         
-        let returnArgument = children.filter(e => e.type === "JSXElement" || e.type === "ExpressionStatement");
+        let returnArgument = children.filter(e => e.type === "JSXElement" || (e.type === "ExpressionStatement" && e.expression.type !== "AssignmentExpression"));
 
         if (returnArgument.length > 1) {
             returnArgument = {
@@ -306,29 +330,34 @@ class TemplateVisitor extends Visitor {
         } else if (returnArgument.length == 1) {
             returnArgument = returnArgument[0];
         } else {
-            returnArgument = {
-                type: "Literal",
-                value: null
-            };
+            returnArgument = null;
         }
 
-        let logicChildren = children.filter(e => e.type !== "JSXElement" && e.type !== "ExpressionStatement");
+        let logicChildren = children.filter(e => e.type !== "JSXElement" && e.type !== "VariableDeclaration" && (e.type !== "ExpressionStatement" || (e.type === "ExpressionStatement" && e.expression.type === "AssignmentExpression")));
 
         logicChildren = this.generateChildren(logicChildren, localCtx);
 
-        const returnStatement = {
-            type: "ReturnStatement",
-            argument: returnArgument
-        };
+        if (!returnArgument && !logicChildren.some(e => e.type === "JSXElement" || e.type === "IfStatement")) {
+            returnArgument = this.createTemplateLiteralFromExpressions(logicChildren);
+        }
 
         const variableDeclarations = this.generateChildren(localCtx.variableDeclarations, localCtx);
 
-        let body;
+        let body = variableDeclarations.concat(logicChildren);
+
+        if (returnArgument) {
+            const returnStatement = {
+                type: "ReturnStatement",
+                argument: returnArgument
+            };
+
+            body.push(returnStatement)
+        }
 
         if (variableDeclarations.length > 0 || logicChildren.length > 0) {
             body = {
                 type: "BlockStatement",
-                body: variableDeclarations.concat(logicChildren).concat([returnStatement])
+                body
             };
         } else {
             body = this.simplifyListExpression(returnArgument);
@@ -609,6 +638,7 @@ class CaseExpressionVisitor extends Visitor {
 
 class CallExpressionVisitor extends Visitor {
     preprocess(node, localCtx, parentCtx) {
+        localCtx.type = ContextType.CALL_EXPRESSION;
         localCtx.callee = this.preprocessChild(node.callee, ContextType.CALL_EXPRESSION_CALLEE, localCtx);
         localCtx.arguments = this.preprocessChildren(node.arguments, ContextType.CALL_EXPRESSION_ARGUMENT, localCtx);
     }
@@ -624,7 +654,7 @@ class CallExpressionVisitor extends Visitor {
         };
 
         const needsWrapper = [
-            ContextType.CONDITIONAL_EXPRESSION_BODY,
+            // ContextType.CONDITIONAL_EXPRESSION_BODY,
             ContextType.FOREACH_BODY,
             ContextType.HTML_ELEMENT_ATTRIBUTE_VALUE,
             ContextType.HTML_ELEMENT_CHILD,
@@ -634,7 +664,7 @@ class CallExpressionVisitor extends Visitor {
             ContextType.TEMPLATE_ELEMENT,
         ];
 
-        return this.wrapIfNeeded(needsWrapper, callExpr, localCtx);
+        return this.wrapIfNeeded(needsWrapper, callExpr, parentCtx);
     }
 }
 
@@ -823,15 +853,15 @@ class UnaryExpressionVisitor extends Visitor {
             'not': '!'
         };
 
-        localCtx.setProperty('operator', unaryOperatorsMapping[node.operator] || node.operator);
-        localCtx.setProperty('argument', node.argument);
-        localCtx.setProperty('prefix', node.prefix);
-
-        this.preprocessChild(node.argument, ContextType.UNARY_OPERATOR_ARGUMENT, localCtx);
+        localCtx.operator = unaryOperatorsMapping[node.operator] || node.operator;
+        localCtx.argument = this.preprocessChild(node.argument, ContextType.UNARY_OPERATOR_ARGUMENT, localCtx);
+        localCtx.prefix = node.prefix;
     }
 
     generate(localCtx) {
-        const { operator, argument, prefix } = localCtx;
+        let { operator, argument, prefix } = localCtx;
+
+        argument = this.generateChild(argument, localCtx);
 
         return {
             type: "UnaryExpression",
@@ -849,10 +879,20 @@ class GeneratedAttributeVisitor extends Visitor {
         if (Array.isArray(name)) {
             if (name.length == 1) {
                 name = name[0];
+            } else {
+                name = name.map(e => e.type ? this.preprocessChild(e, ContextType.GENERATED_ATTRIBUTE_NAME, localCtx) : e);
             }
         }
 
-        // localCtx.type = ContextType.HTML_ELEMENT_ATTRIBUTE_VALUE;
+        let generatorCtx = localCtx.findParent(ContextType.GENERATED_ATTRIBUTE);
+
+        if (generatorCtx) {
+            generatorCtx = generatorCtx.parent;
+
+            localCtx.attributesVarName = generatorCtx.attributesVarName;
+        }
+
+        localCtx.type = ContextType.GENERATED_ATTRIBUTE;
         localCtx.name = name;
         localCtx.value = this.preprocessChild(node.value, ContextType.HTML_ELEMENT_ATTRIBUTE_VALUE, localCtx);
     }
@@ -863,22 +903,29 @@ class GeneratedAttributeVisitor extends Visitor {
         value = this.generateChild(value, localCtx);
         value = this.simplifyListExpression(value);
 
-        // the context which called our parent with GENERATED_ATTRIBUTE type
-        let generatorCtx = localCtx.findParent(ContextType.GENERATED_ATTRIBUTE);
+        if (value.type !== "Literal") {
+            value = {
+                type: "JSXExpressionContainer",
+                expression: value
+            };
+        }
 
-        if (generatorCtx) {
-            generatorCtx = generatorCtx.parent;
-
+        if (localCtx.attributesVarName) {
             if (!name.type) {
-                name = {
-                    type: "Literal",
-                    value: "" + name
-                };
+                if (Array.isArray(name)) {
+                    name = this.generateChildren(name, localCtx);
+                    name = this.createTemplateLiteralFromExpressions(name);
+                } else {
+                    name = {
+                        type: "Literal",
+                        value: "" + name
+                    };
+                }
             }
 
             const reference = {
                 type: "MemberExpression",
-                object: this.generateChild(generatorCtx.attributesVarName, localCtx),
+                object: this.generateChild(localCtx.attributesVarName, localCtx),
                 property: name,
                 computed: name.type !== "Identifier"
             };
@@ -893,6 +940,14 @@ class GeneratedAttributeVisitor extends Visitor {
                 }
             };
         } else {
+            if (Array.isArray(name)) {
+                if (name.length == 1) {
+                    name = name[0];
+                } else if (name.length > 1) {
+                    name = this.createTemplateLiteralFromExpressions(name);
+                }
+            }
+
             return {
                 type: "JSXAttribute",
                 name,
@@ -904,7 +959,12 @@ class GeneratedAttributeVisitor extends Visitor {
 
 class ConditionalExpressionVisitor extends Visitor {
     preprocess(node, localCtx, parentCtx) {
-        localCtx.type = ContextType.CONDITIONAL_EXPRESSION_BODY;
+        if (parentCtx.type === ContextType.TEMPLATE) {
+            localCtx.type = ContextType.IF_STATEMENT_BODY;
+        } else if (localCtx.type == ContextType.GENERATED_ATTRIBUTE) {
+        } else {
+            localCtx.type = ContextType.CONDITIONAL_EXPRESSION_BODY;
+        }
 
         let {test, consequent, alternate} = node;
 
@@ -983,6 +1043,8 @@ class IfStatementVisitor extends ConditionalExpressionVisitor {
 
 class VariableDeclarationVisitor extends Visitor {
     preprocess(node, localCtx, parentCtx) {
+        localCtx.type = ContextType.VARIABLE_DECLARATION;
+        
         localCtx.name = node.name;
 
         const value = Array.isArray(node.value) ? 
@@ -997,13 +1059,21 @@ class VariableDeclarationVisitor extends Visitor {
     }
 
     generate(localCtx) {
+        const id = this.generateChild(localCtx.name, localCtx);
+        
+        let init = Array.isArray(localCtx.value) ? 
+            this.generateChildren(localCtx.value, localCtx) :
+            this.generateChild(localCtx.value, localCtx);
+
+        init = this.simplifyListExpression(init);
+
         return {
             type: "VariableDeclaration",
             declarations: [
                 {
                     type: "VariableDeclarator",
-                    id: this.generateChild(localCtx.name, localCtx),
-                    init: this.generateChild(localCtx.value, localCtx)
+                    id,
+                    init
                 }
             ],
             kind: "let"

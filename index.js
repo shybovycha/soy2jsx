@@ -37,7 +37,7 @@ function parseFile(filename) {
 
                 fs.writeFileSync(jsxAstFilename, JSON.stringify(jsxAst, null, 4));
             } catch (e) {
-                console.error(`ERROR: Could not generate JSX AST.`, e);
+                console.error(`ERROR: Could not generate JSX AST for ${filename}.`, e);
                 return reject(e);
             }
 
@@ -49,7 +49,7 @@ function parseFile(filename) {
                 try {
                     recast.parse(jsx);
                 } catch (e) {
-                    throw `Error parsing output JSX: ${JSON.stringify(e)}`;
+                    throw `Error parsing output JSX for ${filename}: ${JSON.stringify(e)}`;
                 }
 
                 return resolve(jsx);
