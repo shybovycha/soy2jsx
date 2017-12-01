@@ -12,22 +12,22 @@
                 "properties": [
                     {
                         "type": "Identifier",
+                        "name": "Project",
+                        "computed": false
+                    },
+                    {
+                        "type": "Identifier",
+                        "name": "Notifications",
+                        "computed": false
+                    },
+                    {
+                        "type": "Identifier",
+                        "name": "OutgoingEmail",
+                        "computed": false
+                    },
+                    {
+                        "type": "Identifier",
                         "name": "Templates",
-                        "computed": false
-                    },
-                    {
-                        "type": "Identifier",
-                        "name": "Agent",
-                        "computed": false
-                    },
-                    {
-                        "type": "Identifier",
-                        "name": "Reports",
-                        "computed": false
-                    },
-                    {
-                        "type": "Identifier",
-                        "name": "Kb",
                         "computed": false
                     }
                 ]
@@ -41,23 +41,22 @@
                             "lines": [
                                 {
                                     "type": "CommentText",
-                                    "content": "* Renders options for report display, such as timescales"
+                                    "content": "* Renders the rows of the email rules table"
                                 },
                                 {
                                     "type": "TemplateParam",
                                     "name": {
                                         "type": "Identifier",
-                                        "name": "selectedTimescale"
+                                        "name": "outgoingEmailRules"
                                     }
                                 },
                                 {
                                     "type": "TemplateParam",
                                     "name": {
                                         "type": "Identifier",
-                                        "name": "timescales"
+                                        "name": "defaultRuleUrlSuffix"
                                     }
-                                },
-                                null
+                                }
                             ]
                         },
                         null
@@ -68,7 +67,7 @@
                         "properties": [
                             {
                                 "type": "Identifier",
-                                "name": "reportOptions",
+                                "name": "renderOutgoingEmailRules",
                                 "computed": false
                             }
                         ]
@@ -76,207 +75,535 @@
                     "attributes": null,
                     "body": [
                         {
-                            "type": "HtmlElement",
-                            "tagName": {
-                                "type": "Identifier",
-                                "name": "form"
-                            },
-                            "attributes": [
-                                {
-                                    "type": "GeneratedAttribute",
-                                    "name": [
-                                        "class"
-                                    ],
-                                    "value": {
-                                        "type": "SoyCapableString",
-                                        "body": [
-                                            "aui sd-report-timescales"
-                                        ]
-                                    }
-                                },
-                                {
-                                    "type": "IfStatement",
-                                    "test": {
-                                        "type": "BinaryExpression",
-                                        "operator": ">",
-                                        "left": {
-                                            "type": "Identifier",
-                                            "name": "moo"
-                                        },
-                                        "right": {
-                                            "type": "Literal",
-                                            "value": 2
-                                        }
-                                    },
-                                    "consequent": [
-                                        {
-                                            "type": "GeneratedAttribute",
-                                            "name": [
-                                                "foo"
-                                            ],
-                                            "value": {
-                                                "type": "SoyCapableString",
-                                                "body": [
-                                                    {
-                                                        "type": "Literal",
-                                                        "value": 12
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ],
-                                    "alternate": []
-                                }
-                            ],
-                            "children": [
-                                {
-                                    "type": "HtmlElement",
-                                    "tagName": {
+                            "type": "ConditionalExpression",
+                            "test": {
+                                "type": "BinaryExpression",
+                                "operator": "<",
+                                "left": {
+                                    "type": "MemberExpression",
+                                    "object": {
                                         "type": "Identifier",
-                                        "name": "select"
+                                        "name": "outgoingEmailRules"
                                     },
-                                    "attributes": [
+                                    "properties": [
                                         {
-                                            "type": "GeneratedAttribute",
-                                            "name": [
-                                                "class"
-                                            ],
-                                            "value": {
-                                                "type": "SoyCapableString",
-                                                "body": [
-                                                    "hidden js-timescales"
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "GeneratedAttribute",
-                                            "name": [
-                                                "id"
-                                            ],
-                                            "value": {
-                                                "type": "SoyCapableString",
-                                                "body": [
-                                                    "report-timescales"
-                                                ]
-                                            }
+                                            "type": "Identifier",
+                                            "name": "length"
                                         }
-                                    ],
-                                    "children": [
-                                        {
-                                            "type": "ForeachOperator",
-                                            "range": {
-                                                "type": "Identifier",
-                                                "name": "timescales"
-                                            },
-                                            "iterator": {
-                                                "type": "Identifier",
-                                                "name": "timescale"
-                                            },
-                                            "body": [
-                                                {
-                                                    "type": "HtmlElement",
-                                                    "tagName": {
-                                                        "type": "Identifier",
-                                                        "name": "option"
-                                                    },
-                                                    "attributes": [
-                                                        {
-                                                            "type": "GeneratedAttribute",
-                                                            "name": [
-                                                                "value"
-                                                            ],
-                                                            "value": {
-                                                                "type": "SoyCapableString",
-                                                                "body": [
+                                    ]
+                                },
+                                "right": {
+                                    "type": "Literal",
+                                    "value": 1
+                                }
+                            },
+                            "consequent": {
+                                "type": "ForeachOperator",
+                                "range": {
+                                    "type": "Identifier",
+                                    "name": "outgoingEmailRules"
+                                },
+                                "iterator": {
+                                    "type": "Identifier",
+                                    "name": "rule"
+                                },
+                                "body": [
+                                    {
+                                        "type": "HtmlElement",
+                                        "tagName": {
+                                            "type": "Identifier",
+                                            "name": "tr"
+                                        },
+                                        "attributes": [],
+                                        "children": [
+                                            {
+                                                "type": "HtmlElement",
+                                                "tagName": {
+                                                    "type": "Identifier",
+                                                    "name": "td"
+                                                },
+                                                "attributes": [
+                                                    {
+                                                        "type": "GeneratedAttribute",
+                                                        "name": [
+                                                            "class"
+                                                        ],
+                                                        "value": {
+                                                            "type": "SoyCapableString",
+                                                            "body": [
+                                                                "col-name ",
+                                                                {
+                                                                    "type": "IfStatement",
+                                                                    "test": {
+                                                                        "type": "BinaryExpression",
+                                                                        "operator": "==",
+                                                                        "left": {
+                                                                            "type": "MemberExpression",
+                                                                            "object": {
+                                                                                "type": "Identifier",
+                                                                                "name": "rule"
+                                                                            },
+                                                                            "properties": [
+                                                                                {
+                                                                                    "type": "Identifier",
+                                                                                    "name": "enabled",
+                                                                                    "computed": false
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        "right": {
+                                                                            "type": "Literal",
+                                                                            "value": false
+                                                                        }
+                                                                    },
+                                                                    "consequent": [
+                                                                        {
+                                                                            "type": "Literal",
+                                                                            "value": "outgoing-rule-disabled"
+                                                                        }
+                                                                    ],
+                                                                    "alternate": []
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ],
+                                                "children": [
+                                                    {
+                                                        "type": "HtmlElement",
+                                                        "tagName": {
+                                                            "type": "Identifier",
+                                                            "name": "p"
+                                                        },
+                                                        "attributes": [
+                                                            {
+                                                                "type": "GeneratedAttribute",
+                                                                "name": [
+                                                                    "class"
+                                                                ],
+                                                                "value": {
+                                                                    "type": "SoyCapableString",
+                                                                    "body": [
+                                                                        "col-text-content"
+                                                                    ]
+                                                                }
+                                                            }
+                                                        ],
+                                                        "children": [
+                                                            {
+                                                                "type": "MemberExpression",
+                                                                "object": {
+                                                                    "type": "Identifier",
+                                                                    "name": "rule"
+                                                                },
+                                                                "properties": [
                                                                     {
-                                                                        "type": "InterpolatedExpression",
-                                                                        "expression": {
-                                                                            "type": "VariableInterpolation",
-                                                                            "variable": {
+                                                                        "type": "Identifier",
+                                                                        "name": "ruleName",
+                                                                        "computed": false
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "type": "IfStatement",
+                                                                "test": {
+                                                                    "type": "BinaryExpression",
+                                                                    "operator": "==",
+                                                                    "left": {
+                                                                        "type": "MemberExpression",
+                                                                        "object": {
+                                                                            "type": "Identifier",
+                                                                            "name": "rule"
+                                                                        },
+                                                                        "properties": [
+                                                                            {
+                                                                                "type": "Identifier",
+                                                                                "name": "enabled",
+                                                                                "computed": false
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "right": {
+                                                                        "type": "Literal",
+                                                                        "value": false
+                                                                    }
+                                                                },
+                                                                "consequent": [
+                                                                    {
+                                                                        "type": "HtmlElement",
+                                                                        "tagName": {
+                                                                            "type": "Identifier",
+                                                                            "name": "span"
+                                                                        },
+                                                                        "attributes": [
+                                                                            {
+                                                                                "type": "GeneratedAttribute",
+                                                                                "name": [
+                                                                                    "class"
+                                                                                ],
+                                                                                "value": {
+                                                                                    "type": "SoyCapableString",
+                                                                                    "body": [
+                                                                                        "aui-lozenge aui-lozenge-subtle"
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        ],
+                                                                        "children": [
+                                                                            {
+                                                                                "type": "CallExpression",
+                                                                                "callee": {
+                                                                                    "type": "Identifier",
+                                                                                    "name": "getText"
+                                                                                },
+                                                                                "arguments": [
+                                                                                    {
+                                                                                        "type": "Literal",
+                                                                                        "value": "sd.admin.outgoing.email.rules.table.disabled"
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            null
+                                                                        ]
+                                                                    },
+                                                                    null
+                                                                ],
+                                                                "alternate": []
+                                                            },
+                                                            null
+                                                        ]
+                                                    },
+                                                    null
+                                                ]
+                                            },
+                                            {
+                                                "type": "HtmlElement",
+                                                "tagName": {
+                                                    "type": "Identifier",
+                                                    "name": "td"
+                                                },
+                                                "attributes": [
+                                                    {
+                                                        "type": "GeneratedAttribute",
+                                                        "name": [
+                                                            "class"
+                                                        ],
+                                                        "value": {
+                                                            "type": "SoyCapableString",
+                                                            "body": [
+                                                                "col-name ",
+                                                                {
+                                                                    "type": "IfStatement",
+                                                                    "test": {
+                                                                        "type": "BinaryExpression",
+                                                                        "operator": "==",
+                                                                        "left": {
+                                                                            "type": "MemberExpression",
+                                                                            "object": {
+                                                                                "type": "Identifier",
+                                                                                "name": "rule"
+                                                                            },
+                                                                            "properties": [
+                                                                                {
+                                                                                    "type": "Identifier",
+                                                                                    "name": "enabled",
+                                                                                    "computed": false
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        "right": {
+                                                                            "type": "Literal",
+                                                                            "value": false
+                                                                        }
+                                                                    },
+                                                                    "consequent": [
+                                                                        {
+                                                                            "type": "Literal",
+                                                                            "value": "outgoing-rule-disabled"
+                                                                        }
+                                                                    ],
+                                                                    "alternate": []
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ],
+                                                "children": [
+                                                    {
+                                                        "type": "HtmlElement",
+                                                        "tagName": {
+                                                            "type": "Identifier",
+                                                            "name": "p"
+                                                        },
+                                                        "attributes": [
+                                                            {
+                                                                "type": "GeneratedAttribute",
+                                                                "name": [
+                                                                    "class"
+                                                                ],
+                                                                "value": {
+                                                                    "type": "SoyCapableString",
+                                                                    "body": [
+                                                                        "col-text-content"
+                                                                    ]
+                                                                }
+                                                            }
+                                                        ],
+                                                        "children": [
+                                                            {
+                                                                "type": "MemberExpression",
+                                                                "object": {
+                                                                    "type": "Identifier",
+                                                                    "name": "rule"
+                                                                },
+                                                                "properties": [
+                                                                    {
+                                                                        "type": "Identifier",
+                                                                        "name": "ruleDescription",
+                                                                        "computed": false
+                                                                    }
+                                                                ]
+                                                            },
+                                                            null
+                                                        ]
+                                                    },
+                                                    null
+                                                ]
+                                            },
+                                            {
+                                                "type": "HtmlElement",
+                                                "tagName": {
+                                                    "type": "Identifier",
+                                                    "name": "td"
+                                                },
+                                                "attributes": [
+                                                    {
+                                                        "type": "GeneratedAttribute",
+                                                        "name": [
+                                                            "class"
+                                                        ],
+                                                        "value": {
+                                                            "type": "SoyCapableString",
+                                                            "body": [
+                                                                "col-actions"
+                                                            ]
+                                                        }
+                                                    }
+                                                ],
+                                                "children": [
+                                                    {
+                                                        "type": "HtmlElement",
+                                                        "tagName": {
+                                                            "type": "Identifier",
+                                                            "name": "a"
+                                                        },
+                                                        "attributes": [
+                                                            {
+                                                                "type": "GeneratedAttribute",
+                                                                "name": [
+                                                                    "href"
+                                                                ],
+                                                                "value": {
+                                                                    "type": "SoyCapableString",
+                                                                    "body": [
+                                                                        {
+                                                                            "type": "InterpolatedExpression",
+                                                                            "expression": {
+                                                                                "type": "VariableInterpolation",
+                                                                                "variable": {
+                                                                                    "type": "Identifier",
+                                                                                    "name": "defaultRuleUrlPrefix"
+                                                                                },
+                                                                                "filters": null
+                                                                            }
+                                                                        },
+                                                                        "/",
+                                                                        {
+                                                                            "type": "InterpolatedExpression",
+                                                                            "expression": {
+                                                                                "type": "VariableInterpolation",
+                                                                                "variable": {
+                                                                                    "type": "MemberExpression",
+                                                                                    "object": {
+                                                                                        "type": "Identifier",
+                                                                                        "name": "rule"
+                                                                                    },
+                                                                                    "properties": [
+                                                                                        {
+                                                                                            "type": "Identifier",
+                                                                                            "name": "id",
+                                                                                            "computed": false
+                                                                                        }
+                                                                                    ]
+                                                                                },
+                                                                                "filters": null
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "type": "InterpolatedExpression",
+                                                                            "expression": {
+                                                                                "type": "VariableInterpolation",
+                                                                                "variable": {
+                                                                                    "type": "Identifier",
+                                                                                    "name": "defaultRuleUrlSuffix"
+                                                                                },
+                                                                                "filters": null
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            },
+                                                            {
+                                                                "type": "GeneratedAttribute",
+                                                                "name": [
+                                                                    "class"
+                                                                ],
+                                                                "value": {
+                                                                    "type": "SoyCapableString",
+                                                                    "body": [
+                                                                        "js-outgoing-email-rule-edit-link"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            {
+                                                                "type": "GeneratedAttribute",
+                                                                "name": [
+                                                                    "analytics-suffix"
+                                                                ],
+                                                                "value": {
+                                                                    "type": "SoyCapableString",
+                                                                    "body": [
+                                                                        {
+                                                                            "type": "IfStatement",
+                                                                            "test": {
                                                                                 "type": "MemberExpression",
                                                                                 "object": {
                                                                                     "type": "Identifier",
-                                                                                    "name": "timescale"
+                                                                                    "name": "rule"
                                                                                 },
                                                                                 "properties": [
                                                                                     {
                                                                                         "type": "Identifier",
-                                                                                        "name": "id",
+                                                                                        "name": "analyticsSuffix",
                                                                                         "computed": false
                                                                                     }
                                                                                 ]
                                                                             },
-                                                                            "filters": null
+                                                                            "consequent": [
+                                                                                {
+                                                                                    "type": "MemberExpression",
+                                                                                    "object": {
+                                                                                        "type": "Identifier",
+                                                                                        "name": "rule"
+                                                                                    },
+                                                                                    "properties": [
+                                                                                        {
+                                                                                            "type": "Identifier",
+                                                                                            "name": "analyticsSuffix",
+                                                                                            "computed": false
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ],
+                                                                            "alternate": [
+                                                                                {
+                                                                                    "type": "ConditionalBranch",
+                                                                                    "test": null,
+                                                                                    "body": [
+                                                                                        {
+                                                                                            "type": "Literal",
+                                                                                            "value": "custom"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
                                                                         }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        ],
+                                                        "children": [
+                                                            {
+                                                                "type": "CallExpression",
+                                                                "callee": {
+                                                                    "type": "Identifier",
+                                                                    "name": "getText"
+                                                                },
+                                                                "arguments": [
+                                                                    {
+                                                                        "type": "Literal",
+                                                                        "value": "sd.common.words.edit"
                                                                     }
                                                                 ]
-                                                            }
-                                                        },
-                                                        {
-                                                            "type": "IfStatement",
-                                                            "test": {
-                                                                "type": "BinaryExpression",
-                                                                "operator": "==",
-                                                                "left": {
-                                                                    "type": "MemberExpression",
-                                                                    "object": {
-                                                                        "type": "Identifier",
-                                                                        "name": "selectedTimescale"
-                                                                    },
-                                                                    "properties": [
-                                                                        {
-                                                                            "type": "Identifier",
-                                                                            "name": "id",
-                                                                            "computed": false
-                                                                        }
-                                                                    ]
-                                                                },
-                                                                "right": {
-                                                                    "type": "MemberExpression",
-                                                                    "object": {
-                                                                        "type": "Identifier",
-                                                                        "name": "timescale"
-                                                                    },
-                                                                    "properties": [
-                                                                        {
-                                                                            "type": "Identifier",
-                                                                            "name": "id",
-                                                                            "computed": false
-                                                                        }
-                                                                    ]
-                                                                }
                                                             },
-                                                            "consequent": [
-                                                                {
-                                                                    "type": "GeneratedAttribute",
-                                                                    "name": [
-                                                                        "selected"
-                                                                    ],
-                                                                    "value": {
-                                                                        "type": "Literal",
-                                                                        "value": true
-                                                                    }
-                                                                }
-                                                            ],
-                                                            "alternate": []
-                                                        }
+                                                            null
+                                                        ]
+                                                    },
+                                                    null
+                                                ]
+                                            },
+                                            null
+                                        ]
+                                    },
+                                    null
+                                ]
+                            },
+                            "alternate": [
+                                {
+                                    "type": "HtmlElement",
+                                    "tagName": {
+                                        "type": "Identifier",
+                                        "name": "tr"
+                                    },
+                                    "attributes": [],
+                                    "children": [
+                                        {
+                                            "type": "HtmlElement",
+                                            "tagName": {
+                                                "type": "Identifier",
+                                                "name": "td"
+                                            },
+                                            "attributes": [
+                                                {
+                                                    "type": "GeneratedAttribute",
+                                                    "name": [
+                                                        "colspan"
                                                     ],
-                                                    "children": [
+                                                    "value": {
+                                                        "type": "SoyCapableString",
+                                                        "body": [
+                                                            {
+                                                                "type": "Literal",
+                                                                "value": 3
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                {
+                                                    "type": "GeneratedAttribute",
+                                                    "name": [
+                                                        "class"
+                                                    ],
+                                                    "value": {
+                                                        "type": "SoyCapableString",
+                                                        "body": [
+                                                            "rules-not-found"
+                                                        ]
+                                                    }
+                                                }
+                                            ],
+                                            "children": [
+                                                {
+                                                    "type": "CallExpression",
+                                                    "callee": {
+                                                        "type": "Identifier",
+                                                        "name": "getText"
+                                                    },
+                                                    "arguments": [
                                                         {
-                                                            "type": "MemberExpression",
-                                                            "object": {
-                                                                "type": "Identifier",
-                                                                "name": "timescale"
-                                                            },
-                                                            "properties": [
-                                                                {
-                                                                    "type": "Identifier",
-                                                                    "name": "name",
-                                                                    "computed": false
-                                                                }
-                                                            ]
-                                                        },
-                                                        null
+                                                            "type": "Literal",
+                                                            "value": "sd.admin.outgoing.email.rules.not.found"
+                                                        }
                                                     ]
                                                 },
                                                 null
@@ -287,29 +614,6 @@
                                 },
                                 null
                             ]
-                        },
-                        null,
-                        {
-                            "type": "HtmlElement",
-                            "tagName": {
-                                "type": "Identifier",
-                                "name": "div"
-                            },
-                            "attributes": [
-                                {
-                                    "type": "GeneratedAttribute",
-                                    "name": [
-                                        "class"
-                                    ],
-                                    "value": {
-                                        "type": "SoyCapableString",
-                                        "body": [
-                                            "sd-custom-date-range-container"
-                                        ]
-                                    }
-                                }
-                            ],
-                            "children": []
                         },
                         null
                     ]

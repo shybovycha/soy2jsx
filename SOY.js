@@ -360,15 +360,32 @@ function peg$parse(input, options) {
       peg$c109 = peg$literalExpectation("{ifempty}", false),
       peg$c110 = function(iterator, range, body, defaultBody) {
           return {
-            type: "LogicalExpression",
-            operator: "||",
-            left: {
+            type: "ConditionalExpression",
+            test: {
+              type: "BinaryExpression",
+              operator: "<",
+              left: {
+                type: "MemberExpression",
+                object: range,
+                properties: [
+                  {
+                    type: "Identifier",
+                    name: "length"
+                  }
+                ]
+              },
+              right: {
+                type: "Literal",
+                value: 1
+              }
+            },
+            consequent: {
               type: "ForeachOperator",
               range,
               iterator,
               body
             },
-            right: defaultBody
+            alternate: defaultBody
           };
         },
       peg$c111 = "for",

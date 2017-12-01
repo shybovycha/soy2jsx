@@ -1,22 +1,21 @@
-ServiceDesk.Templates.Agent.Reports.Kb = (
+ServiceDesk.Project.Notifications.OutgoingEmail.Templates = (
     {
-        selectedTimescale,
-        timescales
+        outgoingEmailRules,
+        defaultRuleUrlSuffix
     }
 ) => {
-    let __attributes1 = {};
-    let __attributes2 = {};
-    __attributes1["value"] = timescale.id;
+    if (outgoingEmailRules.length < "1") return outgoingEmailRules.map(rule => {
+        return (
+            <tr><td
+                    class={`col-name ${(rule.enabled == "false" ? "outgoing-rule-disabled" : null)}`}><p class="col-text-content">{rule.ruleName}{(rule.enabled == "false" ? <span class="aui-lozenge aui-lozenge-subtle">{getText("sd.admin.outgoing.email.rules.table.disabled")}</span> : null)}</p></td><td
+                    class={`col-name ${(rule.enabled == "false" ? "outgoing-rule-disabled" : null)}`}><p class="col-text-content">{rule.ruleDescription}</p></td><td class="col-actions"><a
+                        href={`${defaultRuleUrlPrefix}/${rule.id}${defaultRuleUrlSuffix}`}
+                        class="js-outgoing-email-rule-edit-link"
+                        analytics-suffix={(rule.analyticsSuffix ? rule.analyticsSuffix : "custom")}>{getText("sd.common.words.edit")}</a></td></tr>
+        );
+    });
+    else
+        return <tr><td colspan="3" class="rules-not-found">{getText("sd.admin.outgoing.email.rules.not.found")}</td></tr>;
 
-    if (selectedTimescale.id == timescale.id)
-        __attributes1["selected"] = true;
-
-    __attributes2["class"] = "aui sd-report-timescales";
-
-    if (moo > 2)
-        __attributes2["foo"] = "12";
-
-    return <form {...__attributes2}><select class="hidden js-timescales" id="report-timescales">{timescales.map(timescale => {
-                return <option {...__attributes1}>{timescale.name}</option>;
-            })}</select></form>, <div class="sd-custom-date-range-container" />;
+    return null;
 };

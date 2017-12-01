@@ -317,15 +317,32 @@ SoySimpleForeachOperator
 SoyForeachWithEmptySectionOperator
   = "{" WS* "foreach" WS+ iterator:VariableReference WS+ "in" WS+ range:SoyAtomicValue WS* "}" WS* body:TemplateBodyElement* WS* "{ifempty}" WS* defaultBody:TemplateBodyElement* WS* "{/foreach}" {
     return {
-      type: "LogicalExpression",
-      operator: "||",
-      left: {
+      type: "ConditionalExpression",
+      test: {
+        type: "BinaryExpression",
+        operator: "<",
+        left: {
+          type: "MemberExpression",
+          object: range,
+          properties: [
+            {
+              type: "Identifier",
+              name: "length"
+            }
+          ]
+        },
+        right: {
+          type: "Literal",
+          value: 1
+        }
+      },
+      consequent: {
         type: "ForeachOperator",
         range,
         iterator,
         body
       },
-      right: defaultBody
+      alternate: defaultBody
     };
   };
 
