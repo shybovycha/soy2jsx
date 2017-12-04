@@ -1,33 +1,50 @@
-{namespace ServiceDesk.Templates.HelpBubble}
+{namespace ServiceDesk.Templates.Agent.Reports}
 
 /**
- * Creates an info help bubble using aui-inline-dialog2. Used by info-help-bubble.js - use that rather than calling this
- * template directly, as it handles cleanup.
- * @param id The id you would like to use for the info bubble
- * @param bubbleContents The contents you would like to have inside the info bubble
- * @param alignment How the dialog is positioned relative to the trigger
+ * Draws in the form for adding a series
+ * @param seriesCategories list of series types
+ * @param colors Valid colours for the series
+ * @param? series data for the current series - if it is passed in
  */
-{template .bubble}
-    {sp}
-    {call aui.icons.icon}
-        {param useIconFont: true /}
-        {param size: 'small' /}
-        {param icon: 'info' /}
-        {param extraAttributes: [
-            'data-aui-trigger': '',
-            'aria-controls': $id,
-            'tabindex': 0
-        ] /}
-    {/call}
-    <aui-inline-dialog id="{$id}" class="sd-help-bubble sd-help-bubble-dialog2-{$alignment}" alignment="bottom {$alignment}">
-        {$bubbleContents |noAutoescape}
-    </aui-inline-dialog>
-{/template}
-
-/**
- * Creates a container to place an info help bubble inside. Use this to create a container to pass to info-help-bubble.js
- * @param? after Is this to be positioned after the container
- */
-{template .container}
-    <div class="sd-help-bubble-container{if $after}-after{/if}"></div>
+{template .seriesForm}
+    <form class="aui series-form">
+        <div class="field-group">
+            <label for="series-type">{getText('sd.report.series.add.seriestype.label')}</label>
+            <select id="series-type" class="hidden" name="series-type">
+                {foreach $seriesCategory in $seriesCategories}
+                    <optgroup label="{$seriesCategory.name}">
+                        {foreach $seriesType in $seriesCategory.seriesTypes}
+                            <option value="{$seriesType.typeKey}" {if $series and $series.seriesKey == $seriesType.typeKey} selected="selected" {/if} title="{$seriesType.typeName}">{$seriesType.typeName}</option>
+                        {/foreach}
+                    </optgroup>
+                {/foreach}
+            </select>
+            <div class="errors s-type"></div>
+        </div>
+        <div class="field-group">
+            <label for="series-label">{getText('sd.report.series.add.label.label')}</label>
+            <input id="series-label" name="series-label" type="text" class="text" {if $series}value="{$series.label}"{/if}>
+            <div class="errors s-label"></div>
+        </div>
+        <div class="field-group">
+            <label for="series-colour">{getText('sd.report.series.add.label.colour')}</label>
+            <div name="series-colour">
+                {foreach $color in $colors}
+                    <div class="series-set-container">
+                        {call .seriesColour}
+                            {param color: $color.full /}
+                            {param series: $series /}
+                        {/call}
+                        {call .seriesColour}
+                            {param color: $color.half /}
+                            {param series: $series /}
+                        {/call}
+                    </div>
+                {/foreach}
+            </div>
+            <div class="errors s-colour"></div>
+        </div>
+        <div id="sd-filter-panel" class="js-filter-panel sd-filter-panel"></div>
+    </form>
+    <div class="series-errors"></div>
 {/template}
