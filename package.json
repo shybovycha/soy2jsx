@@ -12,10 +12,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "pegjs": "^0.10.0",
-    "glob": "^7.1.2",
-    "recast": "^0.12.9",
     "esformatter": "^0.10.0",
-    "esformatter-jsx": "^8.0.1"
+    "esformatter-jsx": "^8.0.1",
+    "glob": "^7.1.2",
+    "pegjs": "^0.10.0",
+    "recast": "^0.12.9",
+    "soyparser": "^1.0.3"
   }
 }
