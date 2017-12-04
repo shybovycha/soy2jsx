@@ -13,6 +13,4 @@ Run parser agains a directory (this command will ignore files in `sdmakehome` an
 
 ## TODO
 
-1. support inline `if` statements for tag attributes
-2. support string interpolation: `<a href="moo {$foo}"></a>`
-
+1. fix generator
