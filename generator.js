@@ -273,7 +273,7 @@ class TemplateVisitor extends Visitor {
             shorthand: true
         }));
 
-        let children = this.generateChildren(localCtx.body, localCtx);
+        let children = this.generateChildren(localCtx.body, localCtx).filter(e => !!e);
 
         if (children.every(e => e.type === "IfStatement")) {
             const wrapWithReturn = (elts) => {
@@ -738,6 +738,7 @@ class ForeachOperatorVisitor extends Visitor {
             const needsWrapper = [
                 ContextType.HTML_ELEMENT_CHILD,
                 ContextType.TEMPLATE_ELEMENT,
+                ContextType.FOREACH_BODY,
             ];
 
             return this.wrapIfNeeded(needsWrapper, foreachExpr, parentCtx);
@@ -894,21 +895,14 @@ class GeneratedAttributeVisitor extends Visitor {
 
         localCtx.type = ContextType.GENERATED_ATTRIBUTE;
         localCtx.name = name;
-        localCtx.value = this.preprocessChild(node.value, ContextType.HTML_ELEMENT_ATTRIBUTE_VALUE, localCtx);
+        localCtx.value = this.preprocessChild(node.value, ContextType.GENERATED_ATTRIBUTE_VALUE, localCtx);
     }
 
-    generate(localCtx) {
+    generate(localCtx, parentCtx) {
         let { name, value } = localCtx;
 
         value = this.generateChild(value, localCtx);
         value = this.simplifyListExpression(value);
-
-        if (value.type !== "Literal") {
-            value = {
-                type: "JSXExpressionContainer",
-                expression: value
-            };
-        }
 
         if (localCtx.attributesVarName) {
             if (!name.type) {
@@ -946,6 +940,13 @@ class GeneratedAttributeVisitor extends Visitor {
                 } else if (name.length > 1) {
                     name = this.createTemplateLiteralFromExpressions(name);
                 }
+            }
+
+            if (value.type !== "Literal") {
+                value = {
+                    type: "JSXExpressionContainer",
+                    expression: value
+                };
             }
 
             return {
@@ -991,6 +992,13 @@ class ConditionalExpressionVisitor extends Visitor {
                     return clauses[0];
                 }
             } else {
+                if (!clauses.some(c => c.type === "ConditionalExpression" && c.type === "ConditionalBranch")) {
+                    return {
+                        type: "SequenceExpression",
+                        expressions: clauses
+                    };
+                }
+
                 return {
                     type: "ConditionalExpression",
                     test: clauses[0].test,
