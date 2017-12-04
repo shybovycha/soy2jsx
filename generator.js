@@ -273,7 +273,7 @@ class TemplateVisitor extends Visitor {
             shorthand: true
         }));
 
-        let children = this.generateChildren(localCtx.body, localCtx).filter(e => !!e);
+        let children = this.generateChildren(localCtx.body, localCtx);
 
         if (children.every(e => e.type === "IfStatement")) {
             const wrapWithReturn = (elts) => {
@@ -282,8 +282,8 @@ class TemplateVisitor extends Visitor {
                 if (Array.isArray(elts)) {
                     if (elts.length > 1) {
                         returnArg = {
-                            type: "SequenceExpression",
-                            expressions: elts
+                            type: "ArrayExpression",
+                            elements: elts
                         };
                     } else if (elts.length == 1) {
                         returnArg = elts[0];
@@ -324,8 +324,8 @@ class TemplateVisitor extends Visitor {
 
         if (returnArgument.length > 1) {
             returnArgument = {
-                type: "SequenceExpression",
-                expressions: returnArgument
+                type: "ArrayExpression",
+                elements: returnArgument
             };
         } else if (returnArgument.length == 1) {
             returnArgument = returnArgument[0];
@@ -608,26 +608,67 @@ class RawTextVisitor extends Visitor {
 
 class SwitchOperatorVisitor extends Visitor {
     preprocess(node, localCtx, parentCtx) {
-        localCtx.setProperty('expression', node.expression);
-        localCtx.setProperty('clauses', node.clauses);
-
-        this.preprocessChild(node.expression, ContextType.SWITCH_OPERATOR_EXPRESSION, localCtx);
-        this.preprocessChildren(node.clauses, ContextType.SWITCH_OPERATOR_CASE, localCtx);
+        localCtx.type = ContextType.SWITCH_OPERATOR_EXPRESSION;
+        localCtx.expression = this.preprocessChild(node.expression, ContextType.SWITCH_OPERATOR_EXPRESSION, localCtx);
+        localCtx.clauses = this.preprocessChildren(node.clauses, ContextType.SWITCH_OPERATOR_CASE, localCtx);
     }
 
     generate(localCtx) {
-        // TODO: implement
-        return null;
+        const reduceCaseExpressions = (switchExpression, caseExpressions) => {
+            if (caseExpressions.length < 2) {
+                const {body} = caseExpressions[0];
+
+                if (Array.isArray(body)) {
+                    return {
+                        type: "ArrayExpression",
+                        elements: this.generateChildren(body, localCtx)
+                    };
+                } else {
+                    return this.generateChild(body, localCtx);
+                }
+            } else {
+                const {body, caseValue} = caseExpressions[0];
+                const alternate = reduceCaseExpressions(switchExpression, caseExpressions.slice(1));
+                
+                let consequent;
+                
+                if (Array.isArray(body)) {
+                    consequent = {
+                        type: "ReturnStatement",
+                        argument: {
+                            type: "ArrayExpression",
+                            elements: this.generateChildren(body, localCtx)
+                        }
+                    };
+                } else {
+                    consequent = {
+                        type: "ReturnStatement",
+                        argument: this.generateChild(body, localCtx)
+                    };
+                }
+
+                return {
+                    type: "IfStatement",
+                    test: {
+                        type: "BinaryExpression",
+                        operator: "===",
+                        left: this.generateChild(switchExpression, localCtx),
+                        right: this.generateChild(caseValue, localCtx)
+                    },
+                    consequent,
+                    alternate
+                };
+            }
+        };
+
+        return reduceCaseExpressions(localCtx.expression, localCtx.clauses);
     }
 }
 
 class CaseExpressionVisitor extends Visitor {
     preprocess(node, localCtx, parentCtx) {
-        localCtx.setProperty('test', node.test);
-        localCtx.setProperty('body', node.body);
-
-        this.preprocessChild(node.test, ContextType.SWITCH_OPERATOR_CASE_TEST, localCtx);
-        this.preprocessChildren(node.body, ContextType.SWITCH_OPERATOR_CASE_BODY, localCtx);
+        localCtx.caseValue = this.preprocessChild(node.test, ContextType.SWITCH_OPERATOR_CASE_TEST, localCtx);
+        localCtx.body = this.preprocessChildren(node.body, ContextType.SWITCH_OPERATOR_CASE_BODY, localCtx);
     }
 
     generate(localCtx) {
@@ -660,7 +701,7 @@ class CallExpressionVisitor extends Visitor {
             ContextType.HTML_ELEMENT_CHILD,
             // ContextType.PROPERTY_VALUE,
             // ContextType.VARIABLE_REFERENCE,
-            ContextType.SWITCH_OPERATOR_CASE_BODY,
+            // ContextType.SWITCH_OPERATOR_CASE_BODY,
             ContextType.TEMPLATE_ELEMENT,
         ];
 
@@ -681,8 +722,8 @@ class ForeachOperatorVisitor extends Visitor {
 
         if (body.length > 1) { // || body.some(e => e.type && e.type === "JSXElement")) {
             body = {
-                type: "SequenceExpression",
-                expressions: body
+                type: "ArrayExpression",
+                elements: body
             };
         } else if (body.length == 1) {
             body = body[0];
@@ -994,8 +1035,8 @@ class ConditionalExpressionVisitor extends Visitor {
             } else {
                 if (!clauses.some(c => c.type === "ConditionalExpression" && c.type === "ConditionalBranch")) {
                     return {
-                        type: "SequenceExpression",
-                        expressions: clauses
+                        type: "ArrayExpression",
+                        elements: clauses
                     };
                 }
 
@@ -1124,8 +1165,8 @@ class InterpolatedExpressionVisitor extends Visitor {
 
         if (expressions.length > 1) {
             expressions = {
-                type: "SequenceExpression",
-                expressions: expressions
+                type: "ArrayExpression",
+                elements: expressions
             };
         } else {
             expressions = expressions[0];

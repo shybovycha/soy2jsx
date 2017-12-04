@@ -24,6 +24,11 @@
                         "type": "Identifier",
                         "name": "Reports",
                         "computed": false
+                    },
+                    {
+                        "type": "Identifier",
+                        "name": "Kb",
+                        "computed": false
                     }
                 ]
             },
@@ -35,21 +40,10 @@
                             "type": "Comment",
                             "lines": [
                                 {
-                                    "type": "CommentText",
-                                    "content": "* Draws in the form for adding a series"
-                                },
-                                {
                                     "type": "TemplateParam",
                                     "name": {
                                         "type": "Identifier",
-                                        "name": "seriesCategories"
-                                    }
-                                },
-                                {
-                                    "type": "TemplateParam",
-                                    "name": {
-                                        "type": "Identifier",
-                                        "name": "colors"
+                                        "name": "formattedDateString"
                                     }
                                 },
                                 {
@@ -63,6 +57,10 @@
                                     "type": "CommentText",
                                     "content": ""
                                 },
+                                {
+                                    "type": "CommentText",
+                                    "content": " * (String label) and \"highlighted\" (boolean)"
+                                },
                                 null
                             ]
                         },
@@ -74,857 +72,13 @@
                         "properties": [
                             {
                                 "type": "Identifier",
-                                "name": "seriesForm",
+                                "name": "hoverBox",
                                 "computed": false
                             }
                         ]
                     },
                     "attributes": null,
                     "body": [
-                        {
-                            "type": "HtmlElement",
-                            "tagName": {
-                                "type": "Identifier",
-                                "name": "form"
-                            },
-                            "attributes": [
-                                {
-                                    "type": "GeneratedAttribute",
-                                    "name": [
-                                        "class"
-                                    ],
-                                    "value": {
-                                        "type": "SoyCapableString",
-                                        "body": [
-                                            "aui series-form"
-                                        ]
-                                    }
-                                }
-                            ],
-                            "children": [
-                                {
-                                    "type": "HtmlElement",
-                                    "tagName": {
-                                        "type": "Identifier",
-                                        "name": "div"
-                                    },
-                                    "attributes": [
-                                        {
-                                            "type": "GeneratedAttribute",
-                                            "name": [
-                                                "class"
-                                            ],
-                                            "value": {
-                                                "type": "SoyCapableString",
-                                                "body": [
-                                                    "field-group"
-                                                ]
-                                            }
-                                        }
-                                    ],
-                                    "children": [
-                                        {
-                                            "type": "HtmlElement",
-                                            "tagName": {
-                                                "type": "Identifier",
-                                                "name": "label"
-                                            },
-                                            "attributes": [
-                                                {
-                                                    "type": "GeneratedAttribute",
-                                                    "name": [
-                                                        "for"
-                                                    ],
-                                                    "value": {
-                                                        "type": "SoyCapableString",
-                                                        "body": [
-                                                            "series-type"
-                                                        ]
-                                                    }
-                                                }
-                                            ],
-                                            "children": [
-                                                {
-                                                    "type": "CallExpression",
-                                                    "callee": {
-                                                        "type": "Identifier",
-                                                        "name": "getText"
-                                                    },
-                                                    "arguments": [
-                                                        {
-                                                            "type": "Literal",
-                                                            "value": "sd.report.series.add.seriestype.label"
-                                                        }
-                                                    ]
-                                                },
-                                                null
-                                            ]
-                                        },
-                                        {
-                                            "type": "HtmlElement",
-                                            "tagName": {
-                                                "type": "Identifier",
-                                                "name": "select"
-                                            },
-                                            "attributes": [
-                                                {
-                                                    "type": "GeneratedAttribute",
-                                                    "name": [
-                                                        "id"
-                                                    ],
-                                                    "value": {
-                                                        "type": "SoyCapableString",
-                                                        "body": [
-                                                            "series-type"
-                                                        ]
-                                                    }
-                                                },
-                                                {
-                                                    "type": "GeneratedAttribute",
-                                                    "name": [
-                                                        "class"
-                                                    ],
-                                                    "value": {
-                                                        "type": "SoyCapableString",
-                                                        "body": [
-                                                            "hidden"
-                                                        ]
-                                                    }
-                                                },
-                                                {
-                                                    "type": "GeneratedAttribute",
-                                                    "name": [
-                                                        "name"
-                                                    ],
-                                                    "value": {
-                                                        "type": "SoyCapableString",
-                                                        "body": [
-                                                            "series-type"
-                                                        ]
-                                                    }
-                                                }
-                                            ],
-                                            "children": [
-                                                {
-                                                    "type": "ForeachOperator",
-                                                    "range": {
-                                                        "type": "Identifier",
-                                                        "name": "seriesCategories"
-                                                    },
-                                                    "iterator": {
-                                                        "type": "Identifier",
-                                                        "name": "seriesCategory"
-                                                    },
-                                                    "body": [
-                                                        {
-                                                            "type": "HtmlElement",
-                                                            "tagName": {
-                                                                "type": "Identifier",
-                                                                "name": "optgroup"
-                                                            },
-                                                            "attributes": [
-                                                                {
-                                                                    "type": "GeneratedAttribute",
-                                                                    "name": [
-                                                                        "label"
-                                                                    ],
-                                                                    "value": {
-                                                                        "type": "SoyCapableString",
-                                                                        "body": [
-                                                                            {
-                                                                                "type": "InterpolatedExpression",
-                                                                                "expression": {
-                                                                                    "type": "VariableInterpolation",
-                                                                                    "variable": {
-                                                                                        "type": "MemberExpression",
-                                                                                        "object": {
-                                                                                            "type": "Identifier",
-                                                                                            "name": "seriesCategory"
-                                                                                        },
-                                                                                        "properties": [
-                                                                                            {
-                                                                                                "type": "Identifier",
-                                                                                                "name": "name",
-                                                                                                "computed": false
-                                                                                            }
-                                                                                        ]
-                                                                                    },
-                                                                                    "filters": null
-                                                                                }
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ],
-                                                            "children": [
-                                                                {
-                                                                    "type": "ForeachOperator",
-                                                                    "range": {
-                                                                        "type": "MemberExpression",
-                                                                        "object": {
-                                                                            "type": "Identifier",
-                                                                            "name": "seriesCategory"
-                                                                        },
-                                                                        "properties": [
-                                                                            {
-                                                                                "type": "Identifier",
-                                                                                "name": "seriesTypes",
-                                                                                "computed": false
-                                                                            }
-                                                                        ]
-                                                                    },
-                                                                    "iterator": {
-                                                                        "type": "Identifier",
-                                                                        "name": "seriesType"
-                                                                    },
-                                                                    "body": [
-                                                                        {
-                                                                            "type": "HtmlElement",
-                                                                            "tagName": {
-                                                                                "type": "Identifier",
-                                                                                "name": "option"
-                                                                            },
-                                                                            "attributes": [
-                                                                                {
-                                                                                    "type": "GeneratedAttribute",
-                                                                                    "name": [
-                                                                                        "value"
-                                                                                    ],
-                                                                                    "value": {
-                                                                                        "type": "SoyCapableString",
-                                                                                        "body": [
-                                                                                            {
-                                                                                                "type": "InterpolatedExpression",
-                                                                                                "expression": {
-                                                                                                    "type": "VariableInterpolation",
-                                                                                                    "variable": {
-                                                                                                        "type": "MemberExpression",
-                                                                                                        "object": {
-                                                                                                            "type": "Identifier",
-                                                                                                            "name": "seriesType"
-                                                                                                        },
-                                                                                                        "properties": [
-                                                                                                            {
-                                                                                                                "type": "Identifier",
-                                                                                                                "name": "typeKey",
-                                                                                                                "computed": false
-                                                                                                            }
-                                                                                                        ]
-                                                                                                    },
-                                                                                                    "filters": null
-                                                                                                }
-                                                                                            }
-                                                                                        ]
-                                                                                    }
-                                                                                },
-                                                                                {
-                                                                                    "type": "IfStatement",
-                                                                                    "test": {
-                                                                                        "type": "BinaryExpression",
-                                                                                        "operator": "and",
-                                                                                        "left": {
-                                                                                            "type": "Identifier",
-                                                                                            "name": "series"
-                                                                                        },
-                                                                                        "right": {
-                                                                                            "type": "BinaryExpression",
-                                                                                            "operator": "==",
-                                                                                            "left": {
-                                                                                                "type": "MemberExpression",
-                                                                                                "object": {
-                                                                                                    "type": "Identifier",
-                                                                                                    "name": "series"
-                                                                                                },
-                                                                                                "properties": [
-                                                                                                    {
-                                                                                                        "type": "Identifier",
-                                                                                                        "name": "seriesKey",
-                                                                                                        "computed": false
-                                                                                                    }
-                                                                                                ]
-                                                                                            },
-                                                                                            "right": {
-                                                                                                "type": "MemberExpression",
-                                                                                                "object": {
-                                                                                                    "type": "Identifier",
-                                                                                                    "name": "seriesType"
-                                                                                                },
-                                                                                                "properties": [
-                                                                                                    {
-                                                                                                        "type": "Identifier",
-                                                                                                        "name": "typeKey",
-                                                                                                        "computed": false
-                                                                                                    }
-                                                                                                ]
-                                                                                            }
-                                                                                        }
-                                                                                    },
-                                                                                    "consequent": [
-                                                                                        {
-                                                                                            "type": "GeneratedAttribute",
-                                                                                            "name": [
-                                                                                                "selected"
-                                                                                            ],
-                                                                                            "value": {
-                                                                                                "type": "SoyCapableString",
-                                                                                                "body": [
-                                                                                                    "selected"
-                                                                                                ]
-                                                                                            }
-                                                                                        }
-                                                                                    ],
-                                                                                    "alternate": []
-                                                                                },
-                                                                                {
-                                                                                    "type": "GeneratedAttribute",
-                                                                                    "name": [
-                                                                                        "title"
-                                                                                    ],
-                                                                                    "value": {
-                                                                                        "type": "SoyCapableString",
-                                                                                        "body": [
-                                                                                            {
-                                                                                                "type": "InterpolatedExpression",
-                                                                                                "expression": {
-                                                                                                    "type": "VariableInterpolation",
-                                                                                                    "variable": {
-                                                                                                        "type": "MemberExpression",
-                                                                                                        "object": {
-                                                                                                            "type": "Identifier",
-                                                                                                            "name": "seriesType"
-                                                                                                        },
-                                                                                                        "properties": [
-                                                                                                            {
-                                                                                                                "type": "Identifier",
-                                                                                                                "name": "typeName",
-                                                                                                                "computed": false
-                                                                                                            }
-                                                                                                        ]
-                                                                                                    },
-                                                                                                    "filters": null
-                                                                                                }
-                                                                                            }
-                                                                                        ]
-                                                                                    }
-                                                                                }
-                                                                            ],
-                                                                            "children": [
-                                                                                {
-                                                                                    "type": "MemberExpression",
-                                                                                    "object": {
-                                                                                        "type": "Identifier",
-                                                                                        "name": "seriesType"
-                                                                                    },
-                                                                                    "properties": [
-                                                                                        {
-                                                                                            "type": "Identifier",
-                                                                                            "name": "typeName",
-                                                                                            "computed": false
-                                                                                        }
-                                                                                    ]
-                                                                                },
-                                                                                null
-                                                                            ]
-                                                                        },
-                                                                        null
-                                                                    ]
-                                                                },
-                                                                null
-                                                            ]
-                                                        },
-                                                        null
-                                                    ]
-                                                },
-                                                null
-                                            ]
-                                        },
-                                        {
-                                            "type": "HtmlElement",
-                                            "tagName": {
-                                                "type": "Identifier",
-                                                "name": "div"
-                                            },
-                                            "attributes": [
-                                                {
-                                                    "type": "GeneratedAttribute",
-                                                    "name": [
-                                                        "class"
-                                                    ],
-                                                    "value": {
-                                                        "type": "SoyCapableString",
-                                                        "body": [
-                                                            "errors s-type"
-                                                        ]
-                                                    }
-                                                }
-                                            ],
-                                            "children": []
-                                        },
-                                        null
-                                    ]
-                                },
-                                {
-                                    "type": "HtmlElement",
-                                    "tagName": {
-                                        "type": "Identifier",
-                                        "name": "div"
-                                    },
-                                    "attributes": [
-                                        {
-                                            "type": "GeneratedAttribute",
-                                            "name": [
-                                                "class"
-                                            ],
-                                            "value": {
-                                                "type": "SoyCapableString",
-                                                "body": [
-                                                    "field-group"
-                                                ]
-                                            }
-                                        }
-                                    ],
-                                    "children": [
-                                        {
-                                            "type": "HtmlElement",
-                                            "tagName": {
-                                                "type": "Identifier",
-                                                "name": "label"
-                                            },
-                                            "attributes": [
-                                                {
-                                                    "type": "GeneratedAttribute",
-                                                    "name": [
-                                                        "for"
-                                                    ],
-                                                    "value": {
-                                                        "type": "SoyCapableString",
-                                                        "body": [
-                                                            "series-label"
-                                                        ]
-                                                    }
-                                                }
-                                            ],
-                                            "children": [
-                                                {
-                                                    "type": "CallExpression",
-                                                    "callee": {
-                                                        "type": "Identifier",
-                                                        "name": "getText"
-                                                    },
-                                                    "arguments": [
-                                                        {
-                                                            "type": "Literal",
-                                                            "value": "sd.report.series.add.label.label"
-                                                        }
-                                                    ]
-                                                },
-                                                null
-                                            ]
-                                        },
-                                        {
-                                            "type": "HtmlElement",
-                                            "tagName": {
-                                                "type": "Identifier",
-                                                "name": "input"
-                                            },
-                                            "attributes": [
-                                                {
-                                                    "type": "GeneratedAttribute",
-                                                    "name": [
-                                                        "id"
-                                                    ],
-                                                    "value": {
-                                                        "type": "SoyCapableString",
-                                                        "body": [
-                                                            "series-label"
-                                                        ]
-                                                    }
-                                                },
-                                                {
-                                                    "type": "GeneratedAttribute",
-                                                    "name": [
-                                                        "name"
-                                                    ],
-                                                    "value": {
-                                                        "type": "SoyCapableString",
-                                                        "body": [
-                                                            "series-label"
-                                                        ]
-                                                    }
-                                                },
-                                                {
-                                                    "type": "GeneratedAttribute",
-                                                    "name": [
-                                                        "type"
-                                                    ],
-                                                    "value": {
-                                                        "type": "SoyCapableString",
-                                                        "body": [
-                                                            "text"
-                                                        ]
-                                                    }
-                                                },
-                                                {
-                                                    "type": "GeneratedAttribute",
-                                                    "name": [
-                                                        "class"
-                                                    ],
-                                                    "value": {
-                                                        "type": "SoyCapableString",
-                                                        "body": [
-                                                            "text"
-                                                        ]
-                                                    }
-                                                },
-                                                {
-                                                    "type": "IfStatement",
-                                                    "test": {
-                                                        "type": "Identifier",
-                                                        "name": "series"
-                                                    },
-                                                    "consequent": [
-                                                        {
-                                                            "type": "GeneratedAttribute",
-                                                            "name": [
-                                                                "value"
-                                                            ],
-                                                            "value": {
-                                                                "type": "SoyCapableString",
-                                                                "body": [
-                                                                    {
-                                                                        "type": "InterpolatedExpression",
-                                                                        "expression": {
-                                                                            "type": "VariableInterpolation",
-                                                                            "variable": {
-                                                                                "type": "MemberExpression",
-                                                                                "object": {
-                                                                                    "type": "Identifier",
-                                                                                    "name": "series"
-                                                                                },
-                                                                                "properties": [
-                                                                                    {
-                                                                                        "type": "Identifier",
-                                                                                        "name": "label",
-                                                                                        "computed": false
-                                                                                    }
-                                                                                ]
-                                                                            },
-                                                                            "filters": null
-                                                                        }
-                                                                    }
-                                                                ]
-                                                            }
-                                                        }
-                                                    ],
-                                                    "alternate": []
-                                                }
-                                            ],
-                                            "children": []
-                                        },
-                                        {
-                                            "type": "HtmlElement",
-                                            "tagName": {
-                                                "type": "Identifier",
-                                                "name": "div"
-                                            },
-                                            "attributes": [
-                                                {
-                                                    "type": "GeneratedAttribute",
-                                                    "name": [
-                                                        "class"
-                                                    ],
-                                                    "value": {
-                                                        "type": "SoyCapableString",
-                                                        "body": [
-                                                            "errors s-label"
-                                                        ]
-                                                    }
-                                                }
-                                            ],
-                                            "children": []
-                                        },
-                                        null
-                                    ]
-                                },
-                                {
-                                    "type": "HtmlElement",
-                                    "tagName": {
-                                        "type": "Identifier",
-                                        "name": "div"
-                                    },
-                                    "attributes": [
-                                        {
-                                            "type": "GeneratedAttribute",
-                                            "name": [
-                                                "class"
-                                            ],
-                                            "value": {
-                                                "type": "SoyCapableString",
-                                                "body": [
-                                                    "field-group"
-                                                ]
-                                            }
-                                        }
-                                    ],
-                                    "children": [
-                                        {
-                                            "type": "HtmlElement",
-                                            "tagName": {
-                                                "type": "Identifier",
-                                                "name": "label"
-                                            },
-                                            "attributes": [
-                                                {
-                                                    "type": "GeneratedAttribute",
-                                                    "name": [
-                                                        "for"
-                                                    ],
-                                                    "value": {
-                                                        "type": "SoyCapableString",
-                                                        "body": [
-                                                            "series-colour"
-                                                        ]
-                                                    }
-                                                }
-                                            ],
-                                            "children": [
-                                                {
-                                                    "type": "CallExpression",
-                                                    "callee": {
-                                                        "type": "Identifier",
-                                                        "name": "getText"
-                                                    },
-                                                    "arguments": [
-                                                        {
-                                                            "type": "Literal",
-                                                            "value": "sd.report.series.add.label.colour"
-                                                        }
-                                                    ]
-                                                },
-                                                null
-                                            ]
-                                        },
-                                        {
-                                            "type": "HtmlElement",
-                                            "tagName": {
-                                                "type": "Identifier",
-                                                "name": "div"
-                                            },
-                                            "attributes": [
-                                                {
-                                                    "type": "GeneratedAttribute",
-                                                    "name": [
-                                                        "name"
-                                                    ],
-                                                    "value": {
-                                                        "type": "SoyCapableString",
-                                                        "body": [
-                                                            "series-colour"
-                                                        ]
-                                                    }
-                                                }
-                                            ],
-                                            "children": [
-                                                {
-                                                    "type": "ForeachOperator",
-                                                    "range": {
-                                                        "type": "Identifier",
-                                                        "name": "colors"
-                                                    },
-                                                    "iterator": {
-                                                        "type": "Identifier",
-                                                        "name": "color"
-                                                    },
-                                                    "body": [
-                                                        {
-                                                            "type": "HtmlElement",
-                                                            "tagName": {
-                                                                "type": "Identifier",
-                                                                "name": "div"
-                                                            },
-                                                            "attributes": [
-                                                                {
-                                                                    "type": "GeneratedAttribute",
-                                                                    "name": [
-                                                                        "class"
-                                                                    ],
-                                                                    "value": {
-                                                                        "type": "SoyCapableString",
-                                                                        "body": [
-                                                                            "series-set-container"
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            ],
-                                                            "children": [
-                                                                {
-                                                                    "type": "TemplateCall",
-                                                                    "template": {
-                                                                        "type": "MemberExpression",
-                                                                        "object": null,
-                                                                        "properties": [
-                                                                            {
-                                                                                "type": "Identifier",
-                                                                                "name": "seriesColour",
-                                                                                "computed": false
-                                                                            }
-                                                                        ]
-                                                                    },
-                                                                    "params": [
-                                                                        {
-                                                                            "type": "TemplateCallParam",
-                                                                            "name": {
-                                                                                "type": "Identifier",
-                                                                                "name": "color"
-                                                                            },
-                                                                            "value": {
-                                                                                "type": "MemberExpression",
-                                                                                "object": {
-                                                                                    "type": "Identifier",
-                                                                                    "name": "color"
-                                                                                },
-                                                                                "properties": [
-                                                                                    {
-                                                                                        "type": "Identifier",
-                                                                                        "name": "full",
-                                                                                        "computed": false
-                                                                                    }
-                                                                                ]
-                                                                            }
-                                                                        },
-                                                                        {
-                                                                            "type": "TemplateCallParam",
-                                                                            "name": {
-                                                                                "type": "Identifier",
-                                                                                "name": "series"
-                                                                            },
-                                                                            "value": {
-                                                                                "type": "Identifier",
-                                                                                "name": "series"
-                                                                            }
-                                                                        }
-                                                                    ]
-                                                                },
-                                                                {
-                                                                    "type": "TemplateCall",
-                                                                    "template": {
-                                                                        "type": "MemberExpression",
-                                                                        "object": null,
-                                                                        "properties": [
-                                                                            {
-                                                                                "type": "Identifier",
-                                                                                "name": "seriesColour",
-                                                                                "computed": false
-                                                                            }
-                                                                        ]
-                                                                    },
-                                                                    "params": [
-                                                                        {
-                                                                            "type": "TemplateCallParam",
-                                                                            "name": {
-                                                                                "type": "Identifier",
-                                                                                "name": "color"
-                                                                            },
-                                                                            "value": {
-                                                                                "type": "MemberExpression",
-                                                                                "object": {
-                                                                                    "type": "Identifier",
-                                                                                    "name": "color"
-                                                                                },
-                                                                                "properties": [
-                                                                                    {
-                                                                                        "type": "Identifier",
-                                                                                        "name": "half",
-                                                                                        "computed": false
-                                                                                    }
-                                                                                ]
-                                                                            }
-                                                                        },
-                                                                        {
-                                                                            "type": "TemplateCallParam",
-                                                                            "name": {
-                                                                                "type": "Identifier",
-                                                                                "name": "series"
-                                                                            },
-                                                                            "value": {
-                                                                                "type": "Identifier",
-                                                                                "name": "series"
-                                                                            }
-                                                                        }
-                                                                    ]
-                                                                },
-                                                                null
-                                                            ]
-                                                        },
-                                                        null
-                                                    ]
-                                                },
-                                                null
-                                            ]
-                                        },
-                                        {
-                                            "type": "HtmlElement",
-                                            "tagName": {
-                                                "type": "Identifier",
-                                                "name": "div"
-                                            },
-                                            "attributes": [
-                                                {
-                                                    "type": "GeneratedAttribute",
-                                                    "name": [
-                                                        "class"
-                                                    ],
-                                                    "value": {
-                                                        "type": "SoyCapableString",
-                                                        "body": [
-                                                            "errors s-colour"
-                                                        ]
-                                                    }
-                                                }
-                                            ],
-                                            "children": []
-                                        },
-                                        null
-                                    ]
-                                },
-                                {
-                                    "type": "HtmlElement",
-                                    "tagName": {
-                                        "type": "Identifier",
-                                        "name": "div"
-                                    },
-                                    "attributes": [
-                                        {
-                                            "type": "GeneratedAttribute",
-                                            "name": [
-                                                "id"
-                                            ],
-                                            "value": {
-                                                "type": "SoyCapableString",
-                                                "body": [
-                                                    "sd-filter-panel"
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "GeneratedAttribute",
-                                            "name": [
-                                                "class"
-                                            ],
-                                            "value": {
-                                                "type": "SoyCapableString",
-                                                "body": [
-                                                    "js-filter-panel sd-filter-panel"
-                                                ]
-                                            }
-                                        }
-                                    ],
-                                    "children": []
-                                },
-                                null
-                            ]
-                        },
-                        null,
                         {
                             "type": "HtmlElement",
                             "tagName": {
@@ -940,12 +94,217 @@
                                     "value": {
                                         "type": "SoyCapableString",
                                         "body": [
-                                            "series-errors"
+                                            "series-date"
                                         ]
                                     }
                                 }
                             ],
-                            "children": []
+                            "children": [
+                                {
+                                    "type": "HtmlElement",
+                                    "tagName": {
+                                        "type": "Identifier",
+                                        "name": "span"
+                                    },
+                                    "attributes": [
+                                        {
+                                            "type": "GeneratedAttribute",
+                                            "name": [
+                                                "class"
+                                            ],
+                                            "value": {
+                                                "type": "SoyCapableString",
+                                                "body": [
+                                                    "aui-icon aui-icon-small aui-iconfont-calendar"
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "GeneratedAttribute",
+                                            "name": [
+                                                "data-unicode"
+                                            ],
+                                            "value": {
+                                                "type": "SoyCapableString",
+                                                "body": [
+                                                    "UTF+118"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "children": [
+                                        {
+                                            "type": "CallExpression",
+                                            "callee": {
+                                                "type": "Identifier",
+                                                "name": "getText"
+                                            },
+                                            "arguments": [
+                                                {
+                                                    "type": "Literal",
+                                                    "value": "sd.project.reports.calendar"
+                                                }
+                                            ]
+                                        },
+                                        null
+                                    ]
+                                },
+                                {
+                                    "type": "HtmlElement",
+                                    "tagName": {
+                                        "type": "Identifier",
+                                        "name": "span"
+                                    },
+                                    "attributes": [],
+                                    "children": [
+                                        {
+                                            "type": "Identifier",
+                                            "name": "formattedDateString"
+                                        },
+                                        null
+                                    ]
+                                },
+                                null
+                            ]
+                        },
+                        null,
+                        {
+                            "type": "ForeachOperator",
+                            "range": {
+                                "type": "Identifier",
+                                "name": "series"
+                            },
+                            "iterator": {
+                                "type": "Identifier",
+                                "name": "s"
+                            },
+                            "body": [
+                                {
+                                    "type": "HtmlElement",
+                                    "tagName": {
+                                        "type": "Identifier",
+                                        "name": "div"
+                                    },
+                                    "attributes": [
+                                        {
+                                            "type": "GeneratedAttribute",
+                                            "name": [
+                                                "class"
+                                            ],
+                                            "value": {
+                                                "type": "SoyCapableString",
+                                                "body": [
+                                                    {
+                                                        "type": "IfStatement",
+                                                        "test": {
+                                                            "type": "MemberExpression",
+                                                            "object": {
+                                                                "type": "Identifier",
+                                                                "name": "s"
+                                                            },
+                                                            "properties": [
+                                                                {
+                                                                    "type": "Identifier",
+                                                                    "name": "highlighted",
+                                                                    "computed": false
+                                                                }
+                                                            ]
+                                                        },
+                                                        "consequent": [
+                                                            {
+                                                                "type": "Literal",
+                                                                "value": "selected-series"
+                                                            }
+                                                        ],
+                                                        "alternate": []
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "children": [
+                                        {
+                                            "type": "HtmlElement",
+                                            "tagName": "span",
+                                            "attributes": [
+                                                {
+                                                    "type": "GeneratedAttribute",
+                                                    "name": [
+                                                        "class"
+                                                    ],
+                                                    "value": {
+                                                        "type": "SoyCapableString",
+                                                        "body": [
+                                                            "series-colour-key"
+                                                        ]
+                                                    }
+                                                },
+                                                {
+                                                    "type": "GeneratedAttribute",
+                                                    "name": [
+                                                        "style"
+                                                    ],
+                                                    "value": {
+                                                        "type": "SoyCapableString",
+                                                        "body": [
+                                                            "background-color: ",
+                                                            {
+                                                                "type": "InterpolatedExpression",
+                                                                "expression": {
+                                                                    "type": "VariableInterpolation",
+                                                                    "variable": {
+                                                                        "type": "MemberExpression",
+                                                                        "object": {
+                                                                            "type": "Identifier",
+                                                                            "name": "s"
+                                                                        },
+                                                                        "properties": [
+                                                                            {
+                                                                                "type": "Identifier",
+                                                                                "name": "color",
+                                                                                "computed": false
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "filters": null
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ],
+                                            "children": []
+                                        },
+                                        {
+                                            "type": "HtmlElement",
+                                            "tagName": {
+                                                "type": "Identifier",
+                                                "name": "span"
+                                            },
+                                            "attributes": [],
+                                            "children": [
+                                                {
+                                                    "type": "MemberExpression",
+                                                    "object": {
+                                                        "type": "Identifier",
+                                                        "name": "s"
+                                                    },
+                                                    "properties": [
+                                                        {
+                                                            "type": "Identifier",
+                                                            "name": "label",
+                                                            "computed": false
+                                                        }
+                                                    ]
+                                                },
+                                                null
+                                            ]
+                                        },
+                                        null
+                                    ]
+                                },
+                                null
+                            ]
                         },
                         null
                     ]
