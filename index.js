@@ -54,7 +54,7 @@ function parseFile(filename) {
 
                 return resolve(jsx);
             } catch (e) {
-                console.error(`ERROR: Could not generate JSX.`, e);
+                console.error(`ERROR: `, e);
                 return reject(e);
             }
         });

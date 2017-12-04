@@ -1,50 +1,21 @@
-{namespace ServiceDesk.Templates.Agent.Reports}
+{namespace ServiceDesk.Templates.Agent.Reports.Kb}
 
 /**
- * Draws in the form for adding a series
- * @param seriesCategories list of series types
- * @param colors Valid colours for the series
- * @param? series data for the current series - if it is passed in
+ * @param formattedDateString locale specific formatted date string, for the currently hovered point's x-value
+ * @param series a list of series values, each with the following properties: "color" (CSS color string), "label"
+ * (String label) and "highlighted" (boolean)
  */
-{template .seriesForm}
-    <form class="aui series-form">
-        <div class="field-group">
-            <label for="series-type">{getText('sd.report.series.add.seriestype.label')}</label>
-            <select id="series-type" class="hidden" name="series-type">
-                {foreach $seriesCategory in $seriesCategories}
-                    <optgroup label="{$seriesCategory.name}">
-                        {foreach $seriesType in $seriesCategory.seriesTypes}
-                            <option value="{$seriesType.typeKey}" {if $series and $series.seriesKey == $seriesType.typeKey} selected="selected" {/if} title="{$seriesType.typeName}">{$seriesType.typeName}</option>
-                        {/foreach}
-                    </optgroup>
-                {/foreach}
-            </select>
-            <div class="errors s-type"></div>
+{template .hoverBox}
+    <div class="series-date">
+        <span class="aui-icon aui-icon-small aui-iconfont-calendar" data-unicode="UTF+118">{getText('sd.project.reports.calendar')}</span>
+        <span>{$formattedDateString}</span>
+    </div>
+    {foreach $s in $series}
+        <div class="{if $s.highlighted}selected-series{/if}">
+            <span class="series-colour-key" style="background-color: {$s.color}"/>
+            <span>{$s.label}</span>
         </div>
-        <div class="field-group">
-            <label for="series-label">{getText('sd.report.series.add.label.label')}</label>
-            <input id="series-label" name="series-label" type="text" class="text" {if $series}value="{$series.label}"{/if}>
-            <div class="errors s-label"></div>
-        </div>
-        <div class="field-group">
-            <label for="series-colour">{getText('sd.report.series.add.label.colour')}</label>
-            <div name="series-colour">
-                {foreach $color in $colors}
-                    <div class="series-set-container">
-                        {call .seriesColour}
-                            {param color: $color.full /}
-                            {param series: $series /}
-                        {/call}
-                        {call .seriesColour}
-                            {param color: $color.half /}
-                            {param series: $series /}
-                        {/call}
-                    </div>
-                {/foreach}
-            </div>
-            <div class="errors s-colour"></div>
-        </div>
-        <div id="sd-filter-panel" class="js-filter-panel sd-filter-panel"></div>
-    </form>
-    <div class="series-errors"></div>
+    {/foreach}
 {/template}
+
+ 
