@@ -458,7 +458,10 @@ function peg$parse(input, options) {
       peg$c126 = "]",
       peg$c127 = peg$literalExpectation("]", false),
       peg$c128 = function(elements) {
-          return [].concat(elements).reduce((acc, e) => acc.concat(e), []);
+          return {
+            type: "ArrayExpression",
+            elements: [].concat(elements).filter(e => !!e).reduce((acc, e) => acc.concat(e), [])
+          };
         },
       peg$c129 = function(elt) {
           return elt;
@@ -473,12 +476,14 @@ function peg$parse(input, options) {
           };
         },
       peg$c132 = function(key, value) {
-          return {
-            type: "Property",
-            key,
-            value,
-            computed: !!key.type
-          };
+          return [
+            {
+              type: "Property",
+              key,
+              value,
+              computed: !!key.type
+            }
+          ];
         },
       peg$c133 = "null",
       peg$c134 = peg$literalExpectation("null", false),

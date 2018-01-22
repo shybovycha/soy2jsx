@@ -18,4 +18,74 @@
     {/foreach}
 {/template}
 
- 
+ {namespace ServiceDesk.Internal.Approvals.Feature.CreateApproval.Templates}
+
+/**
+* Renders form for creating an approval
+* @param eligibleFields
+*/
+{template .body}
+{call aui.form.form}
+    {param action: '#' /}
+    {param isLongLabels: true /}
+    {param content}
+        {call aui.dialog.dialog2Content}
+            {param visible: true /}
+            {param titleText: getText('sd.approval.create.title') /}
+            {param content}
+                {if not length($eligibleFields)}
+                    {call aui.message.warning}
+                        {param content: getText('sd.approval.no.available.fields') /}
+                    {/call}
+                {/if}
+                {call aui.form.fieldGroup}
+                    {param content}
+                        {call aui.form.label}
+                            {param content: getText('sd.approval.approvers.field.label') /}
+                            {param required: true /}
+                        {/call}
+                        {if not length($eligibleFields)}
+                            {call aui.form.select}
+                                {param name: 'field' /}
+                                {param extraAttributes: ['disabled': 'disabled'] /}
+                                {param options: [] /}
+                            {/call}
+                        {else}
+                             {call aui.form.select}
+                                {param name: 'field' /}
+                                {param id: 'approver-field-picker' /}
+                                {param extraClasses: 'js-approver-field-picker' /}
+                                {param options: $eligibleFields /}
+                            {/call}
+                        {/if}
+                    {/param}
+                {/call}
+                {call aui.form.fieldset}
+                    {param isGroup: true /}
+                    {param legendContent: getText('sd.approval.condition.label') /}
+                    {param content}
+                        <div class="radio">
+                            <input class="radio" type="radio" checked="checked" name="condition" value="percent" id="condition-all">
+                            <label for="condition-all">{getText('sd.approval.condition.all.label')}</label>
+                        </div>
+                        <div class="radio sd-partial-condition">
+                            <input class="radio js-condition-partial" type="radio" name="condition" value="number"  id="condition-partial">
+                            <input class="text js-partial-amount sd-partial-amount" type="text" name="partial-amount" />
+                            <label for="condition-partial">{getText('sd.approval.condition.partial.label')}</label>
+                        </div>
+                    {/param}
+                {/call}
+            {/param}
+
+            {param footerActionContent}
+                {call ServiceDesk.Templates.Shared.Form.submitButtons}
+                    {param submitExtraAttributes: $eligibleFields.length ? [] : ['disabled': 'disabled'] /}
+                    {param submitExtraClasses: 'aui-button-primary' /}
+                    {param submitButtonLabel: getText('sd.common.words.create') /}
+                    {param alignment: 'right' /}
+                {/call}
+            {/param}
+        {/call}
+    {/param}
+{/call}
+{/template}

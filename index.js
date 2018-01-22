@@ -1,5 +1,5 @@
 const parser = require('./SOY.js');
-const generator = require('./generator.js');
+const optimizer = require('./optimizer.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -33,11 +33,11 @@ function parseFile(filename) {
             }
 
             try {
-                jsxAst = generator.generate(soyAst);
+                jsxAst = optimizer.optimize(soyAst);
 
                 fs.writeFileSync(jsxAstFilename, JSON.stringify(jsxAst, null, 4));
             } catch (e) {
-                console.error(`ERROR: Could not generate JSX AST for ${filename}.`, e);
+                console.error(`ERROR: Could not optimize JSX AST for ${filename}.`, e);
                 return reject(e);
             }
 
