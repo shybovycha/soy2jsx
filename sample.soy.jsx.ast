@@ -203,165 +203,51 @@
                                 ]
                             },
                             {
-                                "type": "ExpressionStatement",
-                                "expression": {
-                                    "type": "CallExpression",
-                                    "callee": {
-                                        "type": "MemberExpression",
-                                        "object": {
-                                            "type": "Identifier",
-                                            "name": "series"
-                                        },
-                                        "property": {
-                                            "type": "Identifier",
-                                            "name": "map"
-                                        }
+                                "type": "CallExpression",
+                                "callee": {
+                                    "type": "MemberExpression",
+                                    "object": {
+                                        "type": "Identifier",
+                                        "name": "series"
                                     },
-                                    "arguments": [
-                                        {
-                                            "type": "ArrowFunctionExpression",
-                                            "id": null,
-                                            "params": [
+                                    "property": {
+                                        "type": "Identifier",
+                                        "name": "map"
+                                    }
+                                },
+                                "arguments": [
+                                    {
+                                        "type": "ArrowFunctionExpression",
+                                        "id": null,
+                                        "params": [
+                                            {
+                                                "type": "Identifier",
+                                                "name": "s"
+                                            }
+                                        ],
+                                        "body": {
+                                            "type": "BlockStatement",
+                                            "body": [
                                                 {
-                                                    "type": "Identifier",
-                                                    "name": "s"
-                                                }
-                                            ],
-                                            "body": {
-                                                "type": "BlockStatement",
-                                                "body": [
-                                                    {
-                                                        "type": "ReturnStatement",
-                                                        "argument": {
-                                                            "type": "JSXElement",
-                                                            "openingElement": {
-                                                                "type": "JSXOpeningElement",
-                                                                "name": {
-                                                                    "type": "Identifier",
-                                                                    "name": "div"
-                                                                },
-                                                                "selfClosing": false,
-                                                                "attributes": [
-                                                                    {
-                                                                        "type": "JSXAttribute",
-                                                                        "name": "class",
-                                                                        "value": {
-                                                                            "type": "JSXExpressionContainer",
-                                                                            "expression": {
-                                                                                "type": "ConditionalExpression",
-                                                                                "test": {
-                                                                                    "type": "MemberExpression",
-                                                                                    "object": {
-                                                                                        "type": "Identifier",
-                                                                                        "name": "s"
-                                                                                    },
-                                                                                    "property": {
-                                                                                        "type": "Identifier",
-                                                                                        "name": "highlighted"
-                                                                                    },
-                                                                                    "computed": false
-                                                                                },
-                                                                                "consequent": {
-                                                                                    "type": "Literal",
-                                                                                    "value": "selected-series"
-                                                                                },
-                                                                                "alternate": {
-                                                                                    "type": "Literal",
-                                                                                    "value": null
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                ]
+                                                    "type": "ReturnStatement",
+                                                    "argument": {
+                                                        "type": "JSXElement",
+                                                        "openingElement": {
+                                                            "type": "JSXOpeningElement",
+                                                            "name": {
+                                                                "type": "Identifier",
+                                                                "name": "div"
                                                             },
-                                                            "closingElement": {
-                                                                "type": "JSXClosingElement",
-                                                                "name": {
-                                                                    "type": "Identifier",
-                                                                    "name": "div"
-                                                                }
-                                                            },
-                                                            "children": [
+                                                            "selfClosing": false,
+                                                            "attributes": [
                                                                 {
-                                                                    "type": "JSXElement",
-                                                                    "openingElement": {
-                                                                        "type": "JSXOpeningElement",
-                                                                        "name": "span",
-                                                                        "selfClosing": true,
-                                                                        "attributes": [
-                                                                            {
-                                                                                "type": "JSXAttribute",
-                                                                                "name": "class",
-                                                                                "value": {
-                                                                                    "type": "Literal",
-                                                                                    "value": "series-colour-key"
-                                                                                }
-                                                                            },
-                                                                            {
-                                                                                "type": "JSXAttribute",
-                                                                                "name": "style",
-                                                                                "value": {
-                                                                                    "type": "JSXExpressionContainer",
-                                                                                    "expression": {
-                                                                                        "type": "TemplateLiteral",
-                                                                                        "quasis": [
-                                                                                            {
-                                                                                                "type": "TemplateElement",
-                                                                                                "value": {
-                                                                                                    "raw": "background-color: "
-                                                                                                }
-                                                                                            },
-                                                                                            {
-                                                                                                "type": "TemplateElement",
-                                                                                                "value": {
-                                                                                                    "raw": ""
-                                                                                                }
-                                                                                            }
-                                                                                        ],
-                                                                                        "expressions": [
-                                                                                            {
-                                                                                                "type": "MemberExpression",
-                                                                                                "object": {
-                                                                                                    "type": "Identifier",
-                                                                                                    "name": "s"
-                                                                                                },
-                                                                                                "property": {
-                                                                                                    "type": "Identifier",
-                                                                                                    "name": "color"
-                                                                                                },
-                                                                                                "computed": false
-                                                                                            }
-                                                                                        ]
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        ]
-                                                                    },
-                                                                    "closingElement": null,
-                                                                    "children": []
-                                                                },
-                                                                {
-                                                                    "type": "JSXElement",
-                                                                    "openingElement": {
-                                                                        "type": "JSXOpeningElement",
-                                                                        "name": {
-                                                                            "type": "Identifier",
-                                                                            "name": "span"
-                                                                        },
-                                                                        "selfClosing": false,
-                                                                        "attributes": []
-                                                                    },
-                                                                    "closingElement": {
-                                                                        "type": "JSXClosingElement",
-                                                                        "name": {
-                                                                            "type": "Identifier",
-                                                                            "name": "span"
-                                                                        }
-                                                                    },
-                                                                    "children": [
-                                                                        {
-                                                                            "type": "JSXExpressionContainer",
-                                                                            "expression": {
+                                                                    "type": "JSXAttribute",
+                                                                    "name": "class",
+                                                                    "value": {
+                                                                        "type": "JSXExpressionContainer",
+                                                                        "expression": {
+                                                                            "type": "ConditionalExpression",
+                                                                            "test": {
                                                                                 "type": "MemberExpression",
                                                                                 "object": {
                                                                                     "type": "Identifier",
@@ -369,26 +255,1308 @@
                                                                                 },
                                                                                 "property": {
                                                                                     "type": "Identifier",
-                                                                                    "name": "label"
+                                                                                    "name": "highlighted"
                                                                                 },
                                                                                 "computed": false
+                                                                            },
+                                                                            "consequent": {
+                                                                                "type": "Literal",
+                                                                                "value": "selected-series"
+                                                                            },
+                                                                            "alternate": {
+                                                                                "type": "Literal",
+                                                                                "value": null
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            ]
+                                                        },
+                                                        "closingElement": {
+                                                            "type": "JSXClosingElement",
+                                                            "name": {
+                                                                "type": "Identifier",
+                                                                "name": "div"
+                                                            }
+                                                        },
+                                                        "children": [
+                                                            {
+                                                                "type": "JSXElement",
+                                                                "openingElement": {
+                                                                    "type": "JSXOpeningElement",
+                                                                    "name": "span",
+                                                                    "selfClosing": true,
+                                                                    "attributes": [
+                                                                        {
+                                                                            "type": "JSXAttribute",
+                                                                            "name": "class",
+                                                                            "value": {
+                                                                                "type": "Literal",
+                                                                                "value": "series-colour-key"
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "type": "JSXAttribute",
+                                                                            "name": "style",
+                                                                            "value": {
+                                                                                "type": "JSXExpressionContainer",
+                                                                                "expression": {
+                                                                                    "type": "TemplateLiteral",
+                                                                                    "quasis": [
+                                                                                        {
+                                                                                            "type": "TemplateElement",
+                                                                                            "value": {
+                                                                                                "raw": "background-color: "
+                                                                                            }
+                                                                                        },
+                                                                                        {
+                                                                                            "type": "TemplateElement",
+                                                                                            "value": {
+                                                                                                "raw": ""
+                                                                                            }
+                                                                                        }
+                                                                                    ],
+                                                                                    "expressions": [
+                                                                                        {
+                                                                                            "type": "MemberExpression",
+                                                                                            "object": {
+                                                                                                "type": "Identifier",
+                                                                                                "name": "s"
+                                                                                            },
+                                                                                            "property": {
+                                                                                                "type": "Identifier",
+                                                                                                "name": "color"
+                                                                                            },
+                                                                                            "computed": false
+                                                                                        }
+                                                                                    ]
+                                                                                }
                                                                             }
                                                                         }
                                                                     ]
-                                                                }
-                                                            ]
-                                                        }
+                                                                },
+                                                                "closingElement": null,
+                                                                "children": []
+                                                            },
+                                                            {
+                                                                "type": "JSXElement",
+                                                                "openingElement": {
+                                                                    "type": "JSXOpeningElement",
+                                                                    "name": {
+                                                                        "type": "Identifier",
+                                                                        "name": "span"
+                                                                    },
+                                                                    "selfClosing": false,
+                                                                    "attributes": []
+                                                                },
+                                                                "closingElement": {
+                                                                    "type": "JSXClosingElement",
+                                                                    "name": {
+                                                                        "type": "Identifier",
+                                                                        "name": "span"
+                                                                    }
+                                                                },
+                                                                "children": [
+                                                                    {
+                                                                        "type": "JSXExpressionContainer",
+                                                                        "expression": {
+                                                                            "type": "MemberExpression",
+                                                                            "object": {
+                                                                                "type": "Identifier",
+                                                                                "name": "s"
+                                                                            },
+                                                                            "property": {
+                                                                                "type": "Identifier",
+                                                                                "name": "label"
+                                                                            },
+                                                                            "computed": false
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
                                                     }
-                                                ]
-                                            },
-                                            "generator": false,
-                                            "expression": false,
-                                            "async": false
-                                        }
-                                    ]
-                                }
+                                                }
+                                            ]
+                                        },
+                                        "generator": false,
+                                        "expression": false,
+                                        "async": false
+                                    }
+                                ]
                             }
                         ]
+                    }
+                }
+            }
+        },
+        {
+            "type": "ExpressionStatement",
+            "expression": {
+                "type": "AssignmentExpression",
+                "operator": "=",
+                "left": {
+                    "type": "MemberExpression",
+                    "object": {
+                        "type": "MemberExpression",
+                        "object": {
+                            "type": "MemberExpression",
+                            "object": {
+                                "type": "MemberExpression",
+                                "object": {
+                                    "type": "MemberExpression",
+                                    "object": {
+                                        "type": "MemberExpression",
+                                        "object": {
+                                            "type": "Identifier",
+                                            "name": "ServiceDesk"
+                                        },
+                                        "property": {
+                                            "type": "Identifier",
+                                            "name": "Internal"
+                                        },
+                                        "computed": false
+                                    },
+                                    "property": {
+                                        "type": "Identifier",
+                                        "name": "Approvals"
+                                    },
+                                    "computed": false
+                                },
+                                "property": {
+                                    "type": "Identifier",
+                                    "name": "Feature"
+                                },
+                                "computed": false
+                            },
+                            "property": {
+                                "type": "Identifier",
+                                "name": "CreateApproval"
+                            },
+                            "computed": false
+                        },
+                        "property": {
+                            "type": "Identifier",
+                            "name": "Templates"
+                        },
+                        "computed": false
+                    },
+                    "property": {
+                        "type": "Identifier",
+                        "name": "body"
+                    },
+                    "computed": false
+                },
+                "right": {
+                    "type": "ArrowFunctionExpression",
+                    "id": null,
+                    "params": [
+                        {
+                            "type": "ObjectPattern",
+                            "properties": [
+                                {
+                                    "type": "Property",
+                                    "key": {
+                                        "type": "Identifier",
+                                        "name": "eligibleFields"
+                                    },
+                                    "value": {
+                                        "type": "Identifier",
+                                        "name": "eligibleFields"
+                                    },
+                                    "kind": "init",
+                                    "computed": false,
+                                    "method": false,
+                                    "shorthand": true
+                                }
+                            ]
+                        }
+                    ],
+                    "body": {
+                        "type": "JSXElement",
+                        "openingElement": {
+                            "type": "JSXOpeningElement",
+                            "name": {
+                                "type": "JSXMemberExpression",
+                                "object": {
+                                    "type": "JSXMemberExpression",
+                                    "object": {
+                                        "type": "Identifier",
+                                        "name": "aui"
+                                    },
+                                    "property": {
+                                        "type": "Identifier",
+                                        "name": "form"
+                                    }
+                                },
+                                "property": {
+                                    "type": "Identifier",
+                                    "name": "form"
+                                }
+                            },
+                            "attributes": [
+                                {
+                                    "type": "JSXSpreadAttribute",
+                                    "argument": {
+                                        "type": "ObjectExpression",
+                                        "properties": [
+                                            {
+                                                "type": "Property",
+                                                "key": {
+                                                    "type": "Identifier",
+                                                    "name": "action"
+                                                },
+                                                "value": {
+                                                    "type": "Literal",
+                                                    "value": "#"
+                                                },
+                                                "kind": "init"
+                                            },
+                                            {
+                                                "type": "Property",
+                                                "key": {
+                                                    "type": "Identifier",
+                                                    "name": "isLongLabels"
+                                                },
+                                                "value": {
+                                                    "type": "Literal",
+                                                    "value": "true"
+                                                },
+                                                "kind": "init"
+                                            },
+                                            {
+                                                "type": "Property",
+                                                "key": {
+                                                    "type": "Identifier",
+                                                    "name": "content"
+                                                },
+                                                "value": {
+                                                    "type": "JSXElement",
+                                                    "openingElement": {
+                                                        "type": "JSXOpeningElement",
+                                                        "name": {
+                                                            "type": "JSXMemberExpression",
+                                                            "object": {
+                                                                "type": "JSXMemberExpression",
+                                                                "object": {
+                                                                    "type": "Identifier",
+                                                                    "name": "aui"
+                                                                },
+                                                                "property": {
+                                                                    "type": "Identifier",
+                                                                    "name": "dialog"
+                                                                }
+                                                            },
+                                                            "property": {
+                                                                "type": "Identifier",
+                                                                "name": "dialog2Content"
+                                                            }
+                                                        },
+                                                        "attributes": [
+                                                            {
+                                                                "type": "JSXSpreadAttribute",
+                                                                "argument": {
+                                                                    "type": "ObjectExpression",
+                                                                    "properties": [
+                                                                        {
+                                                                            "type": "Property",
+                                                                            "key": {
+                                                                                "type": "Identifier",
+                                                                                "name": "visible"
+                                                                            },
+                                                                            "value": {
+                                                                                "type": "Literal",
+                                                                                "value": "true"
+                                                                            },
+                                                                            "kind": "init"
+                                                                        },
+                                                                        {
+                                                                            "type": "Property",
+                                                                            "key": {
+                                                                                "type": "Identifier",
+                                                                                "name": "titleText"
+                                                                            },
+                                                                            "value": {
+                                                                                "type": "CallExpression",
+                                                                                "callee": {
+                                                                                    "type": "Identifier",
+                                                                                    "name": "getText"
+                                                                                },
+                                                                                "arguments": [
+                                                                                    {
+                                                                                        "type": "Literal",
+                                                                                        "value": "sd.approval.create.title"
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            "kind": "init"
+                                                                        },
+                                                                        {
+                                                                            "type": "Property",
+                                                                            "key": {
+                                                                                "type": "Identifier",
+                                                                                "name": "content"
+                                                                            },
+                                                                            "value": {
+                                                                                "type": "ArrayExpression",
+                                                                                "elements": [
+                                                                                    {
+                                                                                        "type": "ConditionalExpression",
+                                                                                        "test": {
+                                                                                            "type": "UnaryExpression",
+                                                                                            "operator": "!",
+                                                                                            "argument": {
+                                                                                                "type": "CallExpression",
+                                                                                                "callee": {
+                                                                                                    "type": "Identifier",
+                                                                                                    "name": "length"
+                                                                                                },
+                                                                                                "arguments": [
+                                                                                                    {
+                                                                                                        "type": "Identifier",
+                                                                                                        "name": "eligibleFields"
+                                                                                                    }
+                                                                                                ]
+                                                                                            },
+                                                                                            "prefix": true
+                                                                                        },
+                                                                                        "consequent": {
+                                                                                            "type": "JSXElement",
+                                                                                            "openingElement": {
+                                                                                                "type": "JSXOpeningElement",
+                                                                                                "name": {
+                                                                                                    "type": "JSXMemberExpression",
+                                                                                                    "object": {
+                                                                                                        "type": "JSXMemberExpression",
+                                                                                                        "object": {
+                                                                                                            "type": "Identifier",
+                                                                                                            "name": "aui"
+                                                                                                        },
+                                                                                                        "property": {
+                                                                                                            "type": "Identifier",
+                                                                                                            "name": "message"
+                                                                                                        }
+                                                                                                    },
+                                                                                                    "property": {
+                                                                                                        "type": "Identifier",
+                                                                                                        "name": "warning"
+                                                                                                    }
+                                                                                                },
+                                                                                                "attributes": [
+                                                                                                    {
+                                                                                                        "type": "JSXSpreadAttribute",
+                                                                                                        "argument": {
+                                                                                                            "type": "ObjectExpression",
+                                                                                                            "properties": [
+                                                                                                                {
+                                                                                                                    "type": "Property",
+                                                                                                                    "key": {
+                                                                                                                        "type": "Identifier",
+                                                                                                                        "name": "content"
+                                                                                                                    },
+                                                                                                                    "value": {
+                                                                                                                        "type": "CallExpression",
+                                                                                                                        "callee": {
+                                                                                                                            "type": "Identifier",
+                                                                                                                            "name": "getText"
+                                                                                                                        },
+                                                                                                                        "arguments": [
+                                                                                                                            {
+                                                                                                                                "type": "Literal",
+                                                                                                                                "value": "sd.approval.no.available.fields"
+                                                                                                                            }
+                                                                                                                        ]
+                                                                                                                    },
+                                                                                                                    "kind": "init"
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    }
+                                                                                                ],
+                                                                                                "selfClosing": true
+                                                                                            },
+                                                                                            "closingElement": null,
+                                                                                            "children": []
+                                                                                        },
+                                                                                        "alternate": {
+                                                                                            "type": "Literal",
+                                                                                            "value": null
+                                                                                        }
+                                                                                    },
+                                                                                    {
+                                                                                        "type": "JSXElement",
+                                                                                        "openingElement": {
+                                                                                            "type": "JSXOpeningElement",
+                                                                                            "name": {
+                                                                                                "type": "JSXMemberExpression",
+                                                                                                "object": {
+                                                                                                    "type": "JSXMemberExpression",
+                                                                                                    "object": {
+                                                                                                        "type": "Identifier",
+                                                                                                        "name": "aui"
+                                                                                                    },
+                                                                                                    "property": {
+                                                                                                        "type": "Identifier",
+                                                                                                        "name": "form"
+                                                                                                    }
+                                                                                                },
+                                                                                                "property": {
+                                                                                                    "type": "Identifier",
+                                                                                                    "name": "fieldGroup"
+                                                                                                }
+                                                                                            },
+                                                                                            "attributes": [
+                                                                                                {
+                                                                                                    "type": "JSXSpreadAttribute",
+                                                                                                    "argument": {
+                                                                                                        "type": "ObjectExpression",
+                                                                                                        "properties": [
+                                                                                                            {
+                                                                                                                "type": "Property",
+                                                                                                                "key": {
+                                                                                                                    "type": "Identifier",
+                                                                                                                    "name": "content"
+                                                                                                                },
+                                                                                                                "value": {
+                                                                                                                    "type": "ArrayExpression",
+                                                                                                                    "elements": [
+                                                                                                                        {
+                                                                                                                            "type": "JSXElement",
+                                                                                                                            "openingElement": {
+                                                                                                                                "type": "JSXOpeningElement",
+                                                                                                                                "name": {
+                                                                                                                                    "type": "JSXMemberExpression",
+                                                                                                                                    "object": {
+                                                                                                                                        "type": "JSXMemberExpression",
+                                                                                                                                        "object": {
+                                                                                                                                            "type": "Identifier",
+                                                                                                                                            "name": "aui"
+                                                                                                                                        },
+                                                                                                                                        "property": {
+                                                                                                                                            "type": "Identifier",
+                                                                                                                                            "name": "form"
+                                                                                                                                        }
+                                                                                                                                    },
+                                                                                                                                    "property": {
+                                                                                                                                        "type": "Identifier",
+                                                                                                                                        "name": "label"
+                                                                                                                                    }
+                                                                                                                                },
+                                                                                                                                "attributes": [
+                                                                                                                                    {
+                                                                                                                                        "type": "JSXSpreadAttribute",
+                                                                                                                                        "argument": {
+                                                                                                                                            "type": "ObjectExpression",
+                                                                                                                                            "properties": [
+                                                                                                                                                {
+                                                                                                                                                    "type": "Property",
+                                                                                                                                                    "key": {
+                                                                                                                                                        "type": "Identifier",
+                                                                                                                                                        "name": "content"
+                                                                                                                                                    },
+                                                                                                                                                    "value": {
+                                                                                                                                                        "type": "CallExpression",
+                                                                                                                                                        "callee": {
+                                                                                                                                                            "type": "Identifier",
+                                                                                                                                                            "name": "getText"
+                                                                                                                                                        },
+                                                                                                                                                        "arguments": [
+                                                                                                                                                            {
+                                                                                                                                                                "type": "Literal",
+                                                                                                                                                                "value": "sd.approval.approvers.field.label"
+                                                                                                                                                            }
+                                                                                                                                                        ]
+                                                                                                                                                    },
+                                                                                                                                                    "kind": "init"
+                                                                                                                                                },
+                                                                                                                                                {
+                                                                                                                                                    "type": "Property",
+                                                                                                                                                    "key": {
+                                                                                                                                                        "type": "Identifier",
+                                                                                                                                                        "name": "required"
+                                                                                                                                                    },
+                                                                                                                                                    "value": {
+                                                                                                                                                        "type": "Literal",
+                                                                                                                                                        "value": "true"
+                                                                                                                                                    },
+                                                                                                                                                    "kind": "init"
+                                                                                                                                                }
+                                                                                                                                            ]
+                                                                                                                                        }
+                                                                                                                                    }
+                                                                                                                                ],
+                                                                                                                                "selfClosing": true
+                                                                                                                            },
+                                                                                                                            "closingElement": null,
+                                                                                                                            "children": []
+                                                                                                                        },
+                                                                                                                        {
+                                                                                                                            "type": "ConditionalExpression",
+                                                                                                                            "test": {
+                                                                                                                                "type": "UnaryExpression",
+                                                                                                                                "operator": "!",
+                                                                                                                                "argument": {
+                                                                                                                                    "type": "CallExpression",
+                                                                                                                                    "callee": {
+                                                                                                                                        "type": "Identifier",
+                                                                                                                                        "name": "length"
+                                                                                                                                    },
+                                                                                                                                    "arguments": [
+                                                                                                                                        {
+                                                                                                                                            "type": "Identifier",
+                                                                                                                                            "name": "eligibleFields"
+                                                                                                                                        }
+                                                                                                                                    ]
+                                                                                                                                },
+                                                                                                                                "prefix": true
+                                                                                                                            },
+                                                                                                                            "consequent": {
+                                                                                                                                "type": "JSXElement",
+                                                                                                                                "openingElement": {
+                                                                                                                                    "type": "JSXOpeningElement",
+                                                                                                                                    "name": {
+                                                                                                                                        "type": "JSXMemberExpression",
+                                                                                                                                        "object": {
+                                                                                                                                            "type": "JSXMemberExpression",
+                                                                                                                                            "object": {
+                                                                                                                                                "type": "Identifier",
+                                                                                                                                                "name": "aui"
+                                                                                                                                            },
+                                                                                                                                            "property": {
+                                                                                                                                                "type": "Identifier",
+                                                                                                                                                "name": "form"
+                                                                                                                                            }
+                                                                                                                                        },
+                                                                                                                                        "property": {
+                                                                                                                                            "type": "Identifier",
+                                                                                                                                            "name": "select"
+                                                                                                                                        }
+                                                                                                                                    },
+                                                                                                                                    "attributes": [
+                                                                                                                                        {
+                                                                                                                                            "type": "JSXSpreadAttribute",
+                                                                                                                                            "argument": {
+                                                                                                                                                "type": "ObjectExpression",
+                                                                                                                                                "properties": [
+                                                                                                                                                    {
+                                                                                                                                                        "type": "Property",
+                                                                                                                                                        "key": {
+                                                                                                                                                            "type": "Identifier",
+                                                                                                                                                            "name": "name"
+                                                                                                                                                        },
+                                                                                                                                                        "value": {
+                                                                                                                                                            "type": "Literal",
+                                                                                                                                                            "value": "field"
+                                                                                                                                                        },
+                                                                                                                                                        "kind": "init"
+                                                                                                                                                    },
+                                                                                                                                                    {
+                                                                                                                                                        "type": "Property",
+                                                                                                                                                        "key": {
+                                                                                                                                                            "type": "Identifier",
+                                                                                                                                                            "name": "extraAttributes"
+                                                                                                                                                        },
+                                                                                                                                                        "value": {
+                                                                                                                                                            "type": "ObjectExpression",
+                                                                                                                                                            "properties": [
+                                                                                                                                                                {
+                                                                                                                                                                    "type": "Property",
+                                                                                                                                                                    "key": {
+                                                                                                                                                                        "type": "Literal",
+                                                                                                                                                                        "value": "disabled"
+                                                                                                                                                                    },
+                                                                                                                                                                    "value": {
+                                                                                                                                                                        "type": "Literal",
+                                                                                                                                                                        "value": "disabled"
+                                                                                                                                                                    },
+                                                                                                                                                                    "kind": "init",
+                                                                                                                                                                    "computed": false
+                                                                                                                                                                }
+                                                                                                                                                            ]
+                                                                                                                                                        },
+                                                                                                                                                        "kind": "init"
+                                                                                                                                                    },
+                                                                                                                                                    {
+                                                                                                                                                        "type": "Property",
+                                                                                                                                                        "key": {
+                                                                                                                                                            "type": "Identifier",
+                                                                                                                                                            "name": "options"
+                                                                                                                                                        },
+                                                                                                                                                        "value": {
+                                                                                                                                                            "type": "ArrayExpression",
+                                                                                                                                                            "elements": []
+                                                                                                                                                        },
+                                                                                                                                                        "kind": "init"
+                                                                                                                                                    }
+                                                                                                                                                ]
+                                                                                                                                            }
+                                                                                                                                        }
+                                                                                                                                    ],
+                                                                                                                                    "selfClosing": true
+                                                                                                                                },
+                                                                                                                                "closingElement": null,
+                                                                                                                                "children": []
+                                                                                                                            },
+                                                                                                                            "alternate": {
+                                                                                                                                "type": "JSXElement",
+                                                                                                                                "openingElement": {
+                                                                                                                                    "type": "JSXOpeningElement",
+                                                                                                                                    "name": {
+                                                                                                                                        "type": "JSXMemberExpression",
+                                                                                                                                        "object": {
+                                                                                                                                            "type": "JSXMemberExpression",
+                                                                                                                                            "object": {
+                                                                                                                                                "type": "Identifier",
+                                                                                                                                                "name": "aui"
+                                                                                                                                            },
+                                                                                                                                            "property": {
+                                                                                                                                                "type": "Identifier",
+                                                                                                                                                "name": "form"
+                                                                                                                                            }
+                                                                                                                                        },
+                                                                                                                                        "property": {
+                                                                                                                                            "type": "Identifier",
+                                                                                                                                            "name": "select"
+                                                                                                                                        }
+                                                                                                                                    },
+                                                                                                                                    "attributes": [
+                                                                                                                                        {
+                                                                                                                                            "type": "JSXSpreadAttribute",
+                                                                                                                                            "argument": {
+                                                                                                                                                "type": "ObjectExpression",
+                                                                                                                                                "properties": [
+                                                                                                                                                    {
+                                                                                                                                                        "type": "Property",
+                                                                                                                                                        "key": {
+                                                                                                                                                            "type": "Identifier",
+                                                                                                                                                            "name": "name"
+                                                                                                                                                        },
+                                                                                                                                                        "value": {
+                                                                                                                                                            "type": "Literal",
+                                                                                                                                                            "value": "field"
+                                                                                                                                                        },
+                                                                                                                                                        "kind": "init"
+                                                                                                                                                    },
+                                                                                                                                                    {
+                                                                                                                                                        "type": "Property",
+                                                                                                                                                        "key": {
+                                                                                                                                                            "type": "Identifier",
+                                                                                                                                                            "name": "id"
+                                                                                                                                                        },
+                                                                                                                                                        "value": {
+                                                                                                                                                            "type": "Literal",
+                                                                                                                                                            "value": "approver-field-picker"
+                                                                                                                                                        },
+                                                                                                                                                        "kind": "init"
+                                                                                                                                                    },
+                                                                                                                                                    {
+                                                                                                                                                        "type": "Property",
+                                                                                                                                                        "key": {
+                                                                                                                                                            "type": "Identifier",
+                                                                                                                                                            "name": "extraClasses"
+                                                                                                                                                        },
+                                                                                                                                                        "value": {
+                                                                                                                                                            "type": "Literal",
+                                                                                                                                                            "value": "js-approver-field-picker"
+                                                                                                                                                        },
+                                                                                                                                                        "kind": "init"
+                                                                                                                                                    },
+                                                                                                                                                    {
+                                                                                                                                                        "type": "Property",
+                                                                                                                                                        "key": {
+                                                                                                                                                            "type": "Identifier",
+                                                                                                                                                            "name": "options"
+                                                                                                                                                        },
+                                                                                                                                                        "value": {
+                                                                                                                                                            "type": "Identifier",
+                                                                                                                                                            "name": "eligibleFields"
+                                                                                                                                                        },
+                                                                                                                                                        "kind": "init"
+                                                                                                                                                    }
+                                                                                                                                                ]
+                                                                                                                                            }
+                                                                                                                                        }
+                                                                                                                                    ],
+                                                                                                                                    "selfClosing": true
+                                                                                                                                },
+                                                                                                                                "closingElement": null,
+                                                                                                                                "children": []
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                                    ]
+                                                                                                                },
+                                                                                                                "kind": "init"
+                                                                                                            }
+                                                                                                        ]
+                                                                                                    }
+                                                                                                }
+                                                                                            ],
+                                                                                            "selfClosing": true
+                                                                                        },
+                                                                                        "closingElement": null,
+                                                                                        "children": []
+                                                                                    },
+                                                                                    {
+                                                                                        "type": "JSXElement",
+                                                                                        "openingElement": {
+                                                                                            "type": "JSXOpeningElement",
+                                                                                            "name": {
+                                                                                                "type": "JSXMemberExpression",
+                                                                                                "object": {
+                                                                                                    "type": "JSXMemberExpression",
+                                                                                                    "object": {
+                                                                                                        "type": "Identifier",
+                                                                                                        "name": "aui"
+                                                                                                    },
+                                                                                                    "property": {
+                                                                                                        "type": "Identifier",
+                                                                                                        "name": "form"
+                                                                                                    }
+                                                                                                },
+                                                                                                "property": {
+                                                                                                    "type": "Identifier",
+                                                                                                    "name": "fieldset"
+                                                                                                }
+                                                                                            },
+                                                                                            "attributes": [
+                                                                                                {
+                                                                                                    "type": "JSXSpreadAttribute",
+                                                                                                    "argument": {
+                                                                                                        "type": "ObjectExpression",
+                                                                                                        "properties": [
+                                                                                                            {
+                                                                                                                "type": "Property",
+                                                                                                                "key": {
+                                                                                                                    "type": "Identifier",
+                                                                                                                    "name": "isGroup"
+                                                                                                                },
+                                                                                                                "value": {
+                                                                                                                    "type": "Literal",
+                                                                                                                    "value": "true"
+                                                                                                                },
+                                                                                                                "kind": "init"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "type": "Property",
+                                                                                                                "key": {
+                                                                                                                    "type": "Identifier",
+                                                                                                                    "name": "legendContent"
+                                                                                                                },
+                                                                                                                "value": {
+                                                                                                                    "type": "CallExpression",
+                                                                                                                    "callee": {
+                                                                                                                        "type": "Identifier",
+                                                                                                                        "name": "getText"
+                                                                                                                    },
+                                                                                                                    "arguments": [
+                                                                                                                        {
+                                                                                                                            "type": "Literal",
+                                                                                                                            "value": "sd.approval.condition.label"
+                                                                                                                        }
+                                                                                                                    ]
+                                                                                                                },
+                                                                                                                "kind": "init"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "type": "Property",
+                                                                                                                "key": {
+                                                                                                                    "type": "Identifier",
+                                                                                                                    "name": "content"
+                                                                                                                },
+                                                                                                                "value": {
+                                                                                                                    "type": "ArrayExpression",
+                                                                                                                    "elements": [
+                                                                                                                        {
+                                                                                                                            "type": "JSXElement",
+                                                                                                                            "openingElement": {
+                                                                                                                                "type": "JSXOpeningElement",
+                                                                                                                                "name": {
+                                                                                                                                    "type": "Identifier",
+                                                                                                                                    "name": "div"
+                                                                                                                                },
+                                                                                                                                "selfClosing": false,
+                                                                                                                                "attributes": [
+                                                                                                                                    {
+                                                                                                                                        "type": "JSXAttribute",
+                                                                                                                                        "name": "class",
+                                                                                                                                        "value": {
+                                                                                                                                            "type": "Literal",
+                                                                                                                                            "value": "radio"
+                                                                                                                                        }
+                                                                                                                                    }
+                                                                                                                                ]
+                                                                                                                            },
+                                                                                                                            "closingElement": {
+                                                                                                                                "type": "JSXClosingElement",
+                                                                                                                                "name": {
+                                                                                                                                    "type": "Identifier",
+                                                                                                                                    "name": "div"
+                                                                                                                                }
+                                                                                                                            },
+                                                                                                                            "children": [
+                                                                                                                                {
+                                                                                                                                    "type": "JSXElement",
+                                                                                                                                    "openingElement": {
+                                                                                                                                        "type": "JSXOpeningElement",
+                                                                                                                                        "name": {
+                                                                                                                                            "type": "Identifier",
+                                                                                                                                            "name": "input"
+                                                                                                                                        },
+                                                                                                                                        "selfClosing": true,
+                                                                                                                                        "attributes": [
+                                                                                                                                            {
+                                                                                                                                                "type": "JSXAttribute",
+                                                                                                                                                "name": "class",
+                                                                                                                                                "value": {
+                                                                                                                                                    "type": "Literal",
+                                                                                                                                                    "value": "radio"
+                                                                                                                                                }
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "type": "JSXAttribute",
+                                                                                                                                                "name": "type",
+                                                                                                                                                "value": {
+                                                                                                                                                    "type": "Literal",
+                                                                                                                                                    "value": "radio"
+                                                                                                                                                }
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "type": "JSXAttribute",
+                                                                                                                                                "name": "checked",
+                                                                                                                                                "value": {
+                                                                                                                                                    "type": "Literal",
+                                                                                                                                                    "value": "checked"
+                                                                                                                                                }
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "type": "JSXAttribute",
+                                                                                                                                                "name": "name",
+                                                                                                                                                "value": {
+                                                                                                                                                    "type": "Literal",
+                                                                                                                                                    "value": "condition"
+                                                                                                                                                }
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "type": "JSXAttribute",
+                                                                                                                                                "name": "value",
+                                                                                                                                                "value": {
+                                                                                                                                                    "type": "Literal",
+                                                                                                                                                    "value": "percent"
+                                                                                                                                                }
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "type": "JSXAttribute",
+                                                                                                                                                "name": "id",
+                                                                                                                                                "value": {
+                                                                                                                                                    "type": "Literal",
+                                                                                                                                                    "value": "condition-all"
+                                                                                                                                                }
+                                                                                                                                            }
+                                                                                                                                        ]
+                                                                                                                                    },
+                                                                                                                                    "closingElement": null,
+                                                                                                                                    "children": []
+                                                                                                                                },
+                                                                                                                                {
+                                                                                                                                    "type": "JSXElement",
+                                                                                                                                    "openingElement": {
+                                                                                                                                        "type": "JSXOpeningElement",
+                                                                                                                                        "name": {
+                                                                                                                                            "type": "Identifier",
+                                                                                                                                            "name": "label"
+                                                                                                                                        },
+                                                                                                                                        "selfClosing": false,
+                                                                                                                                        "attributes": [
+                                                                                                                                            {
+                                                                                                                                                "type": "JSXAttribute",
+                                                                                                                                                "name": "for",
+                                                                                                                                                "value": {
+                                                                                                                                                    "type": "Literal",
+                                                                                                                                                    "value": "condition-all"
+                                                                                                                                                }
+                                                                                                                                            }
+                                                                                                                                        ]
+                                                                                                                                    },
+                                                                                                                                    "closingElement": {
+                                                                                                                                        "type": "JSXClosingElement",
+                                                                                                                                        "name": {
+                                                                                                                                            "type": "Identifier",
+                                                                                                                                            "name": "label"
+                                                                                                                                        }
+                                                                                                                                    },
+                                                                                                                                    "children": [
+                                                                                                                                        {
+                                                                                                                                            "type": "JSXExpressionContainer",
+                                                                                                                                            "expression": {
+                                                                                                                                                "type": "CallExpression",
+                                                                                                                                                "callee": {
+                                                                                                                                                    "type": "Identifier",
+                                                                                                                                                    "name": "getText"
+                                                                                                                                                },
+                                                                                                                                                "arguments": [
+                                                                                                                                                    {
+                                                                                                                                                        "type": "Literal",
+                                                                                                                                                        "value": "sd.approval.condition.all.label"
+                                                                                                                                                    }
+                                                                                                                                                ]
+                                                                                                                                            }
+                                                                                                                                        }
+                                                                                                                                    ]
+                                                                                                                                }
+                                                                                                                            ]
+                                                                                                                        },
+                                                                                                                        {
+                                                                                                                            "type": "JSXElement",
+                                                                                                                            "openingElement": {
+                                                                                                                                "type": "JSXOpeningElement",
+                                                                                                                                "name": {
+                                                                                                                                    "type": "Identifier",
+                                                                                                                                    "name": "div"
+                                                                                                                                },
+                                                                                                                                "selfClosing": false,
+                                                                                                                                "attributes": [
+                                                                                                                                    {
+                                                                                                                                        "type": "JSXAttribute",
+                                                                                                                                        "name": "class",
+                                                                                                                                        "value": {
+                                                                                                                                            "type": "Literal",
+                                                                                                                                            "value": "radio sd-partial-condition"
+                                                                                                                                        }
+                                                                                                                                    }
+                                                                                                                                ]
+                                                                                                                            },
+                                                                                                                            "closingElement": {
+                                                                                                                                "type": "JSXClosingElement",
+                                                                                                                                "name": {
+                                                                                                                                    "type": "Identifier",
+                                                                                                                                    "name": "div"
+                                                                                                                                }
+                                                                                                                            },
+                                                                                                                            "children": [
+                                                                                                                                {
+                                                                                                                                    "type": "JSXElement",
+                                                                                                                                    "openingElement": {
+                                                                                                                                        "type": "JSXOpeningElement",
+                                                                                                                                        "name": {
+                                                                                                                                            "type": "Identifier",
+                                                                                                                                            "name": "input"
+                                                                                                                                        },
+                                                                                                                                        "selfClosing": true,
+                                                                                                                                        "attributes": [
+                                                                                                                                            {
+                                                                                                                                                "type": "JSXAttribute",
+                                                                                                                                                "name": "class",
+                                                                                                                                                "value": {
+                                                                                                                                                    "type": "Literal",
+                                                                                                                                                    "value": "radio js-condition-partial"
+                                                                                                                                                }
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "type": "JSXAttribute",
+                                                                                                                                                "name": "type",
+                                                                                                                                                "value": {
+                                                                                                                                                    "type": "Literal",
+                                                                                                                                                    "value": "radio"
+                                                                                                                                                }
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "type": "JSXAttribute",
+                                                                                                                                                "name": "name",
+                                                                                                                                                "value": {
+                                                                                                                                                    "type": "Literal",
+                                                                                                                                                    "value": "condition"
+                                                                                                                                                }
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "type": "JSXAttribute",
+                                                                                                                                                "name": "value",
+                                                                                                                                                "value": {
+                                                                                                                                                    "type": "Literal",
+                                                                                                                                                    "value": "number"
+                                                                                                                                                }
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "type": "JSXAttribute",
+                                                                                                                                                "name": "id",
+                                                                                                                                                "value": {
+                                                                                                                                                    "type": "Literal",
+                                                                                                                                                    "value": "condition-partial"
+                                                                                                                                                }
+                                                                                                                                            }
+                                                                                                                                        ]
+                                                                                                                                    },
+                                                                                                                                    "closingElement": null,
+                                                                                                                                    "children": []
+                                                                                                                                },
+                                                                                                                                {
+                                                                                                                                    "type": "JSXElement",
+                                                                                                                                    "openingElement": {
+                                                                                                                                        "type": "JSXOpeningElement",
+                                                                                                                                        "name": "input",
+                                                                                                                                        "selfClosing": true,
+                                                                                                                                        "attributes": [
+                                                                                                                                            {
+                                                                                                                                                "type": "JSXAttribute",
+                                                                                                                                                "name": "class",
+                                                                                                                                                "value": {
+                                                                                                                                                    "type": "Literal",
+                                                                                                                                                    "value": "text js-partial-amount sd-partial-amount"
+                                                                                                                                                }
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "type": "JSXAttribute",
+                                                                                                                                                "name": "type",
+                                                                                                                                                "value": {
+                                                                                                                                                    "type": "Literal",
+                                                                                                                                                    "value": "text"
+                                                                                                                                                }
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "type": "JSXAttribute",
+                                                                                                                                                "name": "name",
+                                                                                                                                                "value": {
+                                                                                                                                                    "type": "Literal",
+                                                                                                                                                    "value": "partial-amount"
+                                                                                                                                                }
+                                                                                                                                            }
+                                                                                                                                        ]
+                                                                                                                                    },
+                                                                                                                                    "closingElement": null,
+                                                                                                                                    "children": []
+                                                                                                                                },
+                                                                                                                                {
+                                                                                                                                    "type": "JSXElement",
+                                                                                                                                    "openingElement": {
+                                                                                                                                        "type": "JSXOpeningElement",
+                                                                                                                                        "name": {
+                                                                                                                                            "type": "Identifier",
+                                                                                                                                            "name": "label"
+                                                                                                                                        },
+                                                                                                                                        "selfClosing": false,
+                                                                                                                                        "attributes": [
+                                                                                                                                            {
+                                                                                                                                                "type": "JSXAttribute",
+                                                                                                                                                "name": "for",
+                                                                                                                                                "value": {
+                                                                                                                                                    "type": "Literal",
+                                                                                                                                                    "value": "condition-partial"
+                                                                                                                                                }
+                                                                                                                                            }
+                                                                                                                                        ]
+                                                                                                                                    },
+                                                                                                                                    "closingElement": {
+                                                                                                                                        "type": "JSXClosingElement",
+                                                                                                                                        "name": {
+                                                                                                                                            "type": "Identifier",
+                                                                                                                                            "name": "label"
+                                                                                                                                        }
+                                                                                                                                    },
+                                                                                                                                    "children": [
+                                                                                                                                        {
+                                                                                                                                            "type": "JSXExpressionContainer",
+                                                                                                                                            "expression": {
+                                                                                                                                                "type": "CallExpression",
+                                                                                                                                                "callee": {
+                                                                                                                                                    "type": "Identifier",
+                                                                                                                                                    "name": "getText"
+                                                                                                                                                },
+                                                                                                                                                "arguments": [
+                                                                                                                                                    {
+                                                                                                                                                        "type": "Literal",
+                                                                                                                                                        "value": "sd.approval.condition.partial.label"
+                                                                                                                                                    }
+                                                                                                                                                ]
+                                                                                                                                            }
+                                                                                                                                        }
+                                                                                                                                    ]
+                                                                                                                                }
+                                                                                                                            ]
+                                                                                                                        }
+                                                                                                                    ]
+                                                                                                                },
+                                                                                                                "kind": "init"
+                                                                                                            }
+                                                                                                        ]
+                                                                                                    }
+                                                                                                }
+                                                                                            ],
+                                                                                            "selfClosing": true
+                                                                                        },
+                                                                                        "closingElement": null,
+                                                                                        "children": []
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            "kind": "init"
+                                                                        },
+                                                                        {
+                                                                            "type": "Property",
+                                                                            "key": {
+                                                                                "type": "Identifier",
+                                                                                "name": "footerActionContent"
+                                                                            },
+                                                                            "value": {
+                                                                                "type": "JSXElement",
+                                                                                "openingElement": {
+                                                                                    "type": "JSXOpeningElement",
+                                                                                    "name": {
+                                                                                        "type": "JSXMemberExpression",
+                                                                                        "object": {
+                                                                                            "type": "JSXMemberExpression",
+                                                                                            "object": {
+                                                                                                "type": "JSXMemberExpression",
+                                                                                                "object": {
+                                                                                                    "type": "JSXMemberExpression",
+                                                                                                    "object": {
+                                                                                                        "type": "Identifier",
+                                                                                                        "name": "ServiceDesk"
+                                                                                                    },
+                                                                                                    "property": {
+                                                                                                        "type": "Identifier",
+                                                                                                        "name": "Templates"
+                                                                                                    }
+                                                                                                },
+                                                                                                "property": {
+                                                                                                    "type": "Identifier",
+                                                                                                    "name": "Shared"
+                                                                                                }
+                                                                                            },
+                                                                                            "property": {
+                                                                                                "type": "Identifier",
+                                                                                                "name": "Form"
+                                                                                            }
+                                                                                        },
+                                                                                        "property": {
+                                                                                            "type": "Identifier",
+                                                                                            "name": "submitButtons"
+                                                                                        }
+                                                                                    },
+                                                                                    "attributes": [
+                                                                                        {
+                                                                                            "type": "JSXSpreadAttribute",
+                                                                                            "argument": {
+                                                                                                "type": "ObjectExpression",
+                                                                                                "properties": [
+                                                                                                    {
+                                                                                                        "type": "Property",
+                                                                                                        "key": {
+                                                                                                            "type": "Identifier",
+                                                                                                            "name": "submitExtraAttributes"
+                                                                                                        },
+                                                                                                        "value": {
+                                                                                                            "type": "ConditionalExpression",
+                                                                                                            "test": {
+                                                                                                                "type": "MemberExpression",
+                                                                                                                "object": {
+                                                                                                                    "type": "Identifier",
+                                                                                                                    "name": "eligibleFields"
+                                                                                                                },
+                                                                                                                "property": {
+                                                                                                                    "type": "Identifier",
+                                                                                                                    "name": "length"
+                                                                                                                },
+                                                                                                                "computed": false
+                                                                                                            },
+                                                                                                            "consequent": {
+                                                                                                                "type": "ArrayExpression",
+                                                                                                                "elements": []
+                                                                                                            },
+                                                                                                            "alternate": {
+                                                                                                                "type": "ObjectExpression",
+                                                                                                                "properties": [
+                                                                                                                    {
+                                                                                                                        "type": "Property",
+                                                                                                                        "key": {
+                                                                                                                            "type": "Literal",
+                                                                                                                            "value": "disabled"
+                                                                                                                        },
+                                                                                                                        "value": {
+                                                                                                                            "type": "Literal",
+                                                                                                                            "value": "disabled"
+                                                                                                                        },
+                                                                                                                        "kind": "init",
+                                                                                                                        "computed": false
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            }
+                                                                                                        },
+                                                                                                        "kind": "init"
+                                                                                                    },
+                                                                                                    {
+                                                                                                        "type": "Property",
+                                                                                                        "key": {
+                                                                                                            "type": "Identifier",
+                                                                                                            "name": "submitExtraClasses"
+                                                                                                        },
+                                                                                                        "value": {
+                                                                                                            "type": "Literal",
+                                                                                                            "value": "aui-button-primary"
+                                                                                                        },
+                                                                                                        "kind": "init"
+                                                                                                    },
+                                                                                                    {
+                                                                                                        "type": "Property",
+                                                                                                        "key": {
+                                                                                                            "type": "Identifier",
+                                                                                                            "name": "submitButtonLabel"
+                                                                                                        },
+                                                                                                        "value": {
+                                                                                                            "type": "CallExpression",
+                                                                                                            "callee": {
+                                                                                                                "type": "Identifier",
+                                                                                                                "name": "getText"
+                                                                                                            },
+                                                                                                            "arguments": [
+                                                                                                                {
+                                                                                                                    "type": "Literal",
+                                                                                                                    "value": "sd.common.words.create"
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        },
+                                                                                                        "kind": "init"
+                                                                                                    },
+                                                                                                    {
+                                                                                                        "type": "Property",
+                                                                                                        "key": {
+                                                                                                            "type": "Identifier",
+                                                                                                            "name": "alignment"
+                                                                                                        },
+                                                                                                        "value": {
+                                                                                                            "type": "Literal",
+                                                                                                            "value": "right"
+                                                                                                        },
+                                                                                                        "kind": "init"
+                                                                                                    }
+                                                                                                ]
+                                                                                            }
+                                                                                        }
+                                                                                    ],
+                                                                                    "selfClosing": true
+                                                                                },
+                                                                                "closingElement": null,
+                                                                                "children": []
+                                                                            },
+                                                                            "kind": "init"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        ],
+                                                        "selfClosing": true
+                                                    },
+                                                    "closingElement": null,
+                                                    "children": []
+                                                },
+                                                "kind": "init"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "selfClosing": true
+                        },
+                        "closingElement": null,
+                        "children": []
                     }
                 }
             }

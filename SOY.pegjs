@@ -447,7 +447,10 @@ SoyValueExpr
 
 SoyArrayExpression
   = "[" WS* elements:SoyArrayElements? WS* "]" {
-    return [].concat(elements).reduce((acc, e) => acc.concat(e), []);
+    return {
+      type: "ArrayExpression",
+      elements: [].concat(elements).filter(e => !!e).reduce((acc, e) => acc.concat(e), [])
+    };
   };
 
 SoyArrayElements
@@ -478,12 +481,14 @@ SoyMapEntries
 
 SoyMapSingleEntry
   = WS* key:SoyValueExpr WS* ":" WS* value:SoyValueExpr WS* {
-    return {
-      type: "Property",
-      key,
-      value,
-      computed: !!key.type
-    };
+    return [
+      {
+        type: "Property",
+        key,
+        value,
+        computed: !!key.type
+      }
+    ];
   };
 
 SoyMapMultipleEntry

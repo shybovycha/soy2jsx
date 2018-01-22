@@ -120,9 +120,18 @@ class TemplateVisitor extends Visitor {
         let returnArgument = children.filter(e => e.type === "JSXElement" || (e.type === "ExpressionStatement" && e.expression.type !== "AssignmentExpression"));
 
         if (returnArgument.length > 1) {
+            // unpack unnecessary ExpressionStatements
+            const elements = returnArgument.map(e => {
+                if (e.type === "ExpressionStatement") {
+                    return e.expression; // TODO: if it is a foreach call - add SpreadOperator
+                } else {
+                    return e;
+                }
+            });
+
             returnArgument = {
                 type: "ArrayExpression",
-                elements: returnArgument
+                elements
             };
         } else if (returnArgument.length == 1) {
             returnArgument = returnArgument[0];
@@ -1281,15 +1290,37 @@ class AssignmentExpressionVisitor extends Visitor {
     }
 }
 
-class Generator {
+class ArrayExpressionVisitor extends Visitor {
+    preprocess(node, localCtx, parentCtx) {
+        const elements = node.elements.filter(e => !!e);
+
+        localCtx.elements = this.preprocessChildren(elements, ContextType.ARRAY_ELEMENT, localCtx);
+    }
+
+    generate(localCtx, parentCtx) {
+        return {
+            type: "ArrayExpression",
+            elements: this.generateChildren(localCtx.elements, localCtx)
+        };
+    }
+}
+
+class Optimizer {
     constructor() { }
 
-    generateJSX(ast) {
+    optimize(ast) {
         const ctx = new Context(ContextType.SOY_FILE);
         const visitor = Visitor.find('SoyFile');
 
-        visitor.preprocess(ast, ctx);
-        return visitor.generate(ctx, null);
+        try {
+            visitor.preprocess(ast, ctx);
+            
+            return visitor.generate(ctx, null);
+        } catch (e) {
+            console.error('Can not optimize AST', e);
+
+            throw e;
+        }
     }
 }
 
@@ -1328,5 +1359,6 @@ Visitor.register('GeneratedElement', new GeneratedElementVisitor());
 Visitor.register('ConditionalBranch', new ConditionalBranchVisitor());
 Visitor.register('AssignmentExpression', new AssignmentExpressionVisitor());
 Visitor.register('AttributesObject', new AttributesObjectVisitor());
+Visitor.register('ArrayExpression', new ArrayExpressionVisitor());
 
-module.exports.generate = (ast) => new Generator().generateJSX(ast);
+module.exports.optimize = (ast) => new Optimizer().optimize(ast);
