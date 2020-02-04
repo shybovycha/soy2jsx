@@ -4,18 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "compile-grammar-dev": "./node_modules/.bin/pegjs -o SOY.js --trace --allowed-start-rules SOY SOY.pegjs ",
-    "compile-grammar": "./node_modules/.bin/pegjs -o SOY.js --allowed-start-rules SOY SOY.pegjs ",
-    "test": "npm run-script compile-grammar && node index.js sample.soy",
+    "compile-grammar-dev": "pegjs -o SOY.js --trace --allowed-start-rules SOY SOY.pegjs ",
+    "compile-grammar": "pegjs -o SOY.js --allowed-start-rules SOY SOY.pegjs ",
+    "test": "npm run compile-grammar && node index.js sample.soy",
     "generate-jsx": "node generator.js sample.soy.ast"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "pegjs": "^0.10.0",
+  "devDependencies": {
+    "esformatter": "^0.11.2",
+    "esformatter-jsx": "^8.0.1",
     "glob": "^7.1.2",
-    "recast": "^0.12.9",
-    "esformatter": "^0.10.0",
-    "esformatter-jsx": "^8.0.1"
+    "pegjs": "^0.10.0",
+    "recast": "^0.18.5"
   }
 }
