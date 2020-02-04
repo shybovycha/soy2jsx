@@ -6,7 +6,7 @@
   "scripts": {
     "compile-grammar-dev": "yarn pegjs -o ./src/grammar/SOY.js --trace --allowed-start-rules SOY ./src/grammar/SOY.pegjs ",
     "compile-grammar": "yarn pegjs -o ./src/grammar/SOY.js --allowed-start-rules SOY ./src/grammar/SOY.pegjs ",
-    "test": "yarn compile-grammar && yarn jest"
+    "test": "yarn jest"
   },
   "author": "",
   "license": "ISC",
