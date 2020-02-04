@@ -169,7 +169,11 @@ SoySpecialCharacter
   = SoySpecialCharacterSpace
   / SoySpecialCharacterIndentation
   / SoySpecialCharacterCaretReturn
-  / SoySpecialCharacterNewline;
+  / SoySpecialCharacterNewline
+  / SoyNilCharacter;
+
+SoyNilCharacter
+  = "{nil}" { return null; };
 
 SoySpecialCharacterSpace
   = "{sp}" { return null; };

@@ -48,9 +48,9 @@ class TemplateVisitor extends Visitor {
 
         localCtx.name = this.preprocessChild(node.name, ContextType.TEMPLATE_NAME, localCtx);
         localCtx.addPropertyElements('body', this.preprocessChildren(node.body, ContextType.TEMPLATE_ELEMENT, localCtx));
-        
+
         localCtx.params = [];
-        
+
         parentCtx.addPropertyElement('templates', localCtx);
 
         this.preprocessChildren(node.comments, ContextType.TEMPLATE_COMMENT, localCtx);
@@ -60,7 +60,7 @@ class TemplateVisitor extends Visitor {
         const name = this.generateChild(localCtx.name, localCtx);
 
         const params = localCtx.params.map(param => ({
-            type: "Property",
+            type: "ObjectProperty",
             key: param.name,
             value: param.name,
             kind: "init",
@@ -115,7 +115,7 @@ class TemplateVisitor extends Visitor {
         //         return child;
         //     });
         // }
-        
+
         // TODO: is this a template call-only templates processing (the second "OR" branch)?
         let returnArgument = children.filter(e => e.type === "JSXElement" || (e.type === "ExpressionStatement" && e.expression.type !== "AssignmentExpression"));
 
@@ -130,8 +130,17 @@ class TemplateVisitor extends Visitor {
             });
 
             returnArgument = {
-                type: "ArrayExpression",
-                elements
+                type: "JSXFragment",
+                openingFragment: {
+                    type: "JSXOpeningFragment"
+                },
+                closingFragment: {
+                    type: "JSXClosingFragment"
+                },
+                children: elements,
+                // extra: {
+                //     parenthesized: true,
+                // },
             };
         } else if (returnArgument.length == 1) {
             returnArgument = returnArgument[0];
@@ -180,10 +189,10 @@ class TemplateVisitor extends Visitor {
                 right: {
                     type: "ArrowFunctionExpression",
                     id: null,
-                    params: [
-                        {
-                            type: "ObjectPattern",
-                            properties: params
+                        params: [
+                            {
+                                type: "ObjectPattern",
+                                properties: params
                         }
                     ],
                     body
@@ -208,7 +217,7 @@ class MemberExpressionVisitor extends Visitor {
         };
 
         let props = [node.object].concat(node.properties).filter(e => !!e);
-        
+
         props = this.preprocessChildren(props, ContextType.MEMBER_EXPRESSION_CHILD, localCtx);
 
         props.reverse();
@@ -280,7 +289,7 @@ class CommentVisitor extends Visitor {
 
 class CommentTextVisitor extends Visitor {
     preprocess(node, localCtx, parentCtx) {
-        // localCtx.setProperty('comment', node.text); 
+        // localCtx.setProperty('comment', node.text);
     }
 
     generate(localCtx) {
@@ -327,7 +336,7 @@ class SoyCapableStringVisitor extends Visitor {
     preprocess(node, localCtx, parentCtx) {
         let quasis = [];
         let expressions = [];
-        
+
         node.body.forEach(e => {
             if (!e.type || (e.type && e.type !== "InterpolatedExpression" && e.type !== "IfStatement")) {
                 quasis.push(e);
@@ -336,7 +345,7 @@ class SoyCapableStringVisitor extends Visitor {
                 expressions.push(e);
             }
         });
-        
+
         localCtx.type = ContextType.STRING_INTERPOLATED_EXPRESSION;
         localCtx.quasis = quasis;
         localCtx.expressions = this.preprocessChildren(expressions, ContextType.STRING_INTERPOLATED_EXPRESSION, localCtx);
@@ -437,9 +446,9 @@ class SwitchOperatorVisitor extends Visitor {
             } else {
                 const {body, caseValue} = caseExpressions[0];
                 const alternate = reduceCaseExpressions(switchExpression, caseExpressions.slice(1));
-                
+
                 let consequent;
-                
+
                 if (Array.isArray(body)) {
                     consequent = {
                         type: "ReturnStatement",
@@ -544,7 +553,7 @@ class ForeachOperatorVisitor extends Visitor {
 
         const range = this.generateChild(localCtx.range, localCtx);
         const iterator = this.generateChild(localCtx.iterator, localCtx);
-        
+
         const foreachExpr = {
             type: "CallExpression",
             callee: {
@@ -611,7 +620,7 @@ class ObjectExpressionVisitor extends Visitor {
 class PropertyVisitor extends Visitor {
     preprocess(node, localCtx, parentCtx) {
         localCtx.key = this.preprocessChild(node.key, ContextType.PROPERTY_KEY, localCtx);
-        localCtx.value = Array.isArray(node.value) ? 
+        localCtx.value = Array.isArray(node.value) ?
             this.preprocessChildren(node.value, ContextType.PROPERTY_VALUE, localCtx) :
             this.preprocessChild(node.value, ContextType.PROPERTY_VALUE, localCtx);
 
@@ -637,7 +646,7 @@ class BinaryExpressionVisitor extends Visitor {
         };
 
         localCtx.operator = binaryOperatorsMapping[node.operator] || node.operator;
-        
+
         localCtx.left = this.preprocessChild(node.left, ContextType.BINARY_OPERATOR_ARGUMENT, localCtx);
         localCtx.right = this.preprocessChild(node.right, ContextType.BINARY_OPERATOR_ARGUMENT, localCtx);
     }
@@ -671,7 +680,7 @@ class LogicalExpressionVisitor extends Visitor {
         };
 
         localCtx.operator = binaryOperatorsMapping[node.operator] || node.operator;
-        
+
         localCtx.left = this.preprocessChild(node.left, ContextType.BINARY_OPERATOR_ARGUMENT, localCtx);
         localCtx.right = this.preprocessChild(node.right, ContextType.BINARY_OPERATOR_ARGUMENT, localCtx);
     }
@@ -786,6 +795,10 @@ class GeneratedAttributeVisitor extends Visitor {
             if (Array.isArray(name)) {
                 if (name.length == 1) {
                     name = name[0];
+
+                    if (name === 'class') {
+                        name = 'className';
+                    }
                 } else if (name.length > 1) {
                     name = this.createTemplateLiteralFromExpressions(name);
                 }
@@ -848,10 +861,19 @@ class ConditionalExpressionVisitor extends Visitor {
                     };
                 }
 
+                let consequent = this.simplifyListExpression(clauses[0].body);
+
+                if (Array.isArray(consequent) && consequent.length > 1) {
+                    consequent = {
+                        type: "ArrayExpression",
+                        elements: consequent
+                    };
+                }
+
                 return {
                     type: "ConditionalExpression",
                     test: clauses[0].test,
-                    consequent: this.simplifyListExpression(clauses[0].body),
+                    consequent,
                     alternate: recursiveReduce(clauses.slice(1))
                 };
             }
@@ -878,11 +900,25 @@ class ConditionalExpressionVisitor extends Visitor {
         consequent = this.simplifyListExpression(consequent);
         alternate = this.simplifyListExpression(alternate);
 
+        if (Array.isArray(consequent) && consequent.length > 1) {
+            consequent = {
+                type: "ArrayExpression",
+                elements: consequent
+            };
+        }
+
+        if (Array.isArray(alternate) && alternate.length > 1) {
+            alternate = {
+                type: "ArrayExpression",
+                elements: alternate
+            };
+        }
+
         const condExpr = {
             type,
             test,
             consequent,
-            alternate 
+            alternate
         };
 
         const needsWrapper = [
@@ -901,24 +937,24 @@ class IfStatementVisitor extends ConditionalExpressionVisitor {
 class VariableDeclarationVisitor extends Visitor {
     preprocess(node, localCtx, parentCtx) {
         localCtx.type = ContextType.VARIABLE_DECLARATION;
-        
+
         localCtx.name = node.name;
 
-        const value = Array.isArray(node.value) ? 
-            this.preprocessChildren(node.value, ContextType.VARIABLE_DECLARATION, localCtx) : 
+        const value = Array.isArray(node.value) ?
+            this.preprocessChildren(node.value, ContextType.VARIABLE_DECLARATION, localCtx) :
             this.preprocessChild(node.value, ContextType.VARIABLE_DECLARATION, localCtx);
 
         localCtx.value = value;
 
         const templateCtx = localCtx.findParent(ContextType.TEMPLATE);
 
-        templateCtx.addPropertyElement('variableDeclarations', localCtx);;
+        templateCtx.addPropertyElement('variableDeclarations', localCtx);
     }
 
     generate(localCtx) {
         const id = this.generateChild(localCtx.name, localCtx);
-        
-        let init = Array.isArray(localCtx.value) ? 
+
+        let init = Array.isArray(localCtx.value) ?
             this.generateChildren(localCtx.value, localCtx) :
             this.generateChild(localCtx.value, localCtx);
 
@@ -979,7 +1015,7 @@ class InterpolatedExpressionVisitor extends Visitor {
         } else {
             expressions = expressions[0];
         }
-        
+
         const filters = localCtx.filters;
 
         const recursiveApplyFilters = function (filters, expression) {
@@ -1137,7 +1173,7 @@ class HtmlElementVisitor extends Visitor {
             localCtx.attributesVarName = attributesVarName;
 
             templateCtx.addPropertyElement('attributeVars', attributesVarName);
-            
+
             const attributesVarValue = {
                 type: "ObjectExpression",
                 properties: []
@@ -1197,6 +1233,10 @@ class HtmlElementVisitor extends Visitor {
 
     generate(localCtx) {
         let { tagName, attributes, children } = localCtx;
+
+        if (tagName.type === "Identifier") {
+            tagName.type = "JSXIdentifier";
+        }
 
         const selfClosing = children.length == 0;
 
@@ -1314,7 +1354,7 @@ class Optimizer {
 
         try {
             visitor.preprocess(ast, ctx);
-            
+
             return visitor.generate(ctx, null);
         } catch (e) {
             console.error('Can not optimize AST', e);
