@@ -3,11 +3,22 @@ const optimizer = require('./optimizer.js');
 
 const fs = require('fs');
 const path = require('path');
-const process = require('process');
-const glob = require('glob');
 const recast = require('recast');
 
-const compileFile = filename => {
+const compileCode = (soySource) =>
+    new Promise((resolve, reject) => {
+        try {
+            const soyAst = parser.parse(soySource);
+            const jsxAst = optimizer.optimize(soyAst);
+            const jsx = recast.print(jsxAst).code;
+
+            resolve(jsx);
+        } catch (e) {
+            reject(e);
+        }
+    });
+
+const compileFile = (filename, { writeSoyAst = false, writeJsxAst = false, verify = false }) => {
     return new Promise((resolve, reject) => {
         fs.readFile(filename, 'utf8', (err, sample) => {
             if (err) {
@@ -27,9 +38,11 @@ const compileFile = filename => {
 
                 soyAst = parser.parse(sample);
 
-                console.log('Writing SOY AST to', soyAstFilename);
+                if (writeSoyAst) {
+                    console.log('Writing SOY AST to', soyAstFilename);
 
-                fs.writeFileSync(soyAstFilename, JSON.stringify(soyAst, null, 4));
+                    fs.writeFileSync(soyAstFilename, JSON.stringify(soyAst, null, 4));
+                }
             } catch (e) {
                 console.error(`PARSE ERROR: Could not parse file ${filename}.`, e);
                 return reject(e);
@@ -40,16 +53,17 @@ const compileFile = filename => {
 
                 jsxAst = optimizer.optimize(soyAst);
 
-                console.log('Writing JSX AST to', jsxAstFilename);
+                if (writeJsxAst) {
+                    console.log('Writing JSX AST to', jsxAstFilename);
 
-                fs.writeFileSync(jsxAstFilename, JSON.stringify(jsxAst, null, 4));
+                    fs.writeFileSync(jsxAstFilename, JSON.stringify(jsxAst, null, 4));
+                }
             } catch (e) {
                 console.error(`OPTIMIZE ERROR: Could not optimize JSX AST for ${filename}.`, e);
                 return reject(e);
             }
 
             try {
-                // const parsedAst = recast.parse();
                 console.log('Generating JSX from AST');
 
                 const jsx = recast.print(jsxAst).code;
@@ -58,10 +72,12 @@ const compileFile = filename => {
 
                 fs.writeFileSync(jsxFilename, jsx);
 
-                try {
-                    recast.parse(jsx);
-                } catch (e) {
-                    throw `Error parsing output JSX for ${filename}: ${JSON.stringify(e)}`;
+                if (verify) {
+                    try {
+                        recast.parse(jsx);
+                    } catch (e) {
+                        throw `Error parsing output JSX for ${filename}: ${JSON.stringify(e)}`;
+                    }
                 }
 
                 return resolve(jsx);
@@ -73,4 +89,4 @@ const compileFile = filename => {
     });
 }
 
-module.exports = { compileFile };
+module.exports = { compileCode, compileFile };
