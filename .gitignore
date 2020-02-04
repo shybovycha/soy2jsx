@@ -2,3 +2,5 @@ node_modules
 *.swp
 .idea
 .vscode
+src/grammar/SOY.js
+*.ast
