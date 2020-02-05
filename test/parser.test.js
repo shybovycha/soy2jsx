@@ -77,6 +77,118 @@ describe('parser', () => {
           });
         });
       });
+
+      describe('template comment', () => {
+        describe('no comment', () => {
+          it('succeeds', () => {});
+        });
+
+        describe('one-line comment', () => {
+          describe('with required parameter declaration', () => {
+            it('ignores parameter declaration', () => {});
+          });
+
+          describe('with optional parameter declaration', () => {
+            it('ignores parameter declaration', () => {});
+          });
+
+          describe('with special characters', () => {
+            it('succeeds', () => {});
+          });
+
+          describe('with variable interpolation', () => {
+            it('ignores that', () => {});
+          });
+
+          describe('with math expression', () => {
+            it('ignores that', () => {});
+          });
+
+          describe('with ternary expression', () => {
+            it('ignores that', () => {});
+          });
+        });
+
+        describe('multi-line comment with no parameters', () => {
+          describe('with special characters', () => {
+            it('succeeds', () => {});
+          });
+
+          describe('with variable interpolation', () => {
+            it('ignores that', () => {});
+          });
+
+          describe('with math expression', () => {
+            it('ignores that', () => {});
+          });
+
+          describe('with ternary expression', () => {
+            it('ignores that', () => {});
+          });
+        });
+
+        describe('multi-line comment with single required parameter', () => {
+          describe('and no documentation', () => {
+            it('generates that parameter', () => {});
+          });
+
+          describe('and documentation string', () => {
+            describe('and special characters', () => {
+              it('succeeds', () => {});
+            });
+
+            describe('and variable interpolation', () => {
+              it('ignores that', () => {});
+            });
+
+            describe('and math expression', () => {
+              it('ignores that', () => {});
+            });
+
+            describe('and ternary expression', () => {
+              it('ignores that', () => {});
+            });
+          });
+        });
+
+        describe('multi-line comment with single optional parameter', () => {
+          describe('and no documentation', () => {
+            it('generates that parameter', () => {});
+          });
+
+          describe('and documentation string', () => {
+            describe('and special characters', () => {
+              it('succeeds', () => {});
+            });
+
+            describe('and variable interpolation', () => {
+              it('ignores that', () => {});
+            });
+
+            describe('and math expression', () => {
+              it('ignores that', () => {});
+            });
+
+            describe('and ternary expression', () => {
+              it('ignores that', () => {});
+            });
+          });
+        });
+
+        describe('multi-line comment with multiple parameters', () => {
+          describe('all required', () => {
+            it('generates those params', () => {});
+          });
+
+          describe('all optional', () => {
+            it('generates those params', () => {});
+          });
+
+          describe('both required and optional', () => {
+            it('generates those params', () => {});
+          });
+        });
+      });
     });
   });
 });
