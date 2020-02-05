@@ -1783,7 +1783,7 @@ hello {$world ? $a : 42}
 {namespace Something}
 
 {template .tpl}
-  {let $tabWidth: 4}
+  {let $tabWidth: 4 /}
 {/template}
           `;
 
@@ -1797,7 +1797,7 @@ hello {$world ? $a : 42}
 {namespace Something}
 
 {template .tpl}
-  {let $gradient: 0.4}
+  {let $gradient: 0.4 /}
 {/template}
           `;
 
@@ -1812,7 +1812,7 @@ hello {$world ? $a : 42}
 {namespace Something}
 
 {template .tpl}
-  {let $tabWidth: $otherVar}
+  {let $tabWidth: $otherVar /}
 {/template}
           `;
 
@@ -1826,7 +1826,7 @@ hello {$world ? $a : 42}
 {namespace Something}
 
 {template .tpl}
-  {let $tabWidth: getOtherVar()}
+  {let $tabWidth: getOtherVar() /}
 {/template}
           `;
 
@@ -1840,7 +1840,7 @@ hello {$world ? $a : 42}
 {namespace Something}
 
 {template .tpl}
-  {let $isBlue: $isEnabled and not $isSelected or $somethingElse}
+  {let $isBlue: $isEnabled and not $isSelected or $somethingElse /}
 {/template}
           `;
 
@@ -1935,21 +1935,61 @@ hello {$world ? $a : 42}
                 });
               });
 
-              describe('with body parameter', () => {
-                const source = `
+              describe('with body parameters', () => {
+                describe('inline boolean param', () => {
+                  const source = `
 {namespace Something}
 
 {template .tpl}
   {let $info}
     {call .message }
-      <b>this is a warning</b>
+      {param body /}
     {/call}
   {/let}
 {/template}
               `;
 
-                it('is parsed correctly', () => {
-                  expect(parser.parse(source)).toMatchObject({});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
+                });
+
+                describe('inline key-value param', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+  {let $info}
+    {call .message }
+      {param body: 12 /}
+    {/call}
+  {/let}
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
+                });
+
+                describe('multiline param', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+  {let $info}
+    {call .message }
+      {param body}
+      <b>this is a warning</b>
+      {/param}
+    {/call}
+  {/let}
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
               });
             });
@@ -2070,8 +2110,8 @@ hello {$world ? $a : 42}
 {/template}
               `;
 
-            it('is parsed correctly', () => {
-              expect(parser.parse(source)).toMatchObject({});
+            it('fails', () => {
+              expect(() => parser.parse(source)).toThrow();
             });
           });
 
@@ -2085,7 +2125,7 @@ hello {$world ? $a : 42}
   <div>{$it}</div>
 {ifempty}
   <div>nothing here</div>
-{/for}
+{/foreach}
 {/let}
 {/template}
               `;
