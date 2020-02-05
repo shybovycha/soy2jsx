@@ -2587,8 +2587,8 @@ hello {$world ? $a : 42}
 {/template}
               `;
 
-            it('is parsed correctly', () => {
-              expect(parser.parse(source)).toMatchObject({});
+            it('fails', () => {
+              expect(() => parser.parse(source)).toThrow();
             });
           });
 
@@ -2603,8 +2603,8 @@ hello {$world ? $a : 42}
 {/template}
               `;
 
-            it('is parsed correctly', () => {
-              expect(parser.parse(source)).toMatchObject({});
+            it('fails', () => {
+              expect(() => parser.parse(source)).toThrow();
             });
           });
 
@@ -2620,8 +2620,8 @@ hello {$world ? $a : 42}
 {/template}
               `;
 
-              it('is parsed correctly', () => {
-                expect(parser.parse(source)).toMatchObject({});
+              it('fails', () => {
+                expect(() => parser.parse(source)).toThrow();
               });
             });
 
@@ -2913,128 +2913,8 @@ hello {$world ? $a : 42}
 {/template}
               `;
 
-            it('is parsed correctly', () => {
-              expect(parser.parse(source)).toMatchObject({});
-            });
-          });
-
-          describe('with parameters', () => {
-            describe('variable value', () => {
-              const source = `
-{namespace Something}
-
-{template .tpl}
-{obj1.getHtml($x, $y, $z)}
-{/template}
-              `;
-
-              it('is parsed correctly', () => {
-                expect(parser.parse(source)).toMatchObject({});
-              });
-            });
-
-            describe('function call result', () => {
-              const source = `
-{namespace Something}
-
-{template .tpl}
-{obj1.getHtml(otherFunc())}
-{/template}
-              `;
-
-              it('is parsed correctly', () => {
-                expect(parser.parse(source)).toMatchObject({});
-              });
-            });
-
-            describe('static value', () => {
-              describe('number', () => {
-                describe('integer', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-{obj1.getHtml(-14)}
-{/template}
-              `;
-
-                  it('is parsed correctly', () => {
-                    expect(parser.parse(source)).toMatchObject({});
-                  });
-                });
-
-                describe('float', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-{obj1.getHtml(-3.14)}
-{/template}
-              `;
-
-                  it('is parsed correctly', () => {
-                    expect(parser.parse(source)).toMatchObject({});
-                  });
-                });
-              });
-
-              describe('string', () => {
-                describe('single-quoted', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-{obj1.getHtml('hello objects')}
-{/template}
-              `;
-
-                  it('is parsed correctly', () => {
-                    expect(parser.parse(source)).toMatchObject({});
-                  });
-                });
-
-                describe('double-quoted', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-{obj1.getHtml("hello objects")}
-{/template}
-              `;
-
-                  it('is parsed correctly', () => {
-                    expect(parser.parse(source)).toMatchObject({});
-                  });
-                });
-              });
-
-              describe('list', () => {
-                const source = `
-{namespace Something}
-
-{template .tpl}
-{obj1.getHtml([ 1, 2, 3] )}
-{/template}
-              `;
-
-                it('is parsed correctly', () => {
-                  expect(parser.parse(source)).toMatchObject({});
-                });
-              });
-
-              describe('map', () => {
-                const source = `
-{namespace Something}
-
-{template .tpl}
-{obj1.getHtml([ "elements": $elts ])}
-{/template}
-              `;
-
-                it('is parsed correctly', () => {
-                  expect(parser.parse(source)).toMatchObject({});
-                });
-              });
+            it('fails', () => {
+              expect(() => parser.parse(source)).toThrow();
             });
           });
         });
