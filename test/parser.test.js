@@ -1836,11 +1836,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {if $variable}
   hello
 {/if}
-</div>
 {/template}
               `;
 
@@ -1852,11 +1850,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {if isCondition()}
   hello
 {/if}
-</div>
 {/template}
               `;
 
@@ -1871,11 +1867,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {if $variable1 and $variable2}
   hello
 {/if}
-</div>
 {/template}
               `;
 
@@ -1887,11 +1881,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {if not $variable1 and $variable2}
   hello
 {/if}
-</div>
 {/template}
               `;
 
@@ -1903,11 +1895,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {if $variable1 and not $variable2}
   hello
 {/if}
-</div>
 {/template}
               `;
 
@@ -1919,11 +1909,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {if $variable1 or $variable2}
   hello
 {/if}
-</div>
 {/template}
               `;
 
@@ -1935,11 +1923,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {if not $variable1 or $variable2}
   hello
 {/if}
-</div>
 {/template}
               `;
 
@@ -1951,11 +1937,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {if $variable1 or not $variable2}
   hello
 {/if}
-</div>
 {/template}
               `;
 
@@ -1969,11 +1953,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {if $variable1 < $variable2}
   hello
 {/if}
-</div>
 {/template}
               `;
 
@@ -1985,11 +1967,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {if $variable1 <= getValue()}
   hello
 {/if}
-</div>
 {/template}
               `;
 
@@ -2001,11 +1981,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {if $variable1 == 'something'}
   hello
 {/if}
-</div>
 {/template}
               `;
 
@@ -2017,11 +1995,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {if $variable1 != -3.14}
   hello
 {/if}
-</div>
 {/template}
               `;
 
@@ -2033,11 +2009,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {if $variable1 >= someOtherValue()}
   hello
 {/if}
-</div>
 {/template}
               `;
 
@@ -2049,11 +2023,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {if $variable1 > complexCall($variable2)}
   hello
 {/if}
-</div>
 {/template}
               `;
 
@@ -2069,13 +2041,11 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {if $variable1 and $variable2}
   hello
 {else}
   goodbye
 {/if}
-</div>
 {/template}
               `;
 
@@ -2090,11 +2060,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {for $it in $list}
   hello-{$it}
 {/for}
-</div>
 {/template}
               `;
 
@@ -2106,11 +2074,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {for $it in getList()}
   hello-{$it}
 {/for}
-</div>
 {/template}
               `;
 
@@ -2123,11 +2089,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {for $it in [1,2,5,7]}
   hello-{$it}
 {/for}
-</div>
 {/template}
               `;
 
@@ -2140,11 +2104,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {for $it in range(3, 10, 2)}
   hello-{$it}
 {/for}
-</div>
 {/template}
               `;
 
@@ -2156,11 +2118,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {for $it in range(3, 10)}
   hello-{$it}
 {/for}
-</div>
 {/template}
               `;
 
@@ -2172,11 +2132,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {for $it in range(10)}
   hello-{$it}
 {/for}
-</div>
 {/template}
               `;
 
@@ -2194,11 +2152,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {foreach $it in $list}
   hello-{$it}
 {/foreach}
-</div>
 {/template}
               `;
 
@@ -2210,11 +2166,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {foreach $it in getList()}
   hello-{$it}
 {/foreach}
-</div>
 {/template}
               `;
 
@@ -2227,11 +2181,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {foreach $it in ['moo', 'foo', 'bar']}
   hello-{$it}
 {/foreach}
-</div>
 {/template}
               `;
 
@@ -2243,11 +2195,9 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {foreach $it in ['moo': -3.14, 'foo': 2.22]}
   hello-{$it}
 {/foreach}
-</div>
 {/template}
               `;
 
@@ -2261,13 +2211,11 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {foreach $it in getList()}
   hello-{$it}
 {ifempty}
   goodbye
 {/foreach}
-</div>
 {/template}
               `;
 
@@ -2282,9 +2230,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {getHtml()}
-</div>
 {/template}
               `;
 
@@ -2297,9 +2243,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {getHtml($var1, $var2)}
-</div>
 {/template}
               `;
 
@@ -2311,9 +2255,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {getHtml(getParam1(), getParam2())}
-</div>
 {/template}
               `;
 
@@ -2327,9 +2269,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {getHtml(1, 42, -7)}
-</div>
 {/template}
               `;
 
@@ -2341,9 +2281,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {getHtml(3.14, -2.22)}
-</div>
 {/template}
               `;
 
@@ -2357,9 +2295,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {getHtml('some', 'string')}
-</div>
 {/template}
               `;
 
@@ -2371,9 +2307,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {getHtml("other", "string")}
-</div>
 {/template}
               `;
 
@@ -2386,9 +2320,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {getHtml([ 2, 4, 6 ])}
-</div>
 {/template}
               `;
 
@@ -2400,9 +2332,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {getHtml([ "key1": 12, "key2": -2 ])}
-</div>
 {/template}
               `;
 
@@ -2418,9 +2348,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {obj1.getHtml()}
-</div>
 {/template}
               `;
 
@@ -2433,9 +2361,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {obj1.getHtml($x, $y, $z)}
-</div>
 {/template}
               `;
 
@@ -2447,9 +2373,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {obj1.getHtml(otherFunc())}
-</div>
 {/template}
               `;
 
@@ -2463,9 +2387,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {obj1.getHtml(-14)}
-</div>
 {/template}
               `;
 
@@ -2477,9 +2399,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {obj1.getHtml(-3.14)}
-</div>
 {/template}
               `;
 
@@ -2493,9 +2413,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {obj1.getHtml('hello objects')}
-</div>
 {/template}
               `;
 
@@ -2507,9 +2425,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {obj1.getHtml("hello objects")}
-</div>
 {/template}
               `;
 
@@ -2522,9 +2438,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {obj1.getHtml([ 1, 2, 3] )}
-</div>
 {/template}
               `;
 
@@ -2536,9 +2450,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {obj1.getHtml([ "elements": $elts ])}
-</div>
 {/template}
               `;
 
@@ -2555,9 +2467,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {call .otherTpl /}
-</div>
 {/template}
               `;
 
@@ -2569,9 +2479,7 @@ const source = `
 {namespace Something}
 
 {template .tpl}
-<div>
 {call Some.Other.Namespace.otherTpl /}
-</div>
 {/template}
               `;
 
