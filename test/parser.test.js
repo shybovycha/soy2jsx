@@ -13,7 +13,9 @@ describe('parser', () => {
 {/template}
             `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('which is invalid because', () => {
@@ -25,7 +27,9 @@ describe('parser', () => {
 {/template}
             `;
 
-              it('fails', () => {});
+              it('fails', () => {
+                expect(() => parser.parse(source)).toThrow();
+              });
             });
 
             describe('it starts with a special character', () => {
@@ -36,7 +40,9 @@ describe('parser', () => {
 {/template}
             `;
 
-              it('fails', () => {});
+              it('fails', () => {
+                expect(() => parser.parse(source)).toThrow();
+              });
             });
 
             describe('it starts with a dot', () => {
@@ -47,7 +53,9 @@ describe('parser', () => {
 {/template}
             `;
 
-              it('fails', () => {});
+              it('fails', () => {
+                expect(() => parser.parse(source)).toThrow();
+              });
             });
 
             describe('it ends with a special character', () => {
@@ -58,7 +66,9 @@ describe('parser', () => {
 {/template}
             `;
 
-              it('fails', () => {});
+              it('fails', () => {
+                expect(() => parser.parse(source)).toThrow();
+              });
             });
 
             describe('it ends with a dot', () => {
@@ -69,7 +79,9 @@ describe('parser', () => {
 {/template}
             `;
 
-              it('fails', () => {});
+              it('fails', () => {
+                expect(() => parser.parse(source)).toThrow();
+              });
             });
           });
         });
@@ -84,7 +96,9 @@ describe('parser', () => {
 {/template}
             `;
 
-              it('fails', () => {});
+              it('fails', () => {
+                expect(() => parser.parse(source)).toThrow();
+              });
             });
 
             describe('it contains space character', () => {
@@ -95,7 +109,9 @@ describe('parser', () => {
 {/template}
             `;
 
-              it('fails', () => {});
+              it('fails', () => {
+                expect(() => parser.parse(source)).toThrow();
+              });
             });
 
             describe('it contains special character', () => {
@@ -106,7 +122,9 @@ describe('parser', () => {
 {/template}
             `;
 
-              it('fails', () => {});
+              it('fails', () => {
+                expect(() => parser.parse(source)).toThrow();
+              });
             });
 
             describe('it contains namespace part starting with digit', () => {
@@ -117,7 +135,9 @@ describe('parser', () => {
 {/template}
             `;
 
-              it('fails', () => {});
+              it('fails', () => {
+                expect(() => parser.parse(source)).toThrow();
+              });
             });
           });
         });
@@ -132,7 +152,9 @@ describe('parser', () => {
 {/template}
             `;
 
-          it('is parsed correctly', () => {});
+          it('is parsed correctly', () => {
+            expect(parser.parse(source)).toMatchObject({});
+          });
         });
 
         describe('which is invalid because', () => {
@@ -144,7 +166,9 @@ describe('parser', () => {
 {/template}
             `;
 
-            it('fails', () => {});
+            it('fails', () => {
+              expect(() => parser.parse(source)).toThrow();
+            });
           });
 
           describe('it contains special characters', () => {
@@ -155,7 +179,9 @@ describe('parser', () => {
 {/template}
             `;
 
-            it('fails', () => {});
+            it('fails', () => {
+              expect(() => parser.parse(source)).toThrow();
+            });
           });
 
           // TODO: is this really invalid?
@@ -167,7 +193,9 @@ describe('parser', () => {
 {/template}
             `;
 
-            it('fails', () => {});
+            it('fails', () => {
+              expect(() => parser.parse(source)).toThrow();
+            });
           });
 
           describe('it starts with a digit', () => {
@@ -178,7 +206,9 @@ describe('parser', () => {
 {/template}
             `;
 
-            it('fails', () => {});
+            it('fails', () => {
+              expect(() => parser.parse(source)).toThrow();
+            });
           });
         });
       });
@@ -192,7 +222,9 @@ describe('parser', () => {
 {/template}
             `;
 
-          it('is parsed correctly', () => {});
+          it('is parsed correctly', () => {
+            expect(parser.parse(source)).toMatchObject({});
+          });
         });
 
         describe('one-line comment', () => {
@@ -205,7 +237,9 @@ describe('parser', () => {
 {/template}
             `;
 
-            it('ignores parameter declaration', () => {});
+            it('ignores parameter declaration', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('with optional parameter declaration', () => {
@@ -217,7 +251,9 @@ describe('parser', () => {
 {/template}
             `;
 
-            it('ignores parameter declaration', () => {});
+            it('ignores parameter declaration', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('with special characters', () => {
@@ -229,7 +265,9 @@ describe('parser', () => {
 {/template}
             `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('with variable interpolation', () => {
@@ -241,7 +279,9 @@ describe('parser', () => {
 {/template}
             `;
 
-            it('ignores that', () => {});
+            it('ignores that', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('with math expression', () => {
@@ -253,7 +293,9 @@ describe('parser', () => {
 {/template}
             `;
 
-            it('ignores that', () => {});
+            it('ignores that', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('with ternary expression', () => {
@@ -265,7 +307,9 @@ describe('parser', () => {
 {/template}
             `;
 
-            it('ignores that', () => {});
+            it('ignores that', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
         });
 
@@ -281,7 +325,9 @@ hello!!! world???
 {/template}
             `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('with variable interpolation', () => {
@@ -295,7 +341,9 @@ hello {$world}
 {/template}
             `;
 
-            it('ignores that', () => {});
+            it('ignores that', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('with math expression', () => {
@@ -309,7 +357,9 @@ hello {3+4}
 {/template}
             `;
 
-            it('ignores that', () => {});
+            it('ignores that', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('with ternary expression', () => {
@@ -323,7 +373,9 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-            it('ignores that', () => {});
+            it('ignores that', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
         });
 
@@ -339,7 +391,9 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-            it('generates that parameter', () => {});
+            it('generates that parameter', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('and documentation string', () => {
@@ -354,7 +408,9 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('and variable interpolation', () => {
@@ -368,7 +424,9 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-              it('ignores that', () => {});
+              it('ignores that', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('and math expression', () => {
@@ -382,7 +440,9 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-              it('ignores that', () => {});
+              it('ignores that', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('and ternary expression', () => {
@@ -396,7 +456,9 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-              it('ignores that', () => {});
+              it('ignores that', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
           });
         });
@@ -413,7 +475,9 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-            it('generates that parameter', () => {});
+            it('generates that parameter', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('and documentation string', () => {
@@ -428,7 +492,9 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('and variable interpolation', () => {
@@ -442,7 +508,9 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-              it('ignores that', () => {});
+              it('ignores that', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('and math expression', () => {
@@ -456,7 +524,9 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-              it('ignores that', () => {});
+              it('ignores that', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('and ternary expression', () => {
@@ -470,7 +540,9 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-              it('ignores that', () => {});
+              it('ignores that', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
           });
         });
@@ -488,7 +560,9 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-            it('generates those params', () => {});
+            it('generates those params', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('all optional', () => {
@@ -503,7 +577,9 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-            it('generates those params', () => {});
+            it('generates those params', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('both required and optional', () => {
@@ -518,7 +594,9 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-            it('generates those params', () => {});
+            it('generates those params', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
         });
       });
@@ -536,7 +614,9 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('just one', () => {
@@ -550,7 +630,9 @@ hello {$world ? $a : 42}
 {/template}
                 `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
 
               describe('with generated name', () => {
@@ -563,7 +645,9 @@ hello {$world ? $a : 42}
 {/template}
                   `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('from a function call', () => {
@@ -575,11 +659,13 @@ hello {$world ? $a : 42}
 {/template}
                   `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('from a ternary expression', () => {
-const source = `
+                  const source = `
 {namespace Something}
 
 {template .tpl}
@@ -587,7 +673,9 @@ const source = `
 {/template}
             `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('from an if expression', () => {
@@ -600,7 +688,9 @@ const source = `
 {/template}
             `;
 
-                    it('is parsed correctly', () => {});
+                    it('is parsed correctly', () => {
+                      expect(parser.parse(source)).toMatchObject({});
+                    });
                   });
 
                   describe('with else branch', () => {
@@ -612,12 +702,14 @@ const source = `
 {/template}
             `;
 
-                    it('is parsed correctly', () => {});
+                    it('is parsed correctly', () => {
+                      expect(parser.parse(source)).toMatchObject({});
+                    });
                   });
                 });
 
                 describe('from math expression', () => {
-const source = `
+                  const source = `
 {namespace Something}
 
 {template .tpl}
@@ -625,7 +717,9 @@ const source = `
 {/template}
             `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
               });
             });
@@ -640,7 +734,9 @@ const source = `
 {/template}
             `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
 
               describe('with generated name and static value', () => {
@@ -653,7 +749,9 @@ const source = `
 {/template}
             `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('from a function call', () => {
@@ -665,7 +763,9 @@ const source = `
 {/template}
             `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('from a ternary expression', () => {
@@ -677,7 +777,9 @@ const source = `
 {/template}
             `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('from an if expression', () => {
@@ -690,7 +792,9 @@ const source = `
 {/template}
             `;
 
-                    it('is parsed correctly', () => {});
+                    it('is parsed correctly', () => {
+                      expect(parser.parse(source)).toMatchObject({});
+                    });
                   });
 
                   describe('with else branch', () => {
@@ -702,7 +806,9 @@ const source = `
 {/template}
             `;
 
-                    it('is parsed correctly', () => {});
+                    it('is parsed correctly', () => {
+                      expect(parser.parse(source)).toMatchObject({});
+                    });
                   });
                 });
 
@@ -715,7 +821,9 @@ const source = `
 {/template}
             `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
               });
 
@@ -729,7 +837,9 @@ const source = `
 {/template}
             `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('from a function call', () => {
@@ -741,7 +851,9 @@ const source = `
 {/template}
             `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('from a ternary expression', () => {
@@ -753,7 +865,9 @@ const source = `
 {/template}
             `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('from an if expression', () => {
@@ -765,7 +879,9 @@ const source = `
 {/template}
             `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('from math expression', () => {
@@ -777,7 +893,9 @@ const source = `
 {/template}
             `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
               });
             });
@@ -793,7 +911,9 @@ const source = `
 {/template}
             `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('key-value', () => {
@@ -805,7 +925,9 @@ const source = `
 {/template}
             `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('boolean and key-value', () => {
@@ -817,8 +939,10 @@ const source = `
 {/template}
             `;
 
-              it('is parsed correctly', () => {});
-            })
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
+            });
           });
         });
 
@@ -833,7 +957,9 @@ const source = `
 {/template}
             `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('from a function call', () => {
@@ -845,7 +971,9 @@ const source = `
 {/template}
             `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('from a ternary expression', () => {
@@ -857,7 +985,9 @@ const source = `
 {/template}
             `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('from an if expression', () => {
@@ -869,7 +999,9 @@ const source = `
 {/template}
             `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('from math expression', () => {
@@ -881,7 +1013,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
           });
 
@@ -895,7 +1029,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('from a function call', () => {
@@ -907,7 +1043,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('from a ternary expression', () => {
@@ -919,7 +1057,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('from an if expression', () => {
@@ -931,7 +1071,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('from math expression', () => {
@@ -943,7 +1085,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
           });
 
@@ -957,7 +1101,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('from a function call', () => {
@@ -969,7 +1115,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('from a ternary expression', () => {
@@ -981,7 +1129,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('from an if expression', () => {
@@ -993,7 +1143,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('from math expression', () => {
@@ -1005,7 +1157,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
           });
         });
@@ -1022,7 +1176,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('pair tags', () => {
@@ -1035,7 +1191,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('pair unclosed tags', () => {
@@ -1048,7 +1206,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
           });
         });
@@ -1066,7 +1226,9 @@ const source = `
 {/template}
                   `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('indentation', () => {
@@ -1080,7 +1242,9 @@ const source = `
 {/template}
                   `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('caret return', () => {
@@ -1094,7 +1258,9 @@ const source = `
 {/template}
                   `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('newline', () => {
@@ -1108,7 +1274,9 @@ const source = `
 {/template}
                   `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('nil', () => {
@@ -1122,7 +1290,9 @@ const source = `
 {/template}
                   `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
           });
 
@@ -1137,7 +1307,9 @@ const source = `
 {/template}
                   `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('plain text', () => {
@@ -1152,7 +1324,9 @@ const source = `
 {/template}
                   `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('UTF-8 characters', () => {
@@ -1166,7 +1340,9 @@ const source = `
 {/template}
                   `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
           });
         });
@@ -1182,7 +1358,9 @@ const source = `
 {/template}
           `;
 
-          it('is parsed correctly', () => {});
+          it('is parsed correctly', () => {
+            expect(parser.parse(source)).toMatchObject({});
+          });
         });
 
         describe('with filters', () => {
@@ -1196,7 +1374,9 @@ const source = `
 {/template}
             `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('with single parameter', () => {
@@ -1210,7 +1390,9 @@ const source = `
 {/template}
                   `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('float', () => {
@@ -1222,7 +1404,9 @@ const source = `
 {/template}
           `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
               });
 
@@ -1235,7 +1419,9 @@ const source = `
 {/template}
           `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
 
               describe('function call result', () => {
@@ -1247,7 +1433,9 @@ const source = `
 {/template}
           `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
 
               describe('ternary expression', () => {
@@ -1259,7 +1447,9 @@ const source = `
 {/template}
           `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
 
               describe('string', () => {
@@ -1275,7 +1465,9 @@ const source = `
 {/template}
           `;
 
-                        it('is parsed correctly', () => {});
+                        it('is parsed correctly', () => {
+                          expect(parser.parse(source)).toMatchObject({});
+                        });
                       });
 
                       describe('float', () => {
@@ -1287,7 +1479,9 @@ const source = `
 {/template}
           `;
 
-                        it('is parsed correctly', () => {});
+                        it('is parsed correctly', () => {
+                          expect(parser.parse(source)).toMatchObject({});
+                        });
                       });
                     });
 
@@ -1300,7 +1494,9 @@ const source = `
 {/template}
           `;
 
-                      it('is parsed correctly', () => {});
+                      it('is parsed correctly', () => {
+                        expect(parser.parse(source)).toMatchObject({});
+                      });
                     });
 
                     describe('function call result', () => {
@@ -1312,7 +1508,9 @@ const source = `
 {/template}
           `;
 
-                      it('is parsed correctly', () => {});
+                      it('is parsed correctly', () => {
+                        expect(parser.parse(source)).toMatchObject({});
+                      });
                     });
 
                     describe('if expression', () => {
@@ -1324,7 +1522,9 @@ const source = `
 {/template}
           `;
 
-                      it('is parsed correctly', () => {});
+                      it('is parsed correctly', () => {
+                        expect(parser.parse(source)).toMatchObject({});
+                      });
                     });
                   });
                 });
@@ -1341,7 +1541,9 @@ const source = `
 {/template}
           `;
 
-                        it('is parsed correctly', () => {});
+                        it('is parsed correctly', () => {
+                          expect(parser.parse(source)).toMatchObject({});
+                        });
                       });
 
                       describe('float', () => {
@@ -1353,7 +1555,9 @@ const source = `
 {/template}
           `;
 
-                        it('is parsed correctly', () => {});
+                        it('is parsed correctly', () => {
+                          expect(parser.parse(source)).toMatchObject({});
+                        });
                       });
                     });
 
@@ -1366,7 +1570,9 @@ const source = `
 {/template}
           `;
 
-                      it('is parsed correctly', () => {});
+                      it('is parsed correctly', () => {
+                        expect(parser.parse(source)).toMatchObject({});
+                      });
                     });
 
                     describe('function call result', () => {
@@ -1378,7 +1584,9 @@ const source = `
 {/template}
           `;
 
-                      it('is parsed correctly', () => {});
+                      it('is parsed correctly', () => {
+                        expect(parser.parse(source)).toMatchObject({});
+                      });
                     });
 
                     describe('ternary expression', () => {
@@ -1390,7 +1598,9 @@ const source = `
 {/template}
           `;
 
-                      it('is parsed correctly', () => {});
+                      it('is parsed correctly', () => {
+                        expect(parser.parse(source)).toMatchObject({});
+                      });
                     });
                   });
                 });
@@ -1408,7 +1618,9 @@ const source = `
 {/template}
           `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('float', () => {
@@ -1420,7 +1632,9 @@ const source = `
 {/template}
           `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
               });
 
@@ -1433,7 +1647,9 @@ const source = `
 {/template}
           `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
 
               describe('function call result', () => {
@@ -1445,7 +1661,9 @@ const source = `
 {/template}
           `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
 
               describe('ternary expression', () => {
@@ -1457,7 +1675,9 @@ const source = `
 {/template}
           `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
             });
           });
@@ -1472,7 +1692,9 @@ const source = `
 {/template}
           `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('with multiple parameters', () => {
@@ -1486,7 +1708,9 @@ const source = `
 {/template}
           `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('float', () => {
@@ -1498,7 +1722,9 @@ const source = `
 {/template}
           `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
               });
 
@@ -1511,7 +1737,9 @@ const source = `
 {/template}
           `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
 
               describe('function call result', () => {
@@ -1523,7 +1751,9 @@ const source = `
 {/template}
           `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
 
               // TODO: this might be actually invalid - how do we get where it is the ternary colon or filter param' colon?
@@ -1536,7 +1766,9 @@ const source = `
 {/template}
           `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
             });
           });
@@ -1555,7 +1787,9 @@ const source = `
 {/template}
           `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('float', () => {
@@ -1567,7 +1801,9 @@ const source = `
 {/template}
           `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
           });
 
@@ -1580,7 +1816,9 @@ const source = `
 {/template}
           `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('function call result', () => {
@@ -1592,7 +1830,9 @@ const source = `
 {/template}
           `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('boolean expression', () => {
@@ -1604,7 +1844,9 @@ const source = `
 {/template}
           `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
         });
 
@@ -1620,7 +1862,9 @@ const source = `
 {/template}
           `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('template call', () => {
@@ -1636,7 +1880,9 @@ const source = `
 {/template}
               `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
 
               describe('with inline parameters', () => {
@@ -1651,7 +1897,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('key-value', () => {
@@ -1665,7 +1913,9 @@ const source = `
 {/template}
               `;
 
-                it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('mixed', () => {
@@ -1679,7 +1929,9 @@ const source = `
 {/template}
                 `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
               });
 
@@ -1696,7 +1948,9 @@ const source = `
 {/template}
               `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
             });
 
@@ -1711,7 +1965,9 @@ const source = `
 {/template}
             `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
           });
 
@@ -1727,7 +1983,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('float', () => {
@@ -1741,7 +1999,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
           });
 
@@ -1756,7 +2016,9 @@ const source = `
 {/template}
               `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('function call result', () => {
@@ -1770,7 +2032,9 @@ const source = `
 {/template}
               `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('if expression', () => {
@@ -1788,7 +2052,9 @@ const source = `
 {/template}
               `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('for expression', () => {
@@ -1804,7 +2070,9 @@ const source = `
 {/template}
               `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('foreach expression', () => {
@@ -1822,7 +2090,9 @@ const source = `
 {/template}
               `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
         });
       });
@@ -1842,7 +2112,9 @@ const source = `
 {/template}
               `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
 
               describe('function call', () => {
@@ -1856,7 +2128,9 @@ const source = `
 {/template}
               `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
             });
 
@@ -1873,7 +2147,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('NOT AND', () => {
@@ -1887,7 +2163,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('AND NOT', () => {
@@ -1901,7 +2179,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('OR', () => {
@@ -1915,7 +2195,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('NOT OR', () => {
@@ -1929,7 +2211,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('OR NOT', () => {
@@ -1943,7 +2227,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
               });
 
@@ -1959,7 +2245,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('less or equal', () => {
@@ -1973,7 +2261,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('equal', () => {
@@ -1987,7 +2277,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('not equal', () => {
@@ -2001,7 +2293,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('greater or equal', () => {
@@ -2015,7 +2309,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('greater', () => {
@@ -2029,7 +2325,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
               });
             });
@@ -2049,7 +2347,9 @@ const source = `
 {/template}
               `;
 
-          it('is parsed correctly', () => {});
+          it('is parsed correctly', () => {
+            expect(parser.parse(source)).toMatchObject({});
+          });
         });
       });
 
@@ -2069,7 +2369,9 @@ const source = `
 {/template}
               `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
 
               describe('float', () => {
@@ -2084,7 +2386,9 @@ const source = `
 {/template}
               `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
             });
 
@@ -2101,7 +2405,9 @@ const source = `
 {/template}
               `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
 
               describe('double-quoted', () => {
@@ -2116,7 +2422,9 @@ const source = `
 {/template}
               `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
             });
           });
@@ -2133,7 +2441,9 @@ const source = `
 {/template}
               `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('as function call result', () => {
@@ -2148,7 +2458,9 @@ const source = `
 {/template}
               `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('as math expression', () => {
@@ -2163,7 +2475,9 @@ const source = `
 {/template}
               `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('as logical expression', () => {
@@ -2178,7 +2492,9 @@ const source = `
 {/template}
               `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
         });
 
@@ -2195,7 +2511,9 @@ const source = `
 {/template}
               `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('with multi-line result', () => {
@@ -2211,7 +2529,9 @@ const source = `
 {/template}
               `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
         });
 
@@ -2229,7 +2549,9 @@ const source = `
 {/template}
               `;
 
-          it('is parsed correctly', () => {});
+          it('is parsed correctly', () => {
+            expect(parser.parse(source)).toMatchObject({});
+          });
         });
 
         describe('with default case', () => {
@@ -2246,7 +2568,9 @@ const source = `
 {/template}
               `;
 
-          it('is parsed correctly', () => {});
+          it('is parsed correctly', () => {
+            expect(parser.parse(source)).toMatchObject({});
+          });
         });
       });
 
@@ -2263,7 +2587,9 @@ const source = `
 {/template}
               `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('function call result', () => {
@@ -2277,7 +2603,9 @@ const source = `
 {/template}
               `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('static value', () => {
@@ -2292,7 +2620,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('range', () => {
@@ -2307,7 +2637,9 @@ const source = `
 {/template}
               `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
 
               describe('with start and end params', () => {
@@ -2321,7 +2653,9 @@ const source = `
 {/template}
               `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
 
               describe('with end param only', () => {
@@ -2335,7 +2669,9 @@ const source = `
 {/template}
               `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
             });
           });
@@ -2355,7 +2691,9 @@ const source = `
 {/template}
               `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('function call result', () => {
@@ -2369,7 +2707,9 @@ const source = `
 {/template}
               `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('static value', () => {
@@ -2384,7 +2724,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('map', () => {
@@ -2398,7 +2740,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
           });
         });
@@ -2416,7 +2760,9 @@ const source = `
 {/template}
               `;
 
-          it('is parsed correctly', () => {});
+          it('is parsed correctly', () => {
+            expect(parser.parse(source)).toMatchObject({});
+          });
         });
       });
 
@@ -2431,7 +2777,9 @@ const source = `
 {/template}
               `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('with parameters', () => {
@@ -2444,7 +2792,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('function call result', () => {
@@ -2456,7 +2806,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('static value', () => {
@@ -2470,7 +2822,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('float', () => {
@@ -2482,7 +2836,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
               });
 
@@ -2496,7 +2852,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('double-quoted', () => {
@@ -2508,7 +2866,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
               });
 
@@ -2521,7 +2881,9 @@ const source = `
 {/template}
               `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
 
               describe('map', () => {
@@ -2533,7 +2895,9 @@ const source = `
 {/template}
               `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
             });
           });
@@ -2549,7 +2913,9 @@ const source = `
 {/template}
               `;
 
-            it('is parsed correctly', () => {});
+            it('is parsed correctly', () => {
+              expect(parser.parse(source)).toMatchObject({});
+            });
           });
 
           describe('with parameters', () => {
@@ -2562,7 +2928,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('function call result', () => {
@@ -2574,7 +2942,9 @@ const source = `
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+              it('is parsed correctly', () => {
+                expect(parser.parse(source)).toMatchObject({});
+              });
             });
 
             describe('static value', () => {
@@ -2588,7 +2958,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('float', () => {
@@ -2600,7 +2972,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
               });
 
@@ -2614,7 +2988,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
 
                 describe('double-quoted', () => {
@@ -2626,7 +3002,9 @@ const source = `
 {/template}
               `;
 
-                  it('is parsed correctly', () => {});
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
                 });
               });
 
@@ -2639,7 +3017,9 @@ const source = `
 {/template}
               `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
 
               describe('map', () => {
@@ -2651,7 +3031,9 @@ const source = `
 {/template}
               `;
 
-                it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {
+                  expect(parser.parse(source)).toMatchObject({});
+                });
               });
             });
           });
@@ -2668,7 +3050,9 @@ const source = `
 {/template}
               `;
 
-          it('is parsed correctly', () => {});
+          it('is parsed correctly', () => {
+            expect(parser.parse(source)).toMatchObject({});
+          });
         });
 
         describe('from the different namespace', () => {
@@ -2680,7 +3064,9 @@ const source = `
 {/template}
               `;
 
-          it('is parsed correctly', () => {});
+          it('is parsed correctly', () => {
+            expect(parser.parse(source)).toMatchObject({});
+          });
         });
       });
     });
