@@ -2053,6 +2053,203 @@ const source = `
         });
       });
 
+      describe('switch expression', () => {
+        describe('with condition', () => {
+          describe('as static value', () => {
+            describe('number', () => {
+              describe('integer', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+{switch $variable1}
+{case 4}
+  resuslt1
+{/switch}
+{/template}
+              `;
+
+                it('is parsed correctly', () => {});
+              });
+
+              describe('float', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+{switch $variable1}
+  {case -3.14}
+  resuslt1
+{/switch}
+{/template}
+              `;
+
+                it('is parsed correctly', () => {});
+              });
+            });
+
+            describe('string', () => {
+              describe('single-quoted', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+{switch $variable1}
+{case 'case 1'}
+  resuslt1
+{/switch}
+{/template}
+              `;
+
+                it('is parsed correctly', () => {});
+              });
+
+              describe('double-quoted', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+{switch $variable1}
+  {case "base case"}
+  resuslt1
+{/switch}
+{/template}
+              `;
+
+                it('is parsed correctly', () => {});
+              });
+            });
+          });
+
+          describe('as variable value', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+{switch $variable1}
+  {case -993}
+  resuslt1
+{/switch}
+{/template}
+              `;
+
+            it('is parsed correctly', () => {});
+          });
+
+          describe('as function call result', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+{switch getMyValue()}
+  {case 42}
+  resuslt1
+{/switch}
+{/template}
+              `;
+
+            it('is parsed correctly', () => {});
+          });
+
+          describe('as math expression', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+{switch 4 + $x}
+  {case 12}
+  resuslt1
+{/switch}
+{/template}
+              `;
+
+            it('is parsed correctly', () => {});
+          });
+
+          describe('as logical expression', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+{switch $variable1 and not $variable2 or $boolVar}
+  {case 4}
+  resuslt1
+{/switch}
+{/template}
+              `;
+
+            it('is parsed correctly', () => {});
+          });
+        });
+
+        describe('with one case', () => {
+          describe('with simple result', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+{switch $variable1}
+  {case 4}
+  resuslt1
+{/switch}
+{/template}
+              `;
+
+            it('is parsed correctly', () => {});
+          });
+
+          describe('with multi-line result', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+{switch $variable1}
+  {case 4}
+  resuslt1
+  it is still this result
+{/switch}
+{/template}
+              `;
+
+            it('is parsed correctly', () => {});
+          });
+        });
+
+        describe('with multiple cases', () => {
+          const source = `
+{namespace Something}
+
+{template .tpl}
+{switch $variable1}
+{case 1}
+  resuslt1
+{case 2}
+  resuslt2
+{/switch}
+{/template}
+              `;
+
+          it('is parsed correctly', () => {});
+        });
+
+        describe('with default case', () => {
+          const source = `
+{namespace Something}
+
+{template .tpl}
+{switch $variable1}
+  {case 4}
+  resuslt1
+  {default}
+  default value
+{/switch}
+{/template}
+              `;
+
+          it('is parsed correctly', () => {});
+        });
+      });
+
       describe('for expression', () => {
         describe('iterating over', () => {
           describe('variable value', () => {
