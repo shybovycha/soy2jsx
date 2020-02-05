@@ -22,10 +22,10 @@ TemplateDef
   = comments:(SoyTemplateDefComment / SoyComment / BlankLine)* WS* "{template " name:TemplateName WS* attributes:Attributes? "}" WS+ body:TemplateBodyElement* "{/template}" WS* {
     return {
       type: "Template",
-      comments,
+      comments: (comments || []).filter(c => !!c),
       name,
-      attributes,
-      body
+      attributes: (attributes || []).filter(a => !!a),
+      body: (body || []).filter(e => !!e)
     };
   };
 
@@ -67,12 +67,15 @@ TemplateBodyText
 
 BlankLine
   = chars:WS+ {
-    return undefined;
+    return null;
   };
 
 HtmlComment
   = "<!--" chars:(!"-->" .)* "-->" {
-    return null;
+    return {
+      type: "HtmlComment",
+      content: chars
+    };
   };
 
 SoyComment
@@ -81,32 +84,59 @@ SoyComment
 
 SoyInlineComment
   = "//" chars:[^\n]* {
-    return null;
+    return {
+      type: "Comment",
+      content: chars.join('').trim()
+    };
   };
 
 SoyMultilineComment
   = "/*" chars:(!"*/" .)* "*/" {
-    return null;
-  };
-
-SoyTemplateDefComment
-  = "/" "*"+ WS* lines:(SoyCommentParamDefinition / SoyCommentText / BlankLine)* WS* "*"+ "/" {
     return {
       type: "Comment",
-      lines
+      content: chars.map(c => c[1]).filter(c => !!c).join('').trim()
     };
   };
 
-SoyCommentText
-  = chars:(!("\n" / "*/") .)* "\n" {
+SoyTemplateDefComment
+  = "/" "*"+ lines:(SoyCommentParamDefinition / SoyTemplateDefCommentText / BlankLine)* "*/" {
+    return {
+      type: "Comment",
+      lines: lines.filter(l => !!l)
+    };
+  };
+
+SoyTemplateDefCommentText
+  = chars:(!("\n" / "*/") .)+ {
+    const content = chars.map(c => c[1]).join('').trim();
+
+    if (!content) {
+      return null;
+    }
+
     return {
       type: "CommentText",
-      content: chars.map(e => e[1]).join('')
+      content
     };
   };
 
 SoyCommentParamDefinition
-  = WS* "*" WS* param:(SoyCommentRequiredParamDef / SoyCommentOptionalParamDef) [^\n]* { return param; };
+  = WS* "*"* WS* content:(SoyCommentParamDefinitionWithComment / SoyCommentParamDefinitionWithoutComment) {
+    return content;
+  };
+
+SoyCommentParamDefinitionWithoutComment
+  = param:(SoyCommentRequiredParamDef / SoyCommentOptionalParamDef);
+
+SoyCommentParamDefinitionWithComment
+  = param:(SoyCommentRequiredParamDef / SoyCommentOptionalParamDef) WS+ docChars:([^\n])+ {
+    const doc = docChars.join('').trim();
+
+    return {
+      ...param,
+      doc
+    };
+  };
 
 SoyCommentRequiredParamDef
   = "@param" WS+ name:Identifier {
@@ -145,12 +175,12 @@ SoyMathEvaluationExpression
 
 SoyBodyExpr
   = SoyComment
-  / SoyMathEvaluationExpression
   / SoySpecialCharacter
   / SoyEvaluatedTernaryOperator
   / SoyVariableInterpolation
   / SoyFunctionCall
   / SoyTemplateCall
+  / SoyMathEvaluationExpression
   / SoyLetOperator
   / SoyIfOperator
   / SoyForeachOperator
@@ -1007,7 +1037,7 @@ HTMLElement
       type: "HtmlElement",
       tagName: element.tagName,
       attributes: element.attributes || [],
-      children: element.children || []
+      children: element.children.filter(c => !!c) || []
     };
   };
 
@@ -1081,7 +1111,7 @@ PairElement
       type: "HtmlElement",
       tagName: startTag.name,
       attributes: startTag.attributes || [],
-      children: children || []
+      children: children.filter(c => !!c) || []
     };
   };
 
