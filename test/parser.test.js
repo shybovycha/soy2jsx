@@ -55,7 +55,7 @@ describe('parser', () => {
 
       describe('template name', () => {
         describe('which is valid', () => {
-          it('succeeds', () => {});
+          it('is parsed correctly', () => {});
         });
 
         describe('which is invalid because', () => {
@@ -80,7 +80,7 @@ describe('parser', () => {
 
       describe('template comment', () => {
         describe('no comment', () => {
-          it('succeeds', () => {});
+          it('is parsed correctly', () => {});
         });
 
         describe('one-line comment', () => {
@@ -93,7 +93,7 @@ describe('parser', () => {
           });
 
           describe('with special characters', () => {
-            it('succeeds', () => {});
+            it('is parsed correctly', () => {});
           });
 
           describe('with variable interpolation', () => {
@@ -111,7 +111,7 @@ describe('parser', () => {
 
         describe('multi-line comment with no parameters', () => {
           describe('with special characters', () => {
-            it('succeeds', () => {});
+            it('is parsed correctly', () => {});
           });
 
           describe('with variable interpolation', () => {
@@ -134,7 +134,7 @@ describe('parser', () => {
 
           describe('and documentation string', () => {
             describe('and special characters', () => {
-              it('succeeds', () => {});
+              it('is parsed correctly', () => {});
             });
 
             describe('and variable interpolation', () => {
@@ -158,7 +158,7 @@ describe('parser', () => {
 
           describe('and documentation string', () => {
             describe('and special characters', () => {
-              it('succeeds', () => {});
+              it('is parsed correctly', () => {});
             });
 
             describe('and variable interpolation', () => {
@@ -195,240 +195,398 @@ describe('parser', () => {
       describe('HTML', () => {
         describe('attributes', () => {
           describe('none', () => {
-            it('succeeds', () => {});
+            it('is parsed correctly', () => {});
           });
 
           describe('just one', () => {
             describe('boolean', () => {
-              describe('with static name', () => {});
+              describe('with static name', () => {
+                it('is parsed correctly', () => {});
+              });
 
               describe('with generated name', () => {
-                describe('from interpolating a variable', () => {});
+                describe('from interpolating a variable', () => {
+                  it('is parsed correctly', () => {});
+                });
 
-                describe('from a function call', () => {});
+                describe('from a function call', () => {
+                  it('is parsed correctly', () => {});
+                });
 
-                describe('from a ternary expression', () => {});
+                describe('from a ternary expression', () => {
+                  it('is parsed correctly', () => {});
+                });
 
-                describe('from an if expression', () => {});
+                describe('from an if expression', () => {
+                  it('is parsed correctly', () => {});
+                });
 
-                describe('from math expression', () => {});
+                describe('from math expression', () => {
+                  it('is parsed correctly', () => {});
+                });
               });
             });
 
             describe('key-value attribute', () => {
-              describe('with static name and value', () => {});
+              describe('with static name and value', () => {
+                it('is parsed correctly', () => {});
+              });
 
               describe('with generated name and static value', () => {
-                describe('from interpolating a variable', () => {});
+                describe('from interpolating a variable', () => {
+                  it('is parsed correctly', () => {});
+                });
 
-                describe('from a function call', () => {});
+                describe('from a function call', () => {
+                  it('is parsed correctly', () => {});
+                });
 
-                describe('from a ternary expression', () => {});
+                describe('from a ternary expression', () => {
+                  it('is parsed correctly', () => {});
+                });
 
-                describe('from an if expression', () => {});
+                describe('from an if expression', () => {
+                  it('is parsed correctly', () => {});
+                });
 
-                describe('from math expression', () => {});
+                describe('from math expression', () => {
+                  it('is parsed correctly', () => {});
+                });
               });
 
               describe('with generated name and value', () => {
-                describe('from interpolating a variable', () => {});
+                describe('from interpolating a variable', () => {
+                  it('is parsed correctly', () => {});
+                });
 
-                describe('from a function call', () => {});
+                describe('from a function call', () => {
+                  it('is parsed correctly', () => {});
+                });
 
-                describe('from a ternary expression', () => {});
+                describe('from a ternary expression', () => {
+                  it('is parsed correctly', () => {});
+                });
 
-                describe('from an if expression', () => {});
+                describe('from an if expression', () => {
+                  it('is parsed correctly', () => {});
+                });
 
-                describe('from math expression', () => {});
+                describe('from math expression', () => {
+                  it('is parsed correctly', () => {});
+                });
               });
             });
           });
 
           describe('multiple', () => {
-            describe('boolean', () => {});
+            describe('boolean', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('key-value', () => {});
+            describe('key-value', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('boolean and key-value', () => {})
+            describe('boolean and key-value', () => {
+              it('is parsed correctly', () => {});
+            })
           });
         });
 
         describe('interpolated tag name', () => {
           describe('self-closed tags', () => {
-            describe('from interpolating a variable', () => {});
+            describe('from interpolating a variable', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('from a function call', () => {});
+            describe('from a function call', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('from a ternary expression', () => {});
+            describe('from a ternary expression', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('from an if expression', () => {});
+            describe('from an if expression', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('from math expression', () => {});
+            describe('from math expression', () => {
+              it('is parsed correctly', () => {});
+            });
           });
 
           describe('pair tags', () => {
-            describe('from interpolating a variable', () => {});
+            describe('from interpolating a variable', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('from a function call', () => {});
+            describe('from a function call', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('from a ternary expression', () => {});
+            describe('from a ternary expression', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('from an if expression', () => {});
+            describe('from an if expression', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('from math expression', () => {});
+            describe('from math expression', () => {
+              it('is parsed correctly', () => {});
+            });
           });
 
           describe('pair closed tags', () => {
-            describe('from interpolating a variable', () => {});
+            describe('from interpolating a variable', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('from a function call', () => {});
+            describe('from a function call', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('from a ternary expression', () => {});
+            describe('from a ternary expression', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('from an if expression', () => {});
+            describe('from an if expression', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('from math expression', () => {});
+            describe('from math expression', () => {
+              it('is parsed correctly', () => {});
+            });
           });
 
           describe('pair unclosed tags', () => {
-            describe('from interpolating a variable', () => {});
+            describe('from interpolating a variable', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('from a function call', () => {});
+            describe('from a function call', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('from a ternary expression', () => {});
+            describe('from a ternary expression', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('from an if expression', () => {});
+            describe('from an if expression', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('from math expression', () => {});
+            describe('from math expression', () => {
+              it('is parsed correctly', () => {});
+            });
           });
         });
 
         describe('top-level', () => {
           describe('single element', () => {
-            describe('self-closed tag', () => {});
+            describe('self-closed tag', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('pair tag', () => {});
+            describe('pair tag', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('pair closed tag', () => {});
+            describe('pair closed tag', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('pair unclosed tag', () => {});
+            describe('pair unclosed tag', () => {
+              it('is parsed correctly', () => {});
+            });
           });
 
           describe('multiple elements', () => {
-            describe('self-closed tags', () => {});
+            describe('self-closed tags', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('pair tags', () => {});
+            describe('pair tags', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('pair closed tags', () => {});
+            describe('pair closed tags', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('pair unclosed tags', () => {});
+            describe('pair unclosed tags', () => {
+              it('is parsed correctly', () => {});
+            });
           });
         });
 
         describe('children', () => {
           describe('variable interpolation', () => {
-            describe('simple', () => {});
+            describe('simple', () => {
+              it('is parsed correctly', () => {});
+            });
 
             describe('with filters', () => {
               describe('just one', () => {
                 describe('with no parameters', () => {
-                  it('passes', () => {});
+                  it('is parsed correctly', () => {});
                 });
 
                 describe('with single parameter', () => {
                   describe('number', () => {
-                    describe('integer', () => {});
+                    describe('integer', () => {
+                      it('is parsed correctly', () => {});
+                    });
 
-                    describe('float', () => {});
+                    describe('float', () => {
+                      it('is parsed correctly', () => {});
+                    });
                   });
 
-                  describe('variable value', () => {});
+                  describe('variable value', () => {
+                    it('is parsed correctly', () => {});
+                  });
 
-                  describe('function call result', () => {});
+                  describe('function call result', () => {
+                    it('is parsed correctly', () => {});
+                  });
 
-                  describe('if expression', () => {});
+                  describe('if expression', () => {
+                    it('is parsed correctly', () => {});
+                  });
                 });
 
                 describe('with multiple parameters', () => {
                   describe('number', () => {
-                    describe('integer', () => {});
+                    describe('integer', () => {
+                      it('is parsed correctly', () => {});
+                    });
 
-                    describe('float', () => {});
+                    describe('float', () => {
+                      it('is parsed correctly', () => {});
+                    });
                   });
 
-                  describe('variable value', () => {});
+                  describe('variable value', () => {
+                    it('is parsed correctly', () => {});
+                  });
 
-                  describe('function call result', () => {});
+                  describe('function call result', () => {
+                    it('is parsed correctly', () => {});
+                  });
 
-                  describe('if expression', () => {});
+                  describe('if expression', () => {
+                    it('is parsed correctly', () => {});
+                  });
                 });
               });
 
               describe('multiple', () => {
                 describe('with no parameters', () => {
-                  it('passes', () => {});
+                  it('is parsed correctly', () => {});
                 });
 
                 describe('with single parameter', () => {
                   describe('number', () => {
-                    describe('integer', () => {});
+                    describe('integer', () => {
+                      it('is parsed correctly', () => {});
+                    });
 
-                    describe('float', () => {});
+                    describe('float', () => {
+                      it('is parsed correctly', () => {});
+                    });
                   });
 
-                  describe('variable value', () => {});
+                  describe('variable value', () => {
+                    it('is parsed correctly', () => {});
+                  });
 
-                  describe('function call result', () => {});
+                  describe('function call result', () => {
+                    it('is parsed correctly', () => {});
+                  });
 
-                  describe('if expression', () => {});
+                  describe('if expression', () => {
+                    it('is parsed correctly', () => {});
+                  });
                 });
 
                 describe('with multiple parameters', () => {
                   describe('number', () => {
-                    describe('integer', () => {});
+                    describe('integer', () => {
+                      it('is parsed correctly', () => {});
+                    });
 
-                    describe('float', () => {});
+                    describe('float', () => {
+                      it('is parsed correctly', () => {});
+                    });
                   });
 
                   describe('string', () => {
                     describe('single-quoted', () => {
                       describe('with interpolation', () => {
                         describe('number', () => {
-                          describe('integer', () => {});
+                          describe('integer', () => {
+                            it('is parsed correctly', () => {});
+                          });
 
-                          describe('float', () => {});
+                          describe('float', () => {
+                            it('is parsed correctly', () => {});
+                          });
                         });
 
-                        describe('variable value', () => {});
+                        describe('variable value', () => {
+                          it('is parsed correctly', () => {});
+                        });
 
-                        describe('function call result', () => {});
+                        describe('function call result', () => {
+                          it('is parsed correctly', () => {});
+                        });
 
-                        describe('if expression', () => {});
+                        describe('if expression', () => {
+                          it('is parsed correctly', () => {});
+                        });
                       });
                     });
 
                     describe('double-quoted', () => {
                       describe('with interpolation', () => {
                         describe('number', () => {
-                          describe('integer', () => {});
+                          describe('integer', () => {
+                            it('is parsed correctly', () => {});
+                          });
 
-                          describe('float', () => {});
+                          describe('float', () => {
+                            it('is parsed correctly', () => {});
+                          });
                         });
 
-                        describe('variable value', () => {});
+                        describe('variable value', () => {
+                          it('is parsed correctly', () => {});
+                        });
 
-                        describe('function call result', () => {});
+                        describe('function call result', () => {
+                          it('is parsed correctly', () => {});
+                        });
 
-                        describe('if expression', () => {});
+                        describe('if expression', () => {
+                          it('is parsed correctly', () => {});
+                        });
                       });
                     });
                   });
 
-                  describe('variable value', () => {});
+                  describe('variable value', () => {
+                    it('is parsed correctly', () => {});
+                  });
 
-                  describe('function call result', () => {});
+                  describe('function call result', () => {
+                    it('is parsed correctly', () => {});
+                  });
 
-                  describe('if expression', () => {});
+                  describe('if expression', () => {
+                    it('is parsed correctly', () => {});
+                  });
                 });
               });
             });
@@ -437,36 +595,62 @@ describe('parser', () => {
           describe('let block', () => {
             describe('with simple value', () => {
               describe('number', () => {
-                describe('integer', () => {});
+                describe('integer', () => {
+                  it('is parsed correctly', () => {});
+                });
 
-                describe('float', () => {});
+                describe('float', () => {
+                  it('is parsed correctly', () => {});
+                });
               });
 
-              describe('variable value', () => {});
+              describe('variable value', () => {
+                it('is parsed correctly', () => {});
+              });
 
-              describe('function call result', () => {});
+              describe('function call result', () => {
+                it('is parsed correctly', () => {});
+              });
             });
 
             describe('with compound value', () => {
-              describe('HTML', () => {});
-
-              describe('template call', () => {});
-
-              describe('number', () => {
-                describe('integer', () => {});
-
-                describe('float', () => {});
+              describe('HTML', () => {
+                it('is parsed correctly', () => {});
               });
 
-              describe('variable value', () => {});
+              describe('template call', () => {
+                it('is parsed correctly', () => {});
+              });
 
-              describe('function call result', () => {});
+              describe('number', () => {
+                describe('integer', () => {
+                  it('is parsed correctly', () => {});
+                });
 
-              describe('if expression', () => {});
+                describe('float', () => {
+                  it('is parsed correctly', () => {});
+                });
+              });
 
-              describe('for expression', () => {});
+              describe('variable value', () => {
+                it('is parsed correctly', () => {});
+              });
 
-              describe('foreach expression', () => {});
+              describe('function call result', () => {
+                it('is parsed correctly', () => {});
+              });
+
+              describe('if expression', () => {
+                it('is parsed correctly', () => {});
+              });
+
+              describe('for expression', () => {
+                it('is parsed correctly', () => {});
+              });
+
+              describe('foreach expression', () => {
+                it('is parsed correctly', () => {});
+              });
             });
           });
 
@@ -474,98 +658,160 @@ describe('parser', () => {
             describe('with no else branch', () => {
               describe('with expression', () => {
                 describe('simple', () => {
-                  describe('variable value', () => {});
+                  describe('variable value', () => {
+                    it('is parsed correctly', () => {});
+                  });
 
-                  describe('function call', () => {});
+                  describe('function call', () => {
+                    it('is parsed correctly', () => {});
+                  });
 
-                  describe('variable / math expression', () => {});
+                  describe('variable / math expression', () => {
+                    it('is parsed correctly', () => {});
+                  });
 
-                  describe('logical NOT operator', () => {});
+                  describe('logical NOT operator', () => {
+                    it('is parsed correctly', () => {});
+                  });
                 });
 
                 describe('compound', () => {
                   describe('logical operator', () => {
-                    describe('AND', () => {});
+                    describe('AND', () => {
+                      it('is parsed correctly', () => {});
+                    });
 
-                    describe('NOT AND', () => {});
+                    describe('NOT AND', () => {
+                      it('is parsed correctly', () => {});
+                    });
 
-                    describe('AND NOT', () => {});
+                    describe('AND NOT', () => {
+                      it('is parsed correctly', () => {});
+                    });
 
-                    describe('OR', () => {});
+                    describe('OR', () => {
+                      it('is parsed correctly', () => {});
+                    });
 
-                    describe('NOT OR', () => {});
+                    describe('NOT OR', () => {
+                      it('is parsed correctly', () => {});
+                    });
 
-                    describe('OR NOT', () => {});
+                    describe('OR NOT', () => {
+                      it('is parsed correctly', () => {});
+                    });
                   });
                 });
               });
             });
 
-            describe('with else branch', () => {});
+            describe('with else branch', () => {
+              it('is parsed correctly', () => {});
+            });
           });
 
           describe('for expression', () => {
             describe('iterating over', () => {
-              describe('variable value', () => {});
+              describe('variable value', () => {
+                it('is parsed correctly', () => {});
+              });
 
-              describe('function call result', () => {});
+              describe('function call result', () => {
+                it('is parsed correctly', () => {});
+              });
 
               describe('static value', () => {
-                describe('list', () => {});
+                describe('list', () => {
+                  it('is parsed correctly', () => {});
+                });
 
-                describe('map', () => {});
+                describe('map', () => {
+                  it('is parsed correctly', () => {});
+                });
               });
             });
           });
 
           describe('foreach expression', () => {
             describe('iterating over', () => {
-              describe('variable value', () => {});
+              describe('variable value', () => {
+                it('is parsed correctly', () => {});
+              });
 
-              describe('function call result', () => {});
+              describe('function call result', () => {
+                it('is parsed correctly', () => {});
+              });
 
               describe('static value', () => {
-                describe('list', () => {});
+                describe('list', () => {
+                  it('is parsed correctly', () => {});
+                });
 
-                describe('map', () => {});
+                describe('map', () => {
+                  it('is parsed correctly', () => {});
+                });
               });
             });
 
-            describe('with ifempty section', () => {});
+            describe('with ifempty section', () => {
+              it('is parsed correctly', () => {});
+            });
           });
 
           describe('function call', () => {
-            describe('plain function', () => {});
+            describe('plain function', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('object method', () => {});
+            describe('object method', () => {
+              it('is parsed correctly', () => {});
+            });
           });
 
           describe('template call', () => {
-            describe('from the same namespace', () => {});
+            describe('from the same namespace', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('from the different namespace', () => {});
+            describe('from the different namespace', () => {
+              it('is parsed correctly', () => {});
+            });
           });
 
           describe('SOY special characters', () => {
-            describe('space', () => {});
+            describe('space', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('indentation', () => {});
+            describe('indentation', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('caret return', () => {});
+            describe('caret return', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('newline', () => {});
+            describe('newline', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('nil', () => {});
+            describe('nil', () => {
+              it('is parsed correctly', () => {});
+            });
           });
 
           describe('HTML entities', () => {
-            it('passes', () => {});
+            it('is parsed correctly', () => {});
           });
 
           describe('plain text', () => {
-            describe('ASCII characters', () => {});
+            describe('ASCII characters', () => {
+              it('is parsed correctly', () => {});
+            });
 
-            describe('UTF-8 characters', () => {});
+            describe('UTF-8 characters', () => {
+              it('is parsed correctly', () => {});
+            });
           });
         });
       });
