@@ -2134,20 +2134,54 @@ const source = `
               it('is parsed correctly', () => {});
             });
 
-            describe('map', () => {
-              const source = `
+            describe('range', () => {
+              describe('with start, end and step params', () => {
+                const source = `
 {namespace Something}
 
 {template .tpl}
 <div>
-{for $it in ["key1": "value1", "key2": "value2"]}
+{for $it in range(3, 10, 2)}
   hello-{$it}
 {/for}
 </div>
 {/template}
               `;
 
-              it('is parsed correctly', () => {});
+                it('is parsed correctly', () => {});
+              });
+
+              describe('with start and end params', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{for $it in range(3, 10)}
+  hello-{$it}
+{/for}
+</div>
+{/template}
+              `;
+
+                it('is parsed correctly', () => {});
+              });
+
+              describe('with end param only', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{for $it in range(10)}
+  hello-{$it}
+{/for}
+</div>
+{/template}
+              `;
+
+                it('is parsed correctly', () => {});
+              });
             });
           });
         });
