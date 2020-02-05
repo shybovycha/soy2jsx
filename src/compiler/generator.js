@@ -48,9 +48,9 @@ class TemplateVisitor extends Visitor {
 
         localCtx.name = this.preprocessChild(node.name, ContextType.TEMPLATE_NAME, localCtx);
         localCtx.addPropertyElements('body', this.preprocessChildren(node.body, ContextType.TEMPLATE_ELEMENT, localCtx));
-        
+
         localCtx.params = [];
-        
+
         parentCtx.addPropertyElement('templates', localCtx);
 
         this.preprocessChildren(node.comments, ContextType.TEMPLATE_COMMENT, localCtx);
@@ -115,14 +115,20 @@ class TemplateVisitor extends Visitor {
         //         return child;
         //     });
         // }
-        
+
         // TODO: is this a template call-only templates processing (the second "OR" branch)?
         let returnArgument = children.filter(e => e.type === "JSXElement" || (e.type === "ExpressionStatement" && e.expression.type !== "AssignmentExpression"));
 
         if (returnArgument.length > 1) {
             returnArgument = {
-                type: "ArrayExpression",
-                elements: returnArgument
+                type: "JSXFragment",
+                openingFragment: {
+                    type: "JSXOpeningFragment"
+                },
+                closingFragment: {
+                    type: "JSXClosingFragment"
+                },
+                children: returnArgument
             };
         } else if (returnArgument.length == 1) {
             returnArgument = returnArgument[0];
@@ -163,23 +169,28 @@ class TemplateVisitor extends Visitor {
         }
 
         return {
-            type: "ExpressionStatement",
-            expression: {
-                type: "AssignmentExpression",
-                operator: "=",
-                left: name,
-                right: {
-                    type: "ArrowFunctionExpression",
-                    id: null,
-                    params: [
-                        {
-                            type: "ObjectPattern",
-                            properties: params
-                        }
-                    ],
-                    body
+            type: "VariableDeclaration",
+            kind: "const",
+            declarations: [
+                {
+                    type: "VariableDeclarator",
+                    id: name,
+                    init: {
+                        type: "ArrowFunctionExpression",
+                        id: null,
+                        generator: false,
+                        async: false,
+                        expression: true,
+                        params: [
+                            {
+                                type: "ObjectPattern",
+                                properties: params
+                            },
+                        ],
+                        body
+                    }
                 }
-            }
+            ]
         };
     }
 }
@@ -199,7 +210,7 @@ class MemberExpressionVisitor extends Visitor {
         };
 
         let props = [node.object].concat(node.properties).filter(e => !!e);
-        
+
         props = this.preprocessChildren(props, ContextType.MEMBER_EXPRESSION_CHILD, localCtx);
 
         props.reverse();
@@ -271,7 +282,7 @@ class CommentVisitor extends Visitor {
 
 class CommentTextVisitor extends Visitor {
     preprocess(node, localCtx, parentCtx) {
-        // localCtx.setProperty('comment', node.text); 
+        // localCtx.setProperty('comment', node.text);
     }
 
     generate(localCtx) {
@@ -318,7 +329,7 @@ class SoyCapableStringVisitor extends Visitor {
     preprocess(node, localCtx, parentCtx) {
         let quasis = [];
         let expressions = [];
-        
+
         node.body.forEach(e => {
             if (!e.type || (e.type && e.type !== "InterpolatedExpression" && e.type !== "IfStatement")) {
                 quasis.push(e);
@@ -327,7 +338,7 @@ class SoyCapableStringVisitor extends Visitor {
                 expressions.push(e);
             }
         });
-        
+
         localCtx.type = ContextType.STRING_INTERPOLATED_EXPRESSION;
         localCtx.quasis = quasis;
         localCtx.expressions = this.preprocessChildren(expressions, ContextType.STRING_INTERPOLATED_EXPRESSION, localCtx);
@@ -428,9 +439,9 @@ class SwitchOperatorVisitor extends Visitor {
             } else {
                 const {body, caseValue} = caseExpressions[0];
                 const alternate = reduceCaseExpressions(switchExpression, caseExpressions.slice(1));
-                
+
                 let consequent;
-                
+
                 if (Array.isArray(body)) {
                     consequent = {
                         type: "ReturnStatement",
@@ -535,7 +546,7 @@ class ForeachOperatorVisitor extends Visitor {
 
         const range = this.generateChild(localCtx.range, localCtx);
         const iterator = this.generateChild(localCtx.iterator, localCtx);
-        
+
         const foreachExpr = {
             type: "CallExpression",
             callee: {
@@ -602,7 +613,7 @@ class ObjectExpressionVisitor extends Visitor {
 class PropertyVisitor extends Visitor {
     preprocess(node, localCtx, parentCtx) {
         localCtx.key = this.preprocessChild(node.key, ContextType.PROPERTY_KEY, localCtx);
-        localCtx.value = Array.isArray(node.value) ? 
+        localCtx.value = Array.isArray(node.value) ?
             this.preprocessChildren(node.value, ContextType.PROPERTY_VALUE, localCtx) :
             this.preprocessChild(node.value, ContextType.PROPERTY_VALUE, localCtx);
 
@@ -628,7 +639,7 @@ class BinaryExpressionVisitor extends Visitor {
         };
 
         localCtx.operator = binaryOperatorsMapping[node.operator] || node.operator;
-        
+
         localCtx.left = this.preprocessChild(node.left, ContextType.BINARY_OPERATOR_ARGUMENT, localCtx);
         localCtx.right = this.preprocessChild(node.right, ContextType.BINARY_OPERATOR_ARGUMENT, localCtx);
     }
@@ -662,7 +673,7 @@ class LogicalExpressionVisitor extends Visitor {
         };
 
         localCtx.operator = binaryOperatorsMapping[node.operator] || node.operator;
-        
+
         localCtx.left = this.preprocessChild(node.left, ContextType.BINARY_OPERATOR_ARGUMENT, localCtx);
         localCtx.right = this.preprocessChild(node.right, ContextType.BINARY_OPERATOR_ARGUMENT, localCtx);
     }
@@ -873,7 +884,7 @@ class ConditionalExpressionVisitor extends Visitor {
             type,
             test,
             consequent,
-            alternate 
+            alternate
         };
 
         const needsWrapper = [
@@ -892,11 +903,11 @@ class IfStatementVisitor extends ConditionalExpressionVisitor {
 class VariableDeclarationVisitor extends Visitor {
     preprocess(node, localCtx, parentCtx) {
         localCtx.type = ContextType.VARIABLE_DECLARATION;
-        
+
         localCtx.name = node.name;
 
-        const value = Array.isArray(node.value) ? 
-            this.preprocessChildren(node.value, ContextType.VARIABLE_DECLARATION, localCtx) : 
+        const value = Array.isArray(node.value) ?
+            this.preprocessChildren(node.value, ContextType.VARIABLE_DECLARATION, localCtx) :
             this.preprocessChild(node.value, ContextType.VARIABLE_DECLARATION, localCtx);
 
         localCtx.value = value;
@@ -908,8 +919,8 @@ class VariableDeclarationVisitor extends Visitor {
 
     generate(localCtx) {
         const id = this.generateChild(localCtx.name, localCtx);
-        
-        let init = Array.isArray(localCtx.value) ? 
+
+        let init = Array.isArray(localCtx.value) ?
             this.generateChildren(localCtx.value, localCtx) :
             this.generateChild(localCtx.value, localCtx);
 
@@ -970,7 +981,7 @@ class InterpolatedExpressionVisitor extends Visitor {
         } else {
             expressions = expressions[0];
         }
-        
+
         const filters = localCtx.filters;
 
         const recursiveApplyFilters = function (filters, expression) {
@@ -1128,7 +1139,7 @@ class HtmlElementVisitor extends Visitor {
             localCtx.attributesVarName = attributesVarName;
 
             templateCtx.addPropertyElement('attributeVars', attributesVarName);
-            
+
             const attributesVarValue = {
                 type: "ObjectExpression",
                 properties: []

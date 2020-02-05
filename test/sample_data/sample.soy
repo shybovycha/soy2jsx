@@ -8,20 +8,36 @@
  * @param isResolved true, if the issue is resolved
  */
 {template .html}
-    <b>{$authorName}</b> <span class="formatted-variable-label-color">{getText('sd.notifications.rendering.status.formatted.label')}</span>
-    {sp}<span class="aui-lozenge aui-lozenge-{if not $isResolved}current{else}success{/if}">{$status}</span>
-    <br><span class="formatted-variable-time-color">{$authorDate}</span>
+    <b>{$authorName}</b>
 {/template}
 
 /**
- * Renders the content section of a batched notification in html
- * @param authorName the author of the comment
- * @param authorDate the time of the comment creation
- * @param status the translated status to render
+ * This is a default template.
+ * @param moo
+ * @param? foo
  */
-{template .text}
-    {$authorName} {getText('sd.notifications.rendering.status.formatted.label')} {$status |noAutoescape}
-    {\n}
-    {\n}
-    {$authorDate}
+{template .main}
+  <div class="cl1 {if $foo}cl2{/if}"></div>
+  {foreach $r in $moo}
+    <a href="/home/{$r}">{$r}</a>
+  {/foreach}
+{/template}
+
+/**
+* Create the success result message with optional link to request actual user count if required
+* @param showingHTML - number results user can see in one page
+* @param totalHTML - number results user can see in one page
+* @param hasAdditionalSign - should the extra sign be shown
+* @param userType - the user type (must be 1 of customer, collaborator or agent)
+*/
+{template .message}
+    {let $totalToShowHTML}
+        {$totalHTML}{if $hasAdditionalSign}+{/if}
+    {/let}
+    {switch $userType}
+        {case 'customer'}
+            {getText('sd.component.total.message.showing.customer', $showingHTML, $totalToShowHTML)|noAutoescape}
+        {case 'agent'}
+            {getText('sd.component.total.message.showing.agent', $showingHTML, $totalToShowHTML)|noAutoescape}
+    {/switch}
 {/template}
