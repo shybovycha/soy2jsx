@@ -1054,1379 +1054,6 @@ const source = `
         });
 
         describe('children', () => {
-          describe('variable interpolation', () => {
-            describe('simple', () => {
-              const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content}</div>
-{/template}
-              `;
-
-              it('is parsed correctly', () => {});
-            });
-
-            describe('with filters', () => {
-              describe('just one', () => {
-                describe('with no parameters', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|htmlSafe}</div>
-{/template}
-                `;
-
-                  it('is parsed correctly', () => {});
-                });
-
-                describe('with single parameter', () => {
-                  describe('number', () => {
-                    describe('integer', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|indent:4}</div>
-{/template}
-                      `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('float', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|opacity:0.14}</div>
-{/template}
-              `;
-
-                      it('is parsed correctly', () => {});
-                    });
-                  });
-
-                  describe('variable value', () => {
-                    const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|opacity:$opacity}</div>
-{/template}
-              `;
-
-                    it('is parsed correctly', () => {});
-                  });
-
-                  describe('function call result', () => {
-                    const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|opacity:getOpacity()}</div>
-{/template}
-              `;
-
-                    it('is parsed correctly', () => {});
-                  });
-
-                  describe('ternary expression', () => {
-                    const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|opacity:$transparent ? 0 : 1}</div>
-{/template}
-              `;
-
-                    it('is parsed correctly', () => {});
-                  });
-
-                  describe('string', () => {
-                    describe('single-quoted', () => {
-                      describe('with interpolation', () => {
-                        describe('number', () => {
-                          describe('integer', () => {
-                            const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|color:'blue-{4}'}</div>
-{/template}
-              `;
-
-                            it('is parsed correctly', () => {});
-                          });
-
-                          describe('float', () => {
-                            const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|color:'blue-{3.2}'}</div>
-{/template}
-              `;
-
-                            it('is parsed correctly', () => {});
-                          });
-                        });
-
-                        describe('variable value', () => {
-                          const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|color:'blue-{$tint}'}</div>
-{/template}
-              `;
-
-                          it('is parsed correctly', () => {});
-                        });
-
-                        describe('function call result', () => {
-                          const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|color:'blue-{getTint()}'}</div>
-{/template}
-              `;
-
-                          it('is parsed correctly', () => {});
-                        });
-
-                        describe('if expression', () => {
-                          const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|color:'blue-{$tint < 0.4 ? 0.4 : 0.6}'}</div>
-{/template}
-              `;
-
-                          it('is parsed correctly', () => {});
-                        });
-                      });
-                    });
-
-                    describe('double-quoted', () => {
-                      describe('with interpolation', () => {
-                        describe('number', () => {
-                          describe('integer', () => {
-                            const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|color:"blue-{4}"}</div>
-{/template}
-              `;
-
-                            it('is parsed correctly', () => {});
-                          });
-
-                          describe('float', () => {
-                            const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|color:"blue-{0.6}"}</div>
-{/template}
-              `;
-
-                            it('is parsed correctly', () => {});
-                          });
-                        });
-
-                        describe('variable value', () => {
-                          const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|color:"blue-{$tint}"}</div>
-{/template}
-              `;
-
-                          it('is parsed correctly', () => {});
-                        });
-
-                        describe('function call result', () => {
-                          const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|color:"blue-{getTint()}"}</div>
-{/template}
-              `;
-
-                          it('is parsed correctly', () => {});
-                        });
-
-                        describe('ternary expression', () => {
-                          const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|color:"blue-{$tint < 0.4 ? 0.4 : 0.6}"}</div>
-{/template}
-              `;
-
-                          it('is parsed correctly', () => {});
-                        });
-                      });
-                    });
-                  });
-                });
-
-                describe('with multiple parameters', () => {
-                  describe('number', () => {
-                    describe('integer', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|indent:4|tabWidth:8}</div>
-{/template}
-              `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('float', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|opacity:1.0|relevancy:0.4}</div>
-{/template}
-              `;
-
-                      it('is parsed correctly', () => {});
-                    });
-                  });
-
-                  describe('variable value', () => {
-                    const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|opacity:$opacity|tabs:$tabWidth|indent:$indentationWidth}</div>
-{/template}
-              `;
-
-                    it('is parsed correctly', () => {});
-                  });
-
-                  describe('function call result', () => {
-                    const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|opacity:getOpacity()|indent:getIndentationWidth()}</div>
-{/template}
-              `;
-
-                    it('is parsed correctly', () => {});
-                  });
-
-                  describe('ternary expression', () => {
-                    const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|opacity:$opacity < 0 ? 0 : 1.0|tabs:$opacity > 0 ? 4 : 0}</div>
-{/template}
-              `;
-
-                    it('is parsed correctly', () => {});
-                  });
-                });
-              });
-
-              describe('multiple', () => {
-                describe('with no parameters', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|transparent|escaped}</div>
-{/template}
-              `;
-
-                  it('is parsed correctly', () => {});
-                });
-
-                describe('with multiple parameters', () => {
-                  describe('number', () => {
-                    describe('integer', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|tab:4:2|indent:2:8}</div>
-{/template}
-              `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('float', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|gradient:0.1:0.4|transition:1.2:3.4}</div>
-{/template}
-              `;
-
-                      it('is parsed correctly', () => {});
-                    });
-                  });
-
-                  describe('variable value', () => {
-                    const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|gradient:$gradientFrom:$gradientTo|transition:$transitionFrom:$transitionTo}</div>
-{/template}
-              `;
-
-                    it('is parsed correctly', () => {});
-                  });
-
-                  describe('function call result', () => {
-                    const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|gradient:getGradientFrom():getGradientTo()|transition:getTransitionFrom():getTransitionTo()}</div>
-{/template}
-              `;
-
-                    it('is parsed correctly', () => {});
-                  });
-
-                  // TODO: this might be actually invalid - how do we get where it is the ternary colon or filter param' colon?
-                  describe('ternary expression', () => {
-                    const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>{$content|gradient:$a < 0.1 ? 0.2:0.4|transition:1.2:3.4}</div>
-{/template}
-              `;
-
-                    it('is parsed correctly', () => {});
-                  });
-                });
-              });
-            });
-          });
-
-          describe('let block', () => {
-            describe('with simple value', () => {
-              describe('number', () => {
-                describe('integer', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $tabWidth: 4}
-{/template}
-              `;
-
-                  it('is parsed correctly', () => {});
-                });
-
-                describe('float', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $gradient: 0.4}
-{/template}
-              `;
-
-                  it('is parsed correctly', () => {});
-                });
-              });
-
-              describe('variable value', () => {
-                const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $tabWidth: $otherVar}
-{/template}
-              `;
-
-                it('is parsed correctly', () => {});
-              });
-
-              describe('function call result', () => {
-                const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $tabWidth: getOtherVar()}
-{/template}
-              `;
-
-                it('is parsed correctly', () => {});
-              });
-
-              describe('boolean expression', () => {
-                const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $isBlue: $isEnabled and not $isSelected or $somethingElse}
-{/template}
-              `;
-
-                it('is parsed correctly', () => {});
-              });
-            });
-
-            describe('with compound value', () => {
-              describe('HTML', () => {
-                const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $info}
-  <div class="info">{$message}</div>
-  {/let}
-{/template}
-              `;
-
-                it('is parsed correctly', () => {});
-              });
-
-              describe('template call', () => {
-                describe('from same namespace', () => {
-                  describe('with no parameters', () => {
-                    const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $info}
-    {call .message /}
-  {/let}
-{/template}
-                  `;
-
-                    it('is parsed correctly', () => {});
-                  });
-
-                  describe('with inline parameters', () => {
-                    describe('boolean', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $info}
-    {call .message isInfo isPopup /}
-  {/let}
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('key-value', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $info}
-    {call .message type="info" message=$mesage /}
-  {/let}
-{/template}
-                  `;
-
-                    it('is parsed correctly', () => {});
-                    });
-
-                    describe('mixed', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $info}
-    {call .message isInfo message=getMessage() }
-  {/let}
-{/template}
-                    `;
-
-                      it('is parsed correctly', () => {});
-                    });
-                  });
-
-                  describe('with body parameter', () => {
-                    const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $info}
-    {call .message }
-      <b>this is a warning</b>
-    {/call}
-  {/let}
-{/template}
-                  `;
-
-                    it('is parsed correctly', () => {});
-                  });
-                });
-
-                describe('from other namespace', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $info}
-    {call Some.Other.Namespace.message /}
-  {/let}
-{/template}
-                `;
-
-                  it('is parsed correctly', () => {});
-                });
-              });
-
-              describe('number', () => {
-                describe('integer', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $info}
-    {4}
-  {/let}
-{/template}
-                  `;
-
-                  it('is parsed correctly', () => {});
-                });
-
-                describe('float', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $info}
-    {-3.14}
-  {/let}
-{/template}
-                  `;
-
-                  it('is parsed correctly', () => {});
-                });
-              });
-
-              describe('variable value', () => {
-                const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $info}
-    {$bigVariable}
-  {/let}
-{/template}
-                  `;
-
-                it('is parsed correctly', () => {});
-              });
-
-              describe('function call result', () => {
-                const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $info}
-    {getBigVariable()}
-  {/let}
-{/template}
-                  `;
-
-                it('is parsed correctly', () => {});
-              });
-
-              describe('if expression', () => {
-                const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $info}
-    {if $isBig}
-    <h1>Big message</h1>
-    {else}
-    <b>small message</b>
-    {/if}
-  {/let}
-{/template}
-                  `;
-
-                it('is parsed correctly', () => {});
-              });
-
-              describe('for expression', () => {
-                const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $info}
-    {for $it in $var}
-      <div>{$it}</div>
-    {/for}
-  {/let}
-{/template}
-                  `;
-
-                it('is parsed correctly', () => {});
-              });
-
-              describe('foreach expression', () => {
-                const source = `
-{namespace Something}
-
-{template .tpl}
-  {let $info}
-    {foreach $it in $var}
-      <div>{$it}</div>
-    {ifempty}
-      <div>nothing here</div>
-    {/for}
-  {/let}
-{/template}
-                  `;
-
-                it('is parsed correctly', () => {});
-              });
-            });
-          });
-
-          describe('if expression', () => {
-            describe('with no else branch', () => {
-              describe('with expression', () => {
-                describe('simple', () => {
-                  describe('variable value', () => {
-                    const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {if $variable}
-      hello
-    {/if}
-  </div>
-{/template}
-                  `;
-
-                    it('is parsed correctly', () => {});
-                  });
-
-                  describe('function call', () => {
-                    const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {if isCondition()}
-      hello
-    {/if}
-  </div>
-{/template}
-                  `;
-
-                    it('is parsed correctly', () => {});
-                  });
-                });
-
-                describe('compound', () => {
-                  describe('logical operator', () => {
-                    describe('AND', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {if $variable1 and $variable2}
-      hello
-    {/if}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('NOT AND', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {if not $variable1 and $variable2}
-      hello
-    {/if}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('AND NOT', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {if $variable1 and not $variable2}
-      hello
-    {/if}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('OR', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {if $variable1 or $variable2}
-      hello
-    {/if}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('NOT OR', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {if not $variable1 or $variable2}
-      hello
-    {/if}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('OR NOT', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {if $variable1 or not $variable2}
-      hello
-    {/if}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-                  });
-
-                  describe('comparison operator', () => {
-                    describe('less', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {if $variable1 < $variable2}
-      hello
-    {/if}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('less or equal', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {if $variable1 <= getValue()}
-      hello
-    {/if}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('equal', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {if $variable1 == 'something'}
-      hello
-    {/if}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('not equal', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {if $variable1 != -3.14}
-      hello
-    {/if}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('greater or equal', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {if $variable1 >= someOtherValue()}
-      hello
-    {/if}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('greater', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {if $variable1 > complexCall($variable2)}
-      hello
-    {/if}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-                  });
-                });
-              });
-            });
-
-            describe('with else branch', () => {
-              const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {if $variable1 and $variable2}
-      hello
-    {else}
-      goodbye
-    {/if}
-  </div>
-{/template}
-                  `;
-
-              it('is parsed correctly', () => {});
-            });
-          });
-
-          describe('for expression', () => {
-            describe('iterating over', () => {
-              describe('variable value', () => {
-                const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {for $it in $list}
-      hello-{$it}
-    {/for}
-  </div>
-{/template}
-                  `;
-
-                it('is parsed correctly', () => {});
-              });
-
-              describe('function call result', () => {
-                const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {for $it in getList()}
-      hello-{$it}
-    {/for}
-  </div>
-{/template}
-                  `;
-
-                it('is parsed correctly', () => {});
-              });
-
-              describe('static value', () => {
-                describe('list', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {for $it in [1,2,5,7]}
-      hello-{$it}
-    {/for}
-  </div>
-{/template}
-                  `;
-
-                  it('is parsed correctly', () => {});
-                });
-
-                describe('map', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {for $it in ["key1": "value1", "key2": "value2"]}
-      hello-{$it}
-    {/for}
-  </div>
-{/template}
-                  `;
-
-                  it('is parsed correctly', () => {});
-                });
-              });
-            });
-          });
-
-          describe('foreach expression', () => {
-            describe('iterating over', () => {
-              describe('variable value', () => {
-                const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {foreach $it in $list}
-      hello-{$it}
-    {/foreach}
-  </div>
-{/template}
-                  `;
-
-                it('is parsed correctly', () => {});
-              });
-
-              describe('function call result', () => {
-                const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {foreach $it in getList()}
-      hello-{$it}
-    {/foreach}
-  </div>
-{/template}
-                  `;
-
-                it('is parsed correctly', () => {});
-              });
-
-              describe('static value', () => {
-                describe('list', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {foreach $it in ['moo', 'foo', 'bar']}
-      hello-{$it}
-    {/foreach}
-  </div>
-{/template}
-                  `;
-
-                  it('is parsed correctly', () => {});
-                });
-
-                describe('map', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {foreach $it in ['moo': -3.14, 'foo': 2.22]}
-      hello-{$it}
-    {/foreach}
-  </div>
-{/template}
-                  `;
-
-                  it('is parsed correctly', () => {});
-                });
-              });
-            });
-
-            describe('with ifempty section', () => {
-              const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {foreach $it in getList()}
-      hello-{$it}
-    {ifempty}
-      goodbye
-    {/foreach}
-  </div>
-{/template}
-                  `;
-
-              it('is parsed correctly', () => {});
-            });
-          });
-
-          describe('function call', () => {
-            describe('plain function', () => {
-              describe('without parameters', () => {
-                const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {getHtml()}
-  </div>
-{/template}
-                  `;
-
-                it('is parsed correctly', () => {});
-              });
-
-              describe('with parameters', () => {
-                describe('variable value', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {getHtml($var1, $var2)}
-  </div>
-{/template}
-                  `;
-
-                  it('is parsed correctly', () => {});
-                });
-
-                describe('function call result', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {getHtml(getParam1(), getParam2())}
-  </div>
-{/template}
-                  `;
-
-                  it('is parsed correctly', () => {});
-                });
-
-                describe('static value', () => {
-                  describe('number', () => {
-                    describe('integer', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {getHtml(1, 42, -7)}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('float', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {getHtml(3.14, -2.22)}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-                  });
-
-                  describe('string', () => {
-                    describe('single-quoted', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {getHtml('some', 'string')}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('double-quoted', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {getHtml("other", "string")}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-                  });
-
-                  describe('list', () => {
-                    const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {getHtml([ 2, 4, 6 ])}
-  </div>
-{/template}
-                  `;
-
-                    it('is parsed correctly', () => {});
-                  });
-
-                  describe('map', () => {
-                    const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {getHtml([ "key1": 12, "key2": -2 ])}
-  </div>
-{/template}
-                  `;
-
-                    it('is parsed correctly', () => {});
-                  });
-                });
-              });
-            });
-
-            describe('object method', () => {
-              describe('without parameters', () => {
-                const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {obj1.getHtml()}
-  </div>
-{/template}
-                  `;
-
-                it('is parsed correctly', () => {});
-              });
-
-              describe('with parameters', () => {
-                describe('variable value', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {obj1.getHtml($x, $y, $z)}
-  </div>
-{/template}
-                  `;
-
-                  it('is parsed correctly', () => {});
-                });
-
-                describe('function call result', () => {
-                  const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {obj1.getHtml(otherFunc())}
-  </div>
-{/template}
-                  `;
-
-                  it('is parsed correctly', () => {});
-                });
-
-                describe('static value', () => {
-                  describe('number', () => {
-                    describe('integer', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {obj1.getHtml(-14)}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('float', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {obj1.getHtml(-3.14)}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-                  });
-
-                  describe('string', () => {
-                    describe('single-quoted', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {obj1.getHtml('hello objects')}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-
-                    describe('double-quoted', () => {
-                      const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {obj1.getHtml("hello objects")}
-  </div>
-{/template}
-                  `;
-
-                      it('is parsed correctly', () => {});
-                    });
-                  });
-
-                  describe('list', () => {
-                    const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {obj1.getHtml([ 1, 2, 3] )}
-  </div>
-{/template}
-                  `;
-
-                    it('is parsed correctly', () => {});
-                  });
-
-                  describe('map', () => {
-                    const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {obj1.getHtml([ "elements": $elts ])}
-  </div>
-{/template}
-                  `;
-
-                    it('is parsed correctly', () => {});
-                  });
-                });
-              });
-            });
-          });
-
-          describe('template call', () => {
-            describe('from the same namespace', () => {
-              const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {call .otherTpl /}
-  </div>
-{/template}
-                  `;
-
-              it('is parsed correctly', () => {});
-            });
-
-            describe('from the different namespace', () => {
-              const source = `
-{namespace Something}
-
-{template .tpl}
-  <div>
-    {call Some.Other.Namespace.otherTpl /}
-  </div>
-{/template}
-                  `;
-
-              it('is parsed correctly', () => {});
-            });
-          });
-
           describe('SOY special characters', () => {
             describe('space', () => {
               const source = `
@@ -2542,6 +1169,1379 @@ const source = `
               it('is parsed correctly', () => {});
             });
           });
+        });
+      });
+
+      describe('variable interpolation', () => {
+        describe('simple', () => {
+          const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content}
+{/template}
+          `;
+
+          it('is parsed correctly', () => {});
+        });
+
+        describe('with filters', () => {
+          describe('just one', () => {
+            describe('with no parameters', () => {
+              const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|htmlSafe}
+{/template}
+            `;
+
+              it('is parsed correctly', () => {});
+            });
+
+            describe('with single parameter', () => {
+              describe('number', () => {
+                describe('integer', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|indent:4}
+{/template}
+                  `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('float', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|opacity:0.14}
+{/template}
+          `;
+
+                  it('is parsed correctly', () => {});
+                });
+              });
+
+              describe('variable value', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|opacity:$opacity}
+{/template}
+          `;
+
+                it('is parsed correctly', () => {});
+              });
+
+              describe('function call result', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|opacity:getOpacity()}
+{/template}
+          `;
+
+                it('is parsed correctly', () => {});
+              });
+
+              describe('ternary expression', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|opacity:$transparent ? 0 : 1}
+{/template}
+          `;
+
+                it('is parsed correctly', () => {});
+              });
+
+              describe('string', () => {
+                describe('single-quoted', () => {
+                  describe('with interpolation', () => {
+                    describe('number', () => {
+                      describe('integer', () => {
+                        const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|color:'blue-{4}'}
+{/template}
+          `;
+
+                        it('is parsed correctly', () => {});
+                      });
+
+                      describe('float', () => {
+                        const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|color:'blue-{3.2}'}
+{/template}
+          `;
+
+                        it('is parsed correctly', () => {});
+                      });
+                    });
+
+                    describe('variable value', () => {
+                      const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|color:'blue-{$tint}'}
+{/template}
+          `;
+
+                      it('is parsed correctly', () => {});
+                    });
+
+                    describe('function call result', () => {
+                      const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|color:'blue-{getTint()}'}
+{/template}
+          `;
+
+                      it('is parsed correctly', () => {});
+                    });
+
+                    describe('if expression', () => {
+                      const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|color:'blue-{$tint < 0.4 ? 0.4 : 0.6}'}
+{/template}
+          `;
+
+                      it('is parsed correctly', () => {});
+                    });
+                  });
+                });
+
+                describe('double-quoted', () => {
+                  describe('with interpolation', () => {
+                    describe('number', () => {
+                      describe('integer', () => {
+                        const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|color:"blue-{4}"}
+{/template}
+          `;
+
+                        it('is parsed correctly', () => {});
+                      });
+
+                      describe('float', () => {
+                        const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|color:"blue-{0.6}"}
+{/template}
+          `;
+
+                        it('is parsed correctly', () => {});
+                      });
+                    });
+
+                    describe('variable value', () => {
+                      const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|color:"blue-{$tint}"}
+{/template}
+          `;
+
+                      it('is parsed correctly', () => {});
+                    });
+
+                    describe('function call result', () => {
+                      const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|color:"blue-{getTint()}"}
+{/template}
+          `;
+
+                      it('is parsed correctly', () => {});
+                    });
+
+                    describe('ternary expression', () => {
+                      const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|color:"blue-{$tint < 0.4 ? 0.4 : 0.6}"}
+{/template}
+          `;
+
+                      it('is parsed correctly', () => {});
+                    });
+                  });
+                });
+              });
+            });
+
+            describe('with multiple parameters', () => {
+              describe('number', () => {
+                describe('integer', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|indent:4|tabWidth:8}
+{/template}
+          `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('float', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|opacity:1.0|relevancy:0.4}
+{/template}
+          `;
+
+                  it('is parsed correctly', () => {});
+                });
+              });
+
+              describe('variable value', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|opacity:$opacity|tabs:$tabWidth|indent:$indentationWidth}
+{/template}
+          `;
+
+                it('is parsed correctly', () => {});
+              });
+
+              describe('function call result', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|opacity:getOpacity()|indent:getIndentationWidth()}
+{/template}
+          `;
+
+                it('is parsed correctly', () => {});
+              });
+
+              describe('ternary expression', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|opacity:$opacity < 0 ? 0 : 1.0|tabs:$opacity > 0 ? 4 : 0}
+{/template}
+          `;
+
+                it('is parsed correctly', () => {});
+              });
+            });
+          });
+
+          describe('multiple', () => {
+            describe('with no parameters', () => {
+              const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|transparent|escaped}
+{/template}
+          `;
+
+              it('is parsed correctly', () => {});
+            });
+
+            describe('with multiple parameters', () => {
+              describe('number', () => {
+                describe('integer', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|tab:4:2|indent:2:8}
+{/template}
+          `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('float', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|gradient:0.1:0.4|transition:1.2:3.4}
+{/template}
+          `;
+
+                  it('is parsed correctly', () => {});
+                });
+              });
+
+              describe('variable value', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|gradient:$gradientFrom:$gradientTo|transition:$transitionFrom:$transitionTo}
+{/template}
+          `;
+
+                it('is parsed correctly', () => {});
+              });
+
+              describe('function call result', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|gradient:getGradientFrom():getGradientTo()|transition:getTransitionFrom():getTransitionTo()}
+{/template}
+          `;
+
+                it('is parsed correctly', () => {});
+              });
+
+              // TODO: this might be actually invalid - how do we get where it is the ternary colon or filter param' colon?
+              describe('ternary expression', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+  {$content|gradient:$a < 0.1 ? 0.2:0.4|transition:1.2:3.4}
+{/template}
+          `;
+
+                it('is parsed correctly', () => {});
+              });
+            });
+          });
+        });
+      });
+
+      describe('let block', () => {
+        describe('with simple value', () => {
+          describe('number', () => {
+            describe('integer', () => {
+              const source = `
+{namespace Something}
+
+{template .tpl}
+  {let $tabWidth: 4}
+{/template}
+          `;
+
+              it('is parsed correctly', () => {});
+            });
+
+            describe('float', () => {
+              const source = `
+{namespace Something}
+
+{template .tpl}
+  {let $gradient: 0.4}
+{/template}
+          `;
+
+              it('is parsed correctly', () => {});
+            });
+          });
+
+          describe('variable value', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+  {let $tabWidth: $otherVar}
+{/template}
+          `;
+
+            it('is parsed correctly', () => {});
+          });
+
+          describe('function call result', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+  {let $tabWidth: getOtherVar()}
+{/template}
+          `;
+
+            it('is parsed correctly', () => {});
+          });
+
+          describe('boolean expression', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+  {let $isBlue: $isEnabled and not $isSelected or $somethingElse}
+{/template}
+          `;
+
+            it('is parsed correctly', () => {});
+          });
+        });
+
+        describe('with compound value', () => {
+          describe('HTML', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+  {let $info}
+    <div class="info">{$message}</div>
+  {/let}
+{/template}
+          `;
+
+            it('is parsed correctly', () => {});
+          });
+
+          describe('template call', () => {
+            describe('from same namespace', () => {
+              describe('with no parameters', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+  {let $info}
+    {call .message /}
+  {/let}
+{/template}
+              `;
+
+                it('is parsed correctly', () => {});
+              });
+
+              describe('with inline parameters', () => {
+                describe('boolean', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+  {let $info}
+    {call .message isInfo isPopup /}
+  {/let}
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('key-value', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+  {let $info}
+    {call .message type="info" message=$mesage /}
+  {/let}
+{/template}
+              `;
+
+                it('is parsed correctly', () => {});
+                });
+
+                describe('mixed', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+  {let $info}
+    {call .message isInfo message=getMessage() }
+  {/let}
+{/template}
+                `;
+
+                  it('is parsed correctly', () => {});
+                });
+              });
+
+              describe('with body parameter', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+  {let $info}
+    {call .message }
+      <b>this is a warning</b>
+    {/call}
+  {/let}
+{/template}
+              `;
+
+                it('is parsed correctly', () => {});
+              });
+            });
+
+            describe('from other namespace', () => {
+              const source = `
+{namespace Something}
+
+{template .tpl}
+{let $info}
+{call Some.Other.Namespace.message /}
+{/let}
+{/template}
+            `;
+
+              it('is parsed correctly', () => {});
+            });
+          });
+
+          describe('number', () => {
+            describe('integer', () => {
+              const source = `
+{namespace Something}
+
+{template .tpl}
+{let $info}
+{4}
+{/let}
+{/template}
+              `;
+
+              it('is parsed correctly', () => {});
+            });
+
+            describe('float', () => {
+              const source = `
+{namespace Something}
+
+{template .tpl}
+{let $info}
+{-3.14}
+{/let}
+{/template}
+              `;
+
+              it('is parsed correctly', () => {});
+            });
+          });
+
+          describe('variable value', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+{let $info}
+{$bigVariable}
+{/let}
+{/template}
+              `;
+
+            it('is parsed correctly', () => {});
+          });
+
+          describe('function call result', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+{let $info}
+{getBigVariable()}
+{/let}
+{/template}
+              `;
+
+            it('is parsed correctly', () => {});
+          });
+
+          describe('if expression', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+{let $info}
+{if $isBig}
+<h1>Big message</h1>
+{else}
+<b>small message</b>
+{/if}
+{/let}
+{/template}
+              `;
+
+            it('is parsed correctly', () => {});
+          });
+
+          describe('for expression', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+{let $info}
+{for $it in $var}
+  <div>{$it}</div>
+{/for}
+{/let}
+{/template}
+              `;
+
+            it('is parsed correctly', () => {});
+          });
+
+          describe('foreach expression', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+{let $info}
+{foreach $it in $var}
+  <div>{$it}</div>
+{ifempty}
+  <div>nothing here</div>
+{/for}
+{/let}
+{/template}
+              `;
+
+            it('is parsed correctly', () => {});
+          });
+        });
+      });
+
+      describe('if expression', () => {
+        describe('with no else branch', () => {
+          describe('with expression', () => {
+            describe('simple', () => {
+              describe('variable value', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{if $variable}
+  hello
+{/if}
+</div>
+{/template}
+              `;
+
+                it('is parsed correctly', () => {});
+              });
+
+              describe('function call', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{if isCondition()}
+  hello
+{/if}
+</div>
+{/template}
+              `;
+
+                it('is parsed correctly', () => {});
+              });
+            });
+
+            describe('compound', () => {
+              describe('logical operator', () => {
+                describe('AND', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{if $variable1 and $variable2}
+  hello
+{/if}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('NOT AND', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{if not $variable1 and $variable2}
+  hello
+{/if}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('AND NOT', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{if $variable1 and not $variable2}
+  hello
+{/if}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('OR', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{if $variable1 or $variable2}
+  hello
+{/if}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('NOT OR', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{if not $variable1 or $variable2}
+  hello
+{/if}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('OR NOT', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{if $variable1 or not $variable2}
+  hello
+{/if}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+              });
+
+              describe('comparison operator', () => {
+                describe('less', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{if $variable1 < $variable2}
+  hello
+{/if}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('less or equal', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{if $variable1 <= getValue()}
+  hello
+{/if}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('equal', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{if $variable1 == 'something'}
+  hello
+{/if}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('not equal', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{if $variable1 != -3.14}
+  hello
+{/if}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('greater or equal', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{if $variable1 >= someOtherValue()}
+  hello
+{/if}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('greater', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{if $variable1 > complexCall($variable2)}
+  hello
+{/if}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+              });
+            });
+          });
+        });
+
+        describe('with else branch', () => {
+          const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{if $variable1 and $variable2}
+  hello
+{else}
+  goodbye
+{/if}
+</div>
+{/template}
+              `;
+
+          it('is parsed correctly', () => {});
+        });
+      });
+
+      describe('for expression', () => {
+        describe('iterating over', () => {
+          describe('variable value', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{for $it in $list}
+  hello-{$it}
+{/for}
+</div>
+{/template}
+              `;
+
+            it('is parsed correctly', () => {});
+          });
+
+          describe('function call result', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{for $it in getList()}
+  hello-{$it}
+{/for}
+</div>
+{/template}
+              `;
+
+            it('is parsed correctly', () => {});
+          });
+
+          describe('static value', () => {
+            describe('list', () => {
+              const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{for $it in [1,2,5,7]}
+  hello-{$it}
+{/for}
+</div>
+{/template}
+              `;
+
+              it('is parsed correctly', () => {});
+            });
+
+            describe('map', () => {
+              const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{for $it in ["key1": "value1", "key2": "value2"]}
+  hello-{$it}
+{/for}
+</div>
+{/template}
+              `;
+
+              it('is parsed correctly', () => {});
+            });
+          });
+        });
+      });
+
+      describe('foreach expression', () => {
+        describe('iterating over', () => {
+          describe('variable value', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{foreach $it in $list}
+  hello-{$it}
+{/foreach}
+</div>
+{/template}
+              `;
+
+            it('is parsed correctly', () => {});
+          });
+
+          describe('function call result', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{foreach $it in getList()}
+  hello-{$it}
+{/foreach}
+</div>
+{/template}
+              `;
+
+            it('is parsed correctly', () => {});
+          });
+
+          describe('static value', () => {
+            describe('list', () => {
+              const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{foreach $it in ['moo', 'foo', 'bar']}
+  hello-{$it}
+{/foreach}
+</div>
+{/template}
+              `;
+
+              it('is parsed correctly', () => {});
+            });
+
+            describe('map', () => {
+              const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{foreach $it in ['moo': -3.14, 'foo': 2.22]}
+  hello-{$it}
+{/foreach}
+</div>
+{/template}
+              `;
+
+              it('is parsed correctly', () => {});
+            });
+          });
+        });
+
+        describe('with ifempty section', () => {
+          const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{foreach $it in getList()}
+  hello-{$it}
+{ifempty}
+  goodbye
+{/foreach}
+</div>
+{/template}
+              `;
+
+          it('is parsed correctly', () => {});
+        });
+      });
+
+      describe('function call', () => {
+        describe('plain function', () => {
+          describe('without parameters', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{getHtml()}
+</div>
+{/template}
+              `;
+
+            it('is parsed correctly', () => {});
+          });
+
+          describe('with parameters', () => {
+            describe('variable value', () => {
+              const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{getHtml($var1, $var2)}
+</div>
+{/template}
+              `;
+
+              it('is parsed correctly', () => {});
+            });
+
+            describe('function call result', () => {
+              const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{getHtml(getParam1(), getParam2())}
+</div>
+{/template}
+              `;
+
+              it('is parsed correctly', () => {});
+            });
+
+            describe('static value', () => {
+              describe('number', () => {
+                describe('integer', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{getHtml(1, 42, -7)}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('float', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{getHtml(3.14, -2.22)}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+              });
+
+              describe('string', () => {
+                describe('single-quoted', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{getHtml('some', 'string')}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('double-quoted', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{getHtml("other", "string")}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+              });
+
+              describe('list', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{getHtml([ 2, 4, 6 ])}
+</div>
+{/template}
+              `;
+
+                it('is parsed correctly', () => {});
+              });
+
+              describe('map', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{getHtml([ "key1": 12, "key2": -2 ])}
+</div>
+{/template}
+              `;
+
+                it('is parsed correctly', () => {});
+              });
+            });
+          });
+        });
+
+        describe('object method', () => {
+          describe('without parameters', () => {
+            const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{obj1.getHtml()}
+</div>
+{/template}
+              `;
+
+            it('is parsed correctly', () => {});
+          });
+
+          describe('with parameters', () => {
+            describe('variable value', () => {
+              const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{obj1.getHtml($x, $y, $z)}
+</div>
+{/template}
+              `;
+
+              it('is parsed correctly', () => {});
+            });
+
+            describe('function call result', () => {
+              const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{obj1.getHtml(otherFunc())}
+</div>
+{/template}
+              `;
+
+              it('is parsed correctly', () => {});
+            });
+
+            describe('static value', () => {
+              describe('number', () => {
+                describe('integer', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{obj1.getHtml(-14)}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('float', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{obj1.getHtml(-3.14)}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+              });
+
+              describe('string', () => {
+                describe('single-quoted', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{obj1.getHtml('hello objects')}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+
+                describe('double-quoted', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{obj1.getHtml("hello objects")}
+</div>
+{/template}
+              `;
+
+                  it('is parsed correctly', () => {});
+                });
+              });
+
+              describe('list', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{obj1.getHtml([ 1, 2, 3] )}
+</div>
+{/template}
+              `;
+
+                it('is parsed correctly', () => {});
+              });
+
+              describe('map', () => {
+                const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{obj1.getHtml([ "elements": $elts ])}
+</div>
+{/template}
+              `;
+
+                it('is parsed correctly', () => {});
+              });
+            });
+          });
+        });
+      });
+
+      describe('template call', () => {
+        describe('from the same namespace', () => {
+          const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{call .otherTpl /}
+</div>
+{/template}
+              `;
+
+          it('is parsed correctly', () => {});
+        });
+
+        describe('from the different namespace', () => {
+          const source = `
+{namespace Something}
+
+{template .tpl}
+<div>
+{call Some.Other.Namespace.otherTpl /}
+</div>
+{/template}
+              `;
+
+          it('is parsed correctly', () => {});
         });
       });
     });
