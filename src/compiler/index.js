@@ -18,7 +18,7 @@ const compileCode = (soySource) =>
         }
     });
 
-const compileFile = (filename, { writeSoyAst = false, writeJsxAst = false, verify = false }) => {
+const compileFile = (filename, { writeSoyAst = false, writeJsxAst = false, verify = false } = {}) => {
     return new Promise((resolve, reject) => {
         fs.readFile(filename, 'utf8', (err, sample) => {
             if (err) {
