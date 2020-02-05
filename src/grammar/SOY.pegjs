@@ -1036,8 +1036,8 @@ HTMLElement
     return {
       type: "HtmlElement",
       tagName: element.tagName,
-      attributes: element.attributes || [],
-      children: element.children.filter(c => !!c) || []
+      attributes: (element.attributes || []).filter(a => !!a),
+      children: (element.children || []).filter(c => !!c)
     };
   };
 
@@ -1111,7 +1111,7 @@ PairElement
       type: "HtmlElement",
       tagName: startTag.name,
       attributes: startTag.attributes || [],
-      children: children.filter(c => !!c) || []
+      children: (children || []).filter(c => !!c)
     };
   };
 
