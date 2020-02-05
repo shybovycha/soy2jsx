@@ -23,7 +23,7 @@ if (stat.isDirectory()) {
 
         Promise
             .all(files.map(f => new Promise((resolve, reject) =>
-                compileFile(f)
+                compileFile(f, { writeJsxAst: true, writeSoyAst: true, verify: true })
                     .then(data => {
                         results.outputs.push(data);
                         resolve(results.successful.push(f));
@@ -40,7 +40,7 @@ if (stat.isDirectory()) {
             });
     });
 } else if (stat.isFile()) {
-    compileFile(process.argv[2]).then(() => process.exit(0)).catch(() => process.exit(1));
+    compileFile(process.argv[2], { writeJsxAst: true, writeSoyAst: true }).then(() => process.exit(0)).catch(() => process.exit(1));
 } else {
     console.error(`${firstArg} does not exist or is not a file or a directory`);
 }
