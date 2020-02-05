@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "compile-grammar-dev": "yarn pegjs -o ./src/grammar/SOY.js --trace --allowed-start-rules SOY ./src/grammar/SOY.pegjs ",
-    "compile-grammar": "yarn pegjs -o ./src/grammar/SOY.js --allowed-start-rules SOY ./src/grammar/SOY.pegjs ",
-    "test": "yarn jest"
+    "compile-grammar-dev": "pegjs -o ./src/grammar/SOY.js --trace --allowed-start-rules SOY ./src/grammar/SOY.pegjs ",
+    "compile-grammar": "pegjs -o ./src/grammar/SOY.js --allowed-start-rules SOY ./src/grammar/SOY.pegjs ",
+    "test": "jest",
+    "build": "npm run compile-grammar"
   },
   "author": "",
   "license": "ISC",
