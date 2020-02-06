@@ -596,9 +596,9 @@ SoyAttributeExpr
   / SoyAttributeIfOperator
   / SoyFunctionCall
   / SoyTemplateCall
-  / SoyVariableInterpolation
   / SoyAttributeGeneratorValueAttribute
-  / SoyAttributeGeneratorBooleanAttribute;
+  / SoyAttributeGeneratorBooleanAttribute
+  / SoyVariableInterpolation;
 
 SoyAttributeGeneratorValueAttribute
   = name:SoyGeneratedAttributeNamePart+ "=" value:SoyCapableString {
