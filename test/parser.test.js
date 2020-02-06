@@ -851,8 +851,8 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-                  it('is parsed correctly', () => {
-                    expect(parser.parse(source)).toMatchObject({});
+                  it('fails', () => {
+                    expect(() => parser.parse(source)).toThrow();
                   });
                 });
 
@@ -865,8 +865,8 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-                  it('is parsed correctly', () => {
-                    expect(parser.parse(source)).toMatchObject({});
+                  it('fails', () => {
+                    expect(() => parser.parse(source)).toThrow();
                   });
                 });
 
@@ -879,8 +879,8 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-                  it('is parsed correctly', () => {
-                    expect(parser.parse(source)).toMatchObject({});
+                  it('fails', () => {
+                    expect(() => parser.parse(source)).toThrow();
                   });
                 });
 
@@ -889,7 +889,7 @@ hello {$world ? $a : 42}
 {namespace Something}
 
 {template .tpl}
-  <input {'place' + 'holder'}="{'name' + 'placeholder'}" />
+  <input {$prefix + $suffix}="{$preValue + $postValue}" />
 {/template}
             `;
 
@@ -1924,7 +1924,7 @@ hello {$world ? $a : 42}
 
 {template .tpl}
   {let $info}
-    {call .message isInfo message=getMessage() }
+    {call .message isInfo message=getMessage() /}
   {/let}
 {/template}
                 `;
