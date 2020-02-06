@@ -594,11 +594,11 @@ SoyComparisonOperator
 SoyAttributeExpr
   = SoySpecialCharacter
   / SoyAttributeIfOperator
-  / SoyFunctionCall
-  / SoyTemplateCall
   / SoyAttributeGeneratorValueAttribute
   / SoyAttributeGeneratorBooleanAttribute
-  / SoyVariableInterpolation;
+  / SoyFunctionCall
+  / SoyVariableInterpolation
+  / SoyTemplateCall;
 
 SoyAttributeGeneratorValueAttribute
   = name:SoyGeneratedAttributeNamePart+ "=" value:SoyCapableString {
@@ -672,7 +672,7 @@ SoyAttributeIfOperatorOutput
   = outputs:SoyAttributeIfOperatorOutputSingle+;
 
 SoyAttributeIfOperatorOutputSingle
-  = (WS / SoySpecialCharacter)* attr:(SoySpecialCharacter / SoyFunctionCall / SoyTemplateCall / SoyAttributeGeneratorValueAttribute / SoyAttributeGeneratorBooleanAttribute / SoyVariableInterpolation / Attributes) (WS / SoySpecialCharacter)* { return attr; };
+  = (WS / SoySpecialCharacter)* attr:(SoySpecialCharacter / SoyFunctionCall / SoyTemplateCall / SoyAttributeGeneratorValueAttribute / SoyAttributeGeneratorBooleanAttribute / SoyVariableInterpolation / SoyCapableString / Identifier) (WS / SoySpecialCharacter)* { return attr; };
 
 SoyIfOperator
   = mainClause:SoyIfClause otherClauses:SoyElseifClause* otherwiseClause:SoyElseClause? SoyEndifOperator {
