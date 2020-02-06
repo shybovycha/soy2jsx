@@ -19,15 +19,28 @@ Namespace
   };
 
 TemplateDef
-  = comments:(SoyTemplateDefComment / SoyComment / BlankLine)* WS* "{template " name:TemplateName WS* attributes:Attributes? "}" WS+ body:TemplateBodyElement* "{/template}" WS* {
+  = comments:(SoyTemplateDefComment / SoyComment / BlankLine)* WS* declaration:(TemplateDeclWithoutAttributes / TemplateDeclWithAttributes) WS+ body:TemplateBodyElement* "{/template}" WS* {
     return {
       type: "Template",
       comments: (comments || []).filter(c => !!c),
-      name,
-      attributes: (attributes || []).filter(a => !!a),
+      ...declaration,
       body: (body || []).filter(e => !!e)
     };
   };
+
+TemplateDeclWithoutAttributes
+  = "{template " name:TemplateName WS* "}" {
+    return { name, attributes: [] };
+  };
+
+TemplateDeclWithAttributes
+  = "{template " name:TemplateName WS+ attributes:Attributes "}" {
+    return {
+      name,
+      attributes: (attributes || []).filter(a => !!a),
+    };
+  };
+
 
 TemplateName
   = LocalTemplateName
@@ -598,10 +611,11 @@ SoyAttributeExpr
   / SoyAttributeGeneratorBooleanAttribute
   / SoyFunctionCall
   / SoyVariableInterpolation
-  / SoyTemplateCall;
+  / SoyTemplateCall
+  / AttributeName;
 
 SoyAttributeGeneratorValueAttribute
-  = name:SoyGeneratedAttributeNamePart+ "=" value:SoyCapableString {
+  = name:SoyAttributeGeneratorAttributeName "=" value:SoyCapableString {
     return {
       type: "GeneratedAttribute",
       name,
@@ -610,7 +624,7 @@ SoyAttributeGeneratorValueAttribute
   };
 
 SoyAttributeGeneratorBooleanAttribute
-  = name:SoyGeneratedAttributeNamePart+ {
+  = name:SoyAttributeGeneratorAttributeName {
     return {
       type: "GeneratedAttribute",
       name,
@@ -620,6 +634,9 @@ SoyAttributeGeneratorBooleanAttribute
       }
     };
   };
+
+SoyAttributeGeneratorAttributeName
+  = SoyGeneratedAttributeNamePart+;
 
 SoyGeneratedAttributeNamePart
   = SoyFunctionCall
@@ -672,7 +689,7 @@ SoyAttributeIfOperatorOutput
   = outputs:SoyAttributeIfOperatorOutputSingle+;
 
 SoyAttributeIfOperatorOutputSingle
-  = (WS / SoySpecialCharacter)* attr:(SoySpecialCharacter / SoyFunctionCall / SoyTemplateCall / SoyAttributeGeneratorValueAttribute / SoyAttributeGeneratorBooleanAttribute / SoyVariableInterpolation / SoyCapableString / Identifier) (WS / SoySpecialCharacter)* { return attr; };
+  = (WS / SoySpecialCharacter)* attr:(SoyFunctionCall / SoyVariableInterpolation / SoyTemplateCall / AttributeName) (WS / SoySpecialCharacter)* { return attr; };
 
 SoyIfOperator
   = mainClause:SoyIfClause otherClauses:SoyElseifClause* otherwiseClause:SoyElseClause? SoyEndifOperator {
@@ -981,7 +998,7 @@ SingleAttribute
   };
 
 MultipleAttributes
-  = WS* first:SoyAttributeExpr WS* rest:Attributes WS* {
+  = WS* first:SoyAttributeExpr WS+ rest:Attributes WS* {
     return [ first ].concat(rest);
   };
 

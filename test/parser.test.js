@@ -144,11 +144,11 @@ describe('parser', () => {
       });
 
       describe('template name', () => {
-        describe('which is valid', () => {
+        describe('which is valid full path', () => {
           const source = `
 {namespace Something}
 
-{template .tem.pla.te}
+{template Other.Namespace.Tem.Pla.te}
 {/template}
             `;
 
@@ -158,6 +158,19 @@ describe('parser', () => {
         });
 
         describe('which is invalid because', () => {
+          describe('it has invalid namespace path', () => {
+            const source = `
+{namespace Something}
+
+{template .wrong.Tem.Pla.te}
+{/template}
+            `;
+
+            it('fails', () => {
+              expect(() => parser.parse(source)).toThrow();
+            });
+          });
+
           describe('it contains multiple consequitive dots', () => {
             const source = `
 {namespace Something}
@@ -673,8 +686,8 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-                  it('is parsed correctly', () => {
-                    expect(parser.parse(source)).toMatchObject({});
+                  it('fails', () => {
+                    expect(() => parser.parse(source)).toThrow();
                   });
                 });
 
@@ -713,12 +726,12 @@ hello {$world ? $a : 42}
 {namespace Something}
 
 {template .tpl}
-  <input {'dis' + 'a' + 'bled'} />
+  <input {$dis + $a + $bled} />
 {/template}
             `;
 
-                  it('is parsed correctly', () => {
-                    expect(parser.parse(source)).toMatchObject({});
+                  it('fails', () => {
+                    expect(() => parser.parse(source)).toThrow();
                   });
                 });
               });
@@ -792,8 +805,8 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-                    it('is parsed correctly', () => {
-                      expect(parser.parse(source)).toMatchObject({});
+                    it('fails', () => {
+                      expect(() => parser.parse(source)).toThrow();
                     });
                   });
 
@@ -806,8 +819,8 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-                    it('is parsed correctly', () => {
-                      expect(parser.parse(source)).toMatchObject({});
+                    it('fails', () => {
+                      expect(() => parser.parse(source)).toThrow();
                     });
                   });
                 });
