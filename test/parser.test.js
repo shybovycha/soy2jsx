@@ -821,8 +821,8 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-                  it('is parsed correctly', () => {
-                    expect(parser.parse(source)).toMatchObject({});
+                  it('fails', () => {
+                    expect(() => parser.parse(source)).toThrow();
                   });
                 });
               });
@@ -833,12 +833,26 @@ hello {$world ? $a : 42}
 {namespace Something}
 
 {template .tpl}
-  <input {$placeholder}={$name} />
+  <input {$placeholder}="{$name}" />
 {/template}
             `;
 
                   it('is parsed correctly', () => {
                     expect(parser.parse(source)).toMatchObject({});
+                  });
+                });
+
+                describe('from interpolating a variable outside a string', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+  <input {$placeholder}={$name} />
+{/template}
+            `;
+
+                  it('fails', () => {
+                    expect(() => parser.parse(source)).toThrow();
                   });
                 });
 
@@ -903,12 +917,12 @@ hello {$world ? $a : 42}
 {namespace Something}
 
 {template .tpl}
-  <input {$prefix + $suffix}="{$preValue+$postValue}" />
+  <input {$attrName}="{$preValue + $postValue}" />
 {/template}
             `;
 
-                  it('is parsed correctly', () => {
-                    expect(parser.parse(source)).toMatchObject({});
+                  it('fails', () => {
+                    expect(() => parser.parse(source)).toThrow();
                   });
                 });
 
