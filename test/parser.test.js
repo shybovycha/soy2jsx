@@ -777,8 +777,8 @@ hello {$world ? $a : 42}
 {/template}
             `;
 
-                  it('is parsed correctly', () => {
-                    expect(parser.parse(source)).toMatchObject({});
+                  it('fails', () => {
+                    expect(() => parser.parse(source)).toThrow();
                   });
                 });
 
