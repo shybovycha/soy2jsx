@@ -884,12 +884,40 @@ hello {$world ? $a : 42}
                   });
                 });
 
-                describe('from math expression', () => {
+                describe('from math expression as name', () => {
                   const source = `
 {namespace Something}
 
 {template .tpl}
-  <input {$prefix + $suffix}="{$preValue + $postValue}" />
+  <input {$prefix + $suffix}="{$preValue}" />
+{/template}
+            `;
+
+                  it('fails', () => {
+                    expect(() => parser.parse(source)).toThrow();
+                  });
+                });
+
+                describe('from math expression as value', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+  <input {$prefix + $suffix}="{$preValue+$postValue}" />
+{/template}
+            `;
+
+                  it('is parsed correctly', () => {
+                    expect(parser.parse(source)).toMatchObject({});
+                  });
+                });
+
+                describe('from string interpolation as value', () => {
+                  const source = `
+{namespace Something}
+
+{template .tpl}
+  <input {$attrName}="{$attrPreValue}-value" />
 {/template}
             `;
 
