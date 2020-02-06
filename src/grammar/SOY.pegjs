@@ -672,7 +672,7 @@ SoyAttributeIfOperatorOutput
   = outputs:SoyAttributeIfOperatorOutputSingle+;
 
 SoyAttributeIfOperatorOutputSingle
-  = (WS / SoySpecialCharacter)* attr:SoyAttributeExpr (WS / SoySpecialCharacter)* { return attr; };
+  = (WS / SoySpecialCharacter)* attr:(SoySpecialCharacter / SoyFunctionCall / SoyTemplateCall / SoyAttributeGeneratorValueAttribute / SoyAttributeGeneratorBooleanAttribute / SoyVariableInterpolation / Attributes) (WS / SoySpecialCharacter)* { return attr; };
 
 SoyIfOperator
   = mainClause:SoyIfClause otherClauses:SoyElseifClause* otherwiseClause:SoyElseClause? SoyEndifOperator {
