@@ -1,16 +1,22 @@
 # soy2jsx converter
 
+![Build status](https://github.com/shybovycha/soy2jsx/workflows/Build/badge.svg)
+
 ## Overview
 
 The goal of this small utility is to automatically convert SOY (Google Closure Template) files to JSX files.
-By now it only supports parsing SOY syntax in most of its features (so far I've reached 194 / 284 successful conversions over JSDS codebase).
+
+By now it only supports parsing SOY syntax in most of its features.
 
 ## Usage
 
 Compile parser: `npm run-script compile-grammar`
+
 Run parser against single file: `node index.js FILENAME.SOY`
-Run parser agains a directory (this command will ignore files in `sdmakehome` and `target/classes/*` directories on any level; this was made to simplify JSDS codebase testing): `node index.js DIRECTORY`
+
+Run parser against a directory: `node index.js DIRECTORY`
 
 ## TODO
 
-1. fix generator
+1. complete the tests
+2. fix optimizer
